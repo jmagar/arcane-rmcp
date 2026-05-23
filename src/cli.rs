@@ -1,4 +1,4 @@
-//! CLI — thin shim that parses args, calls `ExampleService`, formats output.
+//! CLI — thin shim that parses args, calls `ArcaneService`, formats output.
 //!
 //! The CLI uses the same service layer as the MCP server. No business logic lives here.
 //!
@@ -7,14 +7,13 @@
 //! # Usage
 //!
 //! ```text
-//! example greet --name Alice
-//! example echo --message "Hello!"
-//! example status
-//! example doctor [--json]
+//! rustcane call --action container --subaction list --env-id env-abc
+//! rustcane status
+//! rustcane doctor [--json]
 //! ```
 
 use crate::{
-    actions::rest_help, app::ExampleService, config::ExampleConfig, example::ExampleClient,
+    actions::ArcaneAction, app::ArcaneService, arcane::ArcaneClient, config::ArcaneConfig,
 };
 use anyhow::{anyhow, Result};
 
@@ -27,29 +26,28 @@ pub mod watch;
 pub use setup::{run_setup, SetupCommand};
 
 pub const USAGE: &str = "Usage:
-  example [serve]          Start MCP HTTP server (default)
-  example mcp              Start MCP stdio transport
+  rustcane [serve]          Start MCP HTTP server (default)
+  rustcane mcp              Start MCP stdio transport
 
-  example greet [--name NAME]       Greet NAME (or the world)
-  example echo --message MSG        Echo MSG back
-  example status                    Show server status
-  example help                      Show JSON action reference
-  example doctor [--json]           Run environment pre-flight checks
-  example watch [--url URL] [--interval N]  Poll /health and emit on state change
-  example setup check               Check plugin setup without mutating appdata
-  example setup repair              Create missing appdata/env setup files
-  example setup plugin-hook [--no-repair]  Plugin hook JSON contract
+  rustcane call --action ACTION [--subaction SUB] [--env-id ENV] [--id ID] [--params-json JSON] [--confirm]
+  rustcane status                    Show local server status
+  rustcane help [--domain DOMAIN]    Show JSON action reference
+  rustcane doctor [--json]           Run environment pre-flight checks
+  rustcane watch [--url URL] [--interval N]  Poll /health and emit on state change
+  rustcane setup check               Check plugin setup without mutating appdata
+  rustcane setup repair              Create missing appdata/env setup files
+  rustcane setup plugin-hook [--no-repair]  Plugin hook JSON contract
 
-  example --help                    Show this help
-  example --version                 Show version
+  rustcane --help                    Show this help
+  rustcane --version                 Show version
 
 Environment:
-  EXAMPLE_API_URL          Upstream service URL
-  EXAMPLE_API_KEY          Upstream service API key
-  EXAMPLE_MCP_HOST         Bind host (default 127.0.0.1)
-  EXAMPLE_MCP_PORT         Bind port (default 40060)
-  EXAMPLE_MCP_NO_AUTH      Disable auth (loopback only)
-  EXAMPLE_MCP_TOKEN        Static bearer token
+  RUSTCANE_API_URL          Upstream service URL
+  RUSTCANE_API_KEY          Upstream service API key
+  RUSTCANE_MCP_HOST         Bind host (default 127.0.0.1)
+  RUSTCANE_MCP_PORT         Bind port (default 40060)
+  RUSTCANE_MCP_NO_AUTH      Disable auth (loopback only)
+  RUSTCANE_MCP_TOKEN        Static bearer token
   RUST_LOG                 Log filter (e.g. info,rmcp=warn)";
 
 pub fn usage() -> &'static str {
@@ -58,14 +56,17 @@ pub fn usage() -> &'static str {
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum Command {
-    Greet {
-        name: Option<String>,
-    },
-    Echo {
-        message: String,
+    Call {
+        action: String,
+        subaction: Option<String>,
+        env_id: Option<String>,
+        id: Option<String>,
+        params: serde_json::Value,
     },
     Status,
-    Help,
+    Help {
+        domain: Option<String>,
+    },
     /// Pre-flight environment validation (§48).
     ///
     /// TEMPLATE: Always keep this command. It is the operator's first stop
@@ -79,7 +80,7 @@ pub enum Command {
     /// Designed to be run as a plugin monitor — stdout is the event stream,
     /// stderr is debug output. Exits only on CTRL+C.
     Watch {
-        /// Base URL of the MCP server (default: http://localhost:{EXAMPLE_MCP_PORT}).
+        /// Base URL of the MCP server (default: http://localhost:{RUSTCANE_MCP_PORT}).
         url: Option<String>,
         /// Poll interval in seconds (default: 10).
         interval: u64,
@@ -112,27 +113,17 @@ where
     let command = match args.as_slice() {
         [] => None,
         [subcommand, rest @ ..] => match subcommand.as_str() {
-            "greet" => {
-                let name = parse_optional_value_flag(rest, "greet", "--name")?;
-                Some(Command::Greet { name })
-            }
-            "echo" => {
-                let message = parse_required_value_flag(rest, "echo", "--message")?
-                    .filter(|m| !m.is_empty())
-                    .ok_or_else(|| anyhow!("echo requires non-empty --message"))?;
-                Some(Command::Echo { message })
-            }
+            "call" => Some(parse_call_flags(rest)?),
             "status" => {
                 reject_args(rest, "status")?;
                 Some(Command::Status)
             }
-            "help" => {
-                reject_args(rest, "help")?;
-                Some(Command::Help)
-            }
+            "help" => Some(Command::Help {
+                domain: parse_optional_value_flag(rest, "help", "--domain")?,
+            }),
             // §48: doctor is always parsed here, dispatched via run_cli in main.rs.
             // TEMPLATE: Keep this arm. It routes to doctor::run_doctor() which needs
-            //           the full Config (not just ExampleConfig), so main.rs handles it.
+            //           the full Config (not just ArcaneConfig), so main.rs handles it.
             "doctor" => {
                 let json = parse_bool_flag(rest, "doctor", "--json")?;
                 Some(Command::Doctor { json })
@@ -177,17 +168,42 @@ where
 ///
 /// # TEMPLATE
 /// - `Doctor` is handled specially in `main.rs::run_cli` (needs full `Config`).
-/// - All other commands get only `ExampleConfig`; keep it that way.
+/// - All other commands get only `ArcaneConfig`; keep it that way.
 /// - Add `--json` support to each new command by forwarding a `json` flag.
-pub async fn run(cmd: Command, cfg: &ExampleConfig) -> Result<()> {
-    let client = ExampleClient::new(cfg)?;
-    let service = ExampleService::new(client);
+pub async fn run(cmd: Command, cfg: &ArcaneConfig) -> Result<()> {
+    let client = ArcaneClient::new(cfg)?;
+    let service = ArcaneService::new(client);
 
     let result = match &cmd {
-        Command::Greet { name } => service.greet(name.as_deref()).await?,
-        Command::Echo { message } => service.echo(message).await?,
         Command::Status => service.status().await?,
-        Command::Help => rest_help(),
+        Command::Help { domain } => {
+            service
+                .dispatch(&ArcaneAction {
+                    action: "help".into(),
+                    subaction: domain.clone(),
+                    env_id: None,
+                    id: None,
+                    params: serde_json::json!({}),
+                })
+                .await?
+        }
+        Command::Call {
+            action,
+            subaction,
+            env_id,
+            id,
+            params,
+        } => {
+            service
+                .dispatch(&ArcaneAction {
+                    action: action.clone(),
+                    subaction: subaction.clone(),
+                    env_id: env_id.clone(),
+                    id: id.clone(),
+                    params: params.clone(),
+                })
+                .await?
+        }
         // Doctor, Watch, and Setup are never dispatched via this function — main.rs
         // handles them directly because they need config.mcp fields.
         Command::Doctor { .. } | Command::Watch { .. } | Command::Setup(_) => {
@@ -250,11 +266,62 @@ fn parse_optional_value_flag(args: &[String], command: &str, flag: &str) -> Resu
     }
 }
 
-fn parse_required_value_flag(args: &[String], command: &str, flag: &str) -> Result<Option<String>> {
-    match parse_optional_value_flag(args, command, flag)? {
-        Some(value) => Ok(Some(value)),
-        None => Ok(None),
+fn parse_call_flags(args: &[String]) -> Result<Command> {
+    let mut action = None;
+    let mut subaction = None;
+    let mut env_id = None;
+    let mut id = None;
+    let mut params = serde_json::json!({});
+    let mut confirm = false;
+    let mut index = 0;
+
+    while index < args.len() {
+        match args[index].as_str() {
+            "--action" => action = Some(required_next(args, &mut index, "--action")?),
+            "--subaction" => subaction = Some(required_next(args, &mut index, "--subaction")?),
+            "--env-id" => env_id = Some(required_next(args, &mut index, "--env-id")?),
+            "--id" => id = Some(required_next(args, &mut index, "--id")?),
+            "--params-json" => {
+                let raw = required_next(args, &mut index, "--params-json")?;
+                params = serde_json::from_str(&raw)
+                    .map_err(|err| anyhow!("--params-json must be valid JSON object: {err}"))?;
+                if !params.is_object() {
+                    return Err(anyhow!("--params-json must be a JSON object"));
+                }
+            }
+            "--confirm" => {
+                confirm = true;
+                index += 1;
+            }
+            other => return Err(anyhow!("call does not accept argument `{other}`")),
+        }
     }
+
+    if confirm {
+        params
+            .as_object_mut()
+            .expect("params starts as object and parser enforces object")
+            .insert("confirm".into(), serde_json::Value::Bool(true));
+    }
+
+    Ok(Command::Call {
+        action: action.ok_or_else(|| anyhow!("call requires --action"))?,
+        subaction,
+        env_id,
+        id,
+        params,
+    })
+}
+
+fn required_next(args: &[String], index: &mut usize, flag: &str) -> Result<String> {
+    let Some(value) = args.get(*index + 1) else {
+        return Err(anyhow!("call requires a value after {flag}"));
+    };
+    if value.starts_with("--") {
+        return Err(anyhow!("call requires a value after {flag}"));
+    }
+    *index += 2;
+    Ok(value.clone())
 }
 
 fn parse_watch_flags(args: &[String]) -> Result<(Option<String>, Option<String>)> {

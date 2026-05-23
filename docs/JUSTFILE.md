@@ -2,7 +2,7 @@
 title: "Justfile"
 doc_type: "guide"
 status: "active"
-owner: "rmcp-template"
+owner: "rustcane"
 audience:
   - "contributors"
   - "agents"
@@ -19,10 +19,10 @@ last_reviewed: "2026-05-15"
 
 | Recipe | Purpose |
 |---|---|
-| `just dev` | Run HTTP MCP server on loopback in no-auth dev mode (`EXAMPLE_MCP_NO_AUTH=true`). |
-| `just mcp` | Run stdio MCP transport (`example mcp`). |
+| `just dev` | Run HTTP MCP server on loopback in no-auth dev mode (`RUSTCANE_MCP_NO_AUTH=true`). |
+| `just mcp` | Run stdio MCP transport (`rustcane mcp`). |
 | `just greet` | Quick CLI smoke test. |
-| `just doctor` | Pre-flight environment/connectivity checks (`example doctor`). |
+| `just doctor` | Pre-flight environment/connectivity checks (`rustcane doctor`). |
 | `just build` / `just build-release` | Debug/release Rust builds. |
 | `just build-web` | Build static Next.js web assets (`apps/web/out`). |
 | `just build-full` | Build web assets then release binary (CI use). |
@@ -80,28 +80,28 @@ refresh-docs-dry:       bash scripts/refresh-docs.sh --dry-run
 ## Doctor output
 
 ```
-$ example doctor
+$ rustcane doctor
 
-example-mcp v0.1.0 — environment check
+rustcane-mcp v0.1.0 — environment check
 
   Config
   ──────────────────────────────────────────
-  ✓ Config file:       ~/.example/config.toml
-  ✓ Data directory:    ~/.example/ (writable)
-  ✓ Binary in PATH:    /home/user/.local/bin/example
+  ✓ Config file:       ~/.rustcane/config.toml
+  ✓ Data directory:    ~/.rustcane/ (writable)
+  ✓ Binary in PATH:    /home/user/.local/bin/rustcane
 
   Service credentials
   ──────────────────────────────────────────
-  ✓ EXAMPLE_API_URL:   https://example.internal/api (set)
-  ✗ EXAMPLE_API_KEY:   not set
-    → Set EXAMPLE_API_KEY in ~/.example/.env
+  ✓ RUSTCANE_API_URL:   https://rustcane.internal/api (set)
+  ✗ RUSTCANE_API_KEY:   not set
+    → Set RUSTCANE_API_KEY in ~/.rustcane/.env
 
   Connectivity
   ──────────────────────────────────────────
-  ✓ Upstream reachable: https://example.internal/api → 200 OK (42 ms)
+  ✓ Upstream reachable: https://rustcane.internal/api → 200 OK (42 ms)
 
   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  1 issue found. Fix it before running: example serve
+  1 issue found. Fix it before running: rustcane serve
 ```
 
 Exit code 0 = ready. Exit code 1 = issues found.

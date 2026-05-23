@@ -41,12 +41,12 @@ pnpm validate   # Biome check + typecheck + tests + static build
 
 All API calls go through `lib/api.ts`. Template-facing service names, endpoints, and action metadata live in `lib/template.ts` so a scaffolded project has one obvious place to update the web UI.
 
-By default, the base URL is empty (relative) — the Rust server serves both the static files and the API from the same origin, so no CORS configuration is needed. For local `pnpm dev` against a separately running backend, copy `.env.example` to `.env.local` and set `NEXT_PUBLIC_EXAMPLE_API_BASE_URL` (for example, `http://localhost:3100`).
+By default, the base URL is empty (relative) — the Rust server serves both the static files and the API from the same origin, so no CORS configuration is needed. For local `pnpm dev` against a separately running backend, copy `.env.rustcane` to `.env.local` and set `NEXT_PUBLIC_RUSTCANE_API_BASE_URL` (for rustcane, `http://localhost:3100`).
 
 Every action is dispatched as:
 
 ```
-POST /v1/example
+POST /v1/rustcane
 { "action": "<action>", "params": { ... } }
 ```
 
@@ -116,5 +116,5 @@ When adapting for a real service:
 1. For application/platform servers, update `WEB_APP_CONFIG` in `lib/template.ts` with your service name, display name, endpoints, and env var prefix.
 2. Update `ACTIONS` in `lib/template.ts` to match your service's actions, parameters, scopes, and examples.
 3. Update `lib/api.ts` helper functions and response interfaces to match your service's action result shapes.
-4. Replace `NEXT_PUBLIC_EXAMPLE_API_BASE_URL` in `.env.example` and docs with your service-specific public env var name.
+4. Replace `NEXT_PUBLIC_RUSTCANE_API_BASE_URL` in `.env.rustcane` and docs with your service-specific public env var name.
 5. Run `pnpm validate` before committing the scaffolded web app.

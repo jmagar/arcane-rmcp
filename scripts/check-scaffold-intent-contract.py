@@ -70,7 +70,7 @@ def validate_schema() -> None:
     schema = load_json(SCHEMA)
     require(isinstance(schema, dict), f"{SCHEMA}: schema root must be an object")
     require(schema.get("$schema") == "https://json-schema.org/draft/2020-12/schema", f"{SCHEMA}: expected JSON Schema draft 2020-12")
-    require(schema.get("properties", {}).get("kind", {}).get("const") == "rmcp_template_scaffold_intent", f"{SCHEMA}: kind const drifted")
+    require(schema.get("properties", {}).get("kind", {}).get("const") == "rustcane_scaffold_intent", f"{SCHEMA}: kind const drifted")
     required = set(schema.get("required", []))
     expected_required = {
         "kind",
@@ -117,7 +117,7 @@ def validate_payload(payload: object, source: Path) -> None:
     }
     require_keys(payload, str(source), root_keys)
     require_no_extra(payload, str(source), root_keys)
-    require(payload["kind"] == "rmcp_template_scaffold_intent", f"{source}: invalid kind")
+    require(payload["kind"] == "rustcane_scaffold_intent", f"{source}: invalid kind")
     require(payload["schema_version"] == 1, f"{source}: invalid schema_version")
 
     category = payload["server_category"]
@@ -189,8 +189,8 @@ def main() -> int:
         validate_schema()
         examples = sorted(EXAMPLES.glob("scaffold-intent-*.json"))
         require(bool(examples), f"{EXAMPLES}: no scaffold intent examples found")
-        for example in examples:
-            validate_payload(load_json(example), example)
+        for rustcane in examples:
+            validate_payload(load_json(rustcane), rustcane)
     except AssertionError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1

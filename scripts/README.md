@@ -54,7 +54,7 @@ Checks files for unexpected non-ASCII characters. A small allowlist covers inten
 bash scripts/block-env-commits.sh
 ```
 
-Pre-commit guard that rejects staged `.env`, `.env.local`, `.env.prod`, etc. `.env.example` is allowed.
+Pre-commit guard that rejects staged `.env`, `.env.local`, `.env.prod`, etc. `.env.rustcane` is allowed.
 
 ### `bump-version.sh`
 
@@ -116,7 +116,7 @@ just openapi
 just openapi-check
 ```
 
-Generates `docs/generated/openapi.json` for the template REST API surface: `GET /health`, `GET /status`, and `POST /v1/example`. The action enum is derived from `src/actions.rs` and excludes MCP-only actions such as `scaffold_intent`.
+Generates `docs/generated/openapi.json` for the template REST API surface: `GET /health`, `GET /status`, and `POST /v1/rustcane`. The action enum is derived from `src/actions.rs` and excludes MCP-only actions such as `scaffold_intent`.
 
 ### `check-scaffold-intent-contract.py`
 
@@ -140,7 +140,7 @@ Audits plugin setup hooks across known Rust MCP servers. Without `--execute`, it
 
 ```bash
 scripts/check-runtime-current.sh
-scripts/check-runtime-current.sh --mode systemd --expected-binary target/release/example
+scripts/check-runtime-current.sh --mode systemd --expected-binary target/release/rustcane
 scripts/check-runtime-current.sh --mode docker --pull --compose-dir .
 just runtime-current
 ```
@@ -179,7 +179,7 @@ Validates that version-bearing files agree. Missing `CHANGELOG.md` entries are w
 ### `generate-cli.sh`
 
 ```bash
-EXAMPLE_MCP_TOKEN=... bash scripts/generate-cli.sh
+RUSTCANE_MCP_TOKEN=... bash scripts/generate-cli.sh
 just generate-cli
 ```
 
@@ -236,7 +236,7 @@ bash scripts/repair.sh
 just repair
 ```
 
-Stops, rebuilds, and restarts the `example-mcp` service. Detects the active service manager automatically: prefers a systemd user unit (`example-mcp.service`), falls back to Docker Compose. Useful after an in-place binary update without a full `docker compose build`.
+Stops, rebuilds, and restarts the `rustcane-mcp` service. Detects the active service manager automatically: prefers a systemd user unit (`rustcane-mcp.service`), falls back to Docker Compose. Useful after an in-place binary update without a full `docker compose build`.
 
 ### `run-ascii-check.sh`
 
@@ -260,7 +260,7 @@ Copies `Cargo.lock` from `CLAUDE_PLUGIN_ROOT` to `CLAUDE_PLUGIN_DATA` when neede
 ### `test-mcp-auth.sh`
 
 ```bash
-EXAMPLE_MCP_TOKEN=... scripts/test-mcp-auth.sh
+RUSTCANE_MCP_TOKEN=... scripts/test-mcp-auth.sh
 scripts/test-mcp-auth.sh --url http://localhost:3100/mcp --token ...
 scripts/test-mcp-auth.sh --check-x-api-key
 ```
@@ -289,7 +289,7 @@ Watches `apps/web/` for changes and rebuilds on save using `watchexec`. Ignores 
 
 ```bash
 scripts/validate-plugin-layout.sh
-PLUGIN_ROOT=plugins/example scripts/validate-plugin-layout.sh
+PLUGIN_ROOT=plugins/rustcane scripts/validate-plugin-layout.sh
 just validate-plugin
 ```
 

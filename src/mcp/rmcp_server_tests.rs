@@ -46,8 +46,13 @@ fn read_scope_does_not_satisfy_write() {
 }
 
 #[test]
-fn greet_requires_read_scope() {
-    assert_eq!(required_scope_for_action("greet"), Some(READ_SCOPE));
+fn status_requires_read_scope() {
+    assert_eq!(required_scope_for_action("status"), Some(READ_SCOPE));
+}
+
+#[test]
+fn container_requires_write_scope_because_domain_has_mutating_actions() {
+    assert_eq!(required_scope_for_action("container"), Some(WRITE_SCOPE));
 }
 
 #[test]
@@ -68,7 +73,7 @@ fn unknown_action_gets_deny_scope() {
 fn unknown_action_is_rejected_as_validation_before_scope() {
     let error = reject_unknown_action_before_scope("nonexistent_action")
         .expect_err("unknown action should be invalid params");
-    assert!(error.message.contains("unknown example action"));
+    assert!(error.message.contains("unknown rustcane action"));
 }
 
 #[test]

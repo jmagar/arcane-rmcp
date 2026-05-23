@@ -16,29 +16,12 @@ fn schema_action_enum_comes_from_action_metadata() {
 }
 
 #[test]
-fn echo_message_schema_requires_non_empty_string() {
-    let tools = tool_definitions();
-    assert_eq!(
-        tools[0]["inputSchema"]["properties"]["message"]["minLength"],
-        1
-    );
-}
-
-#[test]
-fn schema_conditionally_requires_echo_message() {
-    let tools = tool_definitions();
-    let all_of = tools[0]["inputSchema"]["allOf"]
-        .as_array()
-        .expect("schema should include conditional action validation");
-    assert!(
-        all_of.iter().any(
-            |entry| entry["if"]["properties"]["action"]["const"] == "echo"
-                && entry["then"]["required"]
-                    .as_array()
-                    .is_some_and(|required| required.iter().any(|field| field == "message"))
-        ),
-        "echo action must conditionally require message"
-    );
+fn schema_exposes_arcane_dispatch_fields() {
+    let schema = &tool_definitions()[0]["inputSchema"]["properties"];
+    assert_eq!(schema["subaction"]["type"], "string");
+    assert_eq!(schema["envId"]["type"], "string");
+    assert_eq!(schema["id"]["type"], "string");
+    assert_eq!(schema["params"]["type"], "object");
 }
 
 #[test]

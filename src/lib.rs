@@ -1,22 +1,22 @@
-//! `rmcp-template` library crate.
+//! `rustcane` library crate.
 //!
 //! Exposes the service layer, config, and transport client so that integration
 //! tests can import them without duplicating state construction.
 //!
 //! Public modules:
-//!   [`app`]     — `ExampleService` (business logic)
-//!   [`config`]  — `Config`, `ExampleConfig`, `McpConfig`
-//!   [`example`] — `ExampleClient` (transport stub)
+//!   [`app`]     — `ArcaneService` (business logic)
+//!   [`config`]  — `Config`, `ArcaneConfig`, `McpConfig`
+//!   `arcane` — `ArcaneClient` (transport stub)
 //!   [`mcp`]     — MCP protocol layer (tools, schemas, prompts, server handler)
 //!   [`server`]  — `AppState`, `AuthPolicy`, HTTP router
-//!   [`api`]     — REST API handlers (`POST /v1/example`, health, status)
+//!   [`api`]     — REST API handlers (`POST /v1/rustcane`, health, status)
 
 pub mod actions;
 pub mod api;
 pub mod app;
+pub mod arcane;
 pub mod cli;
 pub mod config;
-pub mod example;
 pub mod logging;
 pub mod mcp;
 pub mod server;
@@ -32,19 +32,19 @@ pub mod testing {
     use std::sync::Arc;
 
     use crate::{
-        app::ExampleService,
-        config::{ExampleConfig, McpConfig},
-        example::ExampleClient,
+        app::ArcaneService,
+        arcane::ArcaneClient,
+        config::{ArcaneConfig, McpConfig},
         server::{AppState, AuthPolicy},
     };
 
-    fn stub_service() -> ExampleService {
-        let client = ExampleClient::new(&ExampleConfig {
+    fn stub_service() -> ArcaneService {
+        let client = ArcaneClient::new(&ArcaneConfig {
             api_url: "http://localhost:1/stub".into(),
             api_key: "test".into(),
         })
         .expect("stub client should always build");
-        ExampleService::new(client)
+        ArcaneService::new(client)
     }
 
     /// `AppState` with no auth (loopback trust boundary).
@@ -75,7 +75,7 @@ pub mod testing {
         AppState {
             config: McpConfig {
                 auth: crate::config::AuthConfig {
-                    public_url: Some("https://example.example.com".to_string()),
+                    public_url: Some("https://rustcane.rustcane.com".to_string()),
                     ..Default::default()
                 },
                 ..McpConfig::default()
@@ -89,41 +89,41 @@ pub mod testing {
 
     pub async fn build_auth_state(data_dir: &std::path::Path) -> lab_auth::state::AuthState {
         let vars: Vec<(String, String)> = vec![
-            ("EXAMPLE_MCP_AUTH_MODE".into(), "oauth".into()),
+            ("RUSTCANE_MCP_AUTH_MODE".into(), "oauth".into()),
             (
-                "EXAMPLE_MCP_PUBLIC_URL".into(),
-                "https://example.example.com".into(),
+                "RUSTCANE_MCP_PUBLIC_URL".into(),
+                "https://rustcane.rustcane.com".into(),
             ),
             (
-                "EXAMPLE_MCP_GOOGLE_CLIENT_ID".into(),
+                "RUSTCANE_MCP_GOOGLE_CLIENT_ID".into(),
                 "test-client-id".into(),
             ),
             (
-                "EXAMPLE_MCP_GOOGLE_CLIENT_SECRET".into(),
+                "RUSTCANE_MCP_GOOGLE_CLIENT_SECRET".into(),
                 "test-client-secret".into(),
             ),
             (
-                "EXAMPLE_MCP_AUTH_ADMIN_EMAIL".into(),
-                "admin@example.com".into(),
+                "RUSTCANE_MCP_AUTH_ADMIN_EMAIL".into(),
+                "admin@rustcane.com".into(),
             ),
             (
-                "EXAMPLE_MCP_AUTH_SQLITE_PATH".into(),
+                "RUSTCANE_MCP_AUTH_SQLITE_PATH".into(),
                 data_dir.join("auth.db").display().to_string(),
             ),
             (
-                "EXAMPLE_MCP_AUTH_KEY_PATH".into(),
+                "RUSTCANE_MCP_AUTH_KEY_PATH".into(),
                 data_dir.join("auth-jwt.pem").display().to_string(),
             ),
         ];
 
         let auth_config = lab_auth::config::AuthConfigBuilder::new()
-            .env_prefix("EXAMPLE_MCP")
+            .env_prefix("RUSTCANE_MCP")
             .session_cookie_name("example_mcp_session")
             .scopes_supported(vec![
                 crate::actions::READ_SCOPE.into(),
                 crate::actions::WRITE_SCOPE.into(),
             ])
-            .default_scope("example:read")
+            .default_scope("rustcane:read")
             .resource_path("/mcp")
             .build_from_sources(vars)
             .expect("test auth config should build");

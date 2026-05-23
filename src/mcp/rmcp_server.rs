@@ -1,11 +1,11 @@
-//! `ExampleRmcpServer` — the `ServerHandler` implementation.
+//! `ArcaneRmcpServer` — the `ServerHandler` implementation.
 //!
 //! This is the adapter between the rmcp crate and your application. It:
 //!   - Advertises tools, resources, and prompts to MCP clients
 //!   - Enforces auth scopes on every call
-//!   - Delegates business logic to `tools.rs` → `app.rs` → `example.rs`
+//!   - Delegates business logic to `tools.rs` → `app.rs` → `rustcane.rs`
 //!
-//! **Template**: rename `ExampleRmcpServer`. Update action metadata in
+//! **Template**: rename `ArcaneRmcpServer`. Update action metadata in
 //! `src/actions.rs` to keep schemas, scope rules, and dispatch in sync.
 
 use std::{borrow::Cow, sync::Arc, time::Instant};
@@ -35,15 +35,15 @@ use super::{prompts, schemas::tool_definitions, tools::execute_tool};
 // ── server ────────────────────────────────────────────────────────────────────
 
 #[derive(Clone)]
-pub struct ExampleRmcpServer {
+pub struct ArcaneRmcpServer {
     state: AppState,
 }
 
-pub fn rmcp_server(state: AppState) -> ExampleRmcpServer {
-    ExampleRmcpServer { state }
+pub fn rmcp_server(state: AppState) -> ArcaneRmcpServer {
+    ArcaneRmcpServer { state }
 }
 
-impl ServerHandler for ExampleRmcpServer {
+impl ServerHandler for ArcaneRmcpServer {
     // ── tools ─────────────────────────────────────────────────────────────────
 
     async fn list_tools(
@@ -209,14 +209,14 @@ impl ServerHandler for ExampleRmcpServer {
 
 // ── resource definitions ──────────────────────────────────────────────────────
 
-/// URI for the schema resource. **Template**: change `example` to your service name.
-const SCHEMA_RESOURCE_URI: &str = "example://schema/mcp-tool";
+/// URI for the schema resource. **Template**: change `rustcane` to your service name.
+const SCHEMA_RESOURCE_URI: &str = "rustcane://schema/mcp-tool";
 
 fn schema_resource() -> Resource {
     Resource::new(
-        RawResource::new(SCHEMA_RESOURCE_URI, "example tool schema")
+        RawResource::new(SCHEMA_RESOURCE_URI, "rustcane tool schema")
             .with_description(
-                "JSON schema for the example MCP tool and its action-based parameters",
+                "JSON schema for the rustcane MCP tool and its action-based parameters",
             )
             .with_mime_type("application/json"),
         None,

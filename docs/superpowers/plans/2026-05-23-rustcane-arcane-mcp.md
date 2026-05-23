@@ -4,7 +4,7 @@
 
 **Goal:** Build `rustcane`, a Rust rmcp MCP server and CLI for Arcane Docker management.
 
-**Architecture:** Start from `rmcp-template`, rename the scaffold to rustcane, and keep the upstream-client shape: `src/arcane.rs` owns HTTP calls, `src/app.rs` owns action validation/confirmation/dispatch, and `src/mcp/tools.rs` plus `src/cli.rs` only parse and delegate. Use a centralized action table so MCP schema, CLI validation, scopes, help, and dispatch stay aligned.
+**Architecture:** Start from `rustcane`, rename the scaffold to rustcane, and keep the upstream-client shape: `src/arcane.rs` owns HTTP calls, `src/app.rs` owns action validation/confirmation/dispatch, and `src/mcp/tools.rs` plus `src/cli.rs` only parse and delegate. Use a centralized action table so MCP schema, CLI validation, scopes, help, and dispatch stay aligned.
 
 **Tech Stack:** Rust, rmcp, axum, reqwest, serde_json, clap, tokio, wiremock, cargo test/clippy/fmt.
 
@@ -20,23 +20,23 @@
 ## File Map
 
 - Modify: `Cargo.toml`, `Cargo.lock` for package/bin/dependencies.
-- Rename/replace: `src/example.rs` -> `src/arcane.rs`.
+- Rename/replace: `src/rustcane.rs` -> `src/arcane.rs`.
 - Modify: `src/config.rs`, `src/app.rs`, `src/actions.rs`, `src/cli.rs`, `src/main.rs`, `src/lib.rs`.
 - Modify: `src/mcp/tools.rs`, `src/mcp/schemas.rs`, `src/mcp/rmcp_server.rs`, `src/mcp/prompts.rs`, `src/mcp.rs`.
 - Modify: `tests/cli_parse.rs`, `tests/tool_dispatch.rs`; create `tests/arcane_client.rs`.
-- Modify docs/config/plugin surfaces: `README.md`, `AGENTS.md`, `.env.example`, `config.example.toml`, `server.json`, `plugins/example/**` renamed or rewritten to `plugins/rustcane/**`.
+- Modify docs/config/plugin surfaces: `README.md`, `AGENTS.md`, `.env.rustcane`, `config.rustcane.toml`, `server.json`, `plugins/rustcane/**` renamed or rewritten to `plugins/rustcane/**`.
 
 ## Task 1: Baseline Scaffold Rename
 
 **Files:**
 - Modify: `Cargo.toml`, `src/main.rs`, `src/lib.rs`, `src/config.rs`, `src/mcp.rs`, docs/config/plugin files.
-- Rename: `src/example.rs` to `src/arcane.rs`; `plugins/example/` to `plugins/rustcane/`.
+- Rename: `src/rustcane.rs` to `src/arcane.rs`; `plugins/rustcane/` to `plugins/rustcane/`.
 
 - [ ] **Step 1: Write/adjust tests for names**
 
 Run:
 ```bash
-rg -n "rmcp-template|Example|example|EXAMPLE" src tests README.md AGENTS.md plugins config* server.json .env.example
+rg -n "rustcane|Arcane|rustcane|EXAMPLE" src tests README.md AGENTS.md plugins config* server.json .env.rustcane
 ```
 Expected before implementation: matches exist. Expected after implementation: no template identifiers remain except intentional historical references in docs.
 
@@ -44,20 +44,20 @@ Expected before implementation: matches exist. Expected after implementation: no
 
 Use repository-aware replacement, preserving case:
 ```bash
-mv src/example.rs src/arcane.rs
-mv plugins/example plugins/rustcane
+mv src/rustcane.rs src/arcane.rs
+mv plugins/rustcane plugins/rustcane
 ```
 Then replace:
 ```text
-rmcp-template -> rustcane
-ExampleClient -> ArcaneClient
-ExampleService -> ArcaneService
-ExampleConfig -> ArcaneConfig
-ExampleRmcpServer -> ArcaneRmcpServer
-EXAMPLE_ -> RUSTCANE_
-example:read -> rustcane:read
-example:write -> rustcane:write
-example://schema/mcp-tool -> rustcane://schema/mcp-tool
+rustcane -> rustcane
+ArcaneClient -> ArcaneClient
+ArcaneService -> ArcaneService
+ArcaneConfig -> ArcaneConfig
+ArcaneRmcpServer -> ArcaneRmcpServer
+RUSTCANE_ -> RUSTCANE_
+rustcane:read -> rustcane:read
+rustcane:write -> rustcane:write
+rustcane://schema/mcp-tool -> rustcane://schema/mcp-tool
 ```
 
 - [ ] **Step 3: Verify compile catches only expected missing Arcane implementation**
@@ -176,7 +176,7 @@ CLI shims parse flags, add `confirm=true` only from `--confirm`, and delegate to
 ## Task 5: Docs, Verification, Commit, and PR
 
 **Files:**
-- Modify: `README.md`, `AGENTS.md`, `.env.example`, `config.example.toml`, `server.json`, plugin docs/manifests.
+- Modify: `README.md`, `AGENTS.md`, `.env.rustcane`, `config.rustcane.toml`, `server.json`, plugin docs/manifests.
 
 - [ ] **Step 1: Document the delivered contract**
 

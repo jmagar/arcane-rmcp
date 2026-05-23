@@ -121,16 +121,16 @@ fn setup_check(config: &Config, no_repair: bool) -> SetupReport {
             ),
         });
     }
-    if config.example.api_url.is_empty() {
+    if config.rustcane.api_url.is_empty() {
         report.blocking_failures.push(SetupFailure {
             code: "missing_example_api_url",
-            message: "EXAMPLE_API_URL is required".into(),
+            message: "RUSTCANE_API_URL is required".into(),
         });
     }
-    if config.example.api_key.is_empty() {
+    if config.rustcane.api_key.is_empty() {
         report.blocking_failures.push(SetupFailure {
             code: "missing_example_api_key",
-            message: "EXAMPLE_API_KEY is required".into(),
+            message: "RUSTCANE_API_KEY is required".into(),
         });
     }
 
@@ -188,30 +188,31 @@ fn check_auth(config: &Config, report: &mut SetupReport) {
             report,
             &config.mcp.auth.public_url,
             "missing_oauth_public_url",
-            "EXAMPLE_MCP_PUBLIC_URL is required for OAuth mode",
+            "RUSTCANE_MCP_PUBLIC_URL is required for OAuth mode",
         );
         require_oauth_field(
             report,
             &config.mcp.auth.google_client_id,
             "missing_oauth_client_id",
-            "EXAMPLE_MCP_GOOGLE_CLIENT_ID is required for OAuth mode",
+            "RUSTCANE_MCP_GOOGLE_CLIENT_ID is required for OAuth mode",
         );
         require_oauth_field(
             report,
             &config.mcp.auth.google_client_secret,
             "missing_oauth_client_secret",
-            "EXAMPLE_MCP_GOOGLE_CLIENT_SECRET is required for OAuth mode",
+            "RUSTCANE_MCP_GOOGLE_CLIENT_SECRET is required for OAuth mode",
         );
         require_oauth_field(
             report,
             &Some(config.mcp.auth.admin_email.clone()),
             "missing_oauth_admin_email",
-            "EXAMPLE_MCP_AUTH_ADMIN_EMAIL is required for OAuth mode",
+            "RUSTCANE_MCP_AUTH_ADMIN_EMAIL is required for OAuth mode",
         );
     } else if config.mcp.api_token.as_deref().unwrap_or("").is_empty() {
         report.blocking_failures.push(SetupFailure {
             code: "missing_mcp_token",
-            message: "EXAMPLE_MCP_TOKEN is required unless no_auth or OAuth mode is enabled".into(),
+            message: "RUSTCANE_MCP_TOKEN is required unless no_auth or OAuth mode is enabled"
+                .into(),
         });
     }
 }
@@ -226,12 +227,12 @@ fn check_port(host: &str, port: u16, report: &mut SetupReport) {
 }
 
 fn setup_data_dir() -> anyhow::Result<PathBuf> {
-    // L11: setup_data_dir uses CLAUDE_PLUGIN_DATA/EXAMPLE_HOME while Config::load
-    // searches ~/.example/config.toml first. In the plugin context CLAUDE_PLUGIN_DATA
+    // L11: setup_data_dir uses CLAUDE_PLUGIN_DATA/RUSTCANE_HOME while Config::load
+    // searches ~/.rustcane/config.toml first. In the plugin context CLAUDE_PLUGIN_DATA
     // and the config search path should coincide, but they can diverge in non-standard
     // deployments. TEMPLATE: align these when adapting the template.
     if let Some(val) =
-        std::env::var_os("CLAUDE_PLUGIN_DATA").or_else(|| std::env::var_os("EXAMPLE_HOME"))
+        std::env::var_os("CLAUDE_PLUGIN_DATA").or_else(|| std::env::var_os("RUSTCANE_HOME"))
     {
         return Ok(PathBuf::from(val));
     }
@@ -240,30 +241,30 @@ fn setup_data_dir() -> anyhow::Result<PathBuf> {
 
 fn write_env(data_dir: &Path, config: &Config) -> Result<()> {
     let mut lines = vec![
-        dotenv_assignment("EXAMPLE_API_URL", &config.example.api_url)?,
-        dotenv_assignment("EXAMPLE_API_KEY", &config.example.api_key)?,
-        dotenv_assignment("EXAMPLE_MCP_HOST", &config.mcp.host)?,
-        dotenv_assignment("EXAMPLE_MCP_PORT", &config.mcp.port.to_string())?,
-        dotenv_assignment("EXAMPLE_MCP_NO_AUTH", &config.mcp.no_auth.to_string())?,
+        dotenv_assignment("RUSTCANE_API_URL", &config.rustcane.api_url)?,
+        dotenv_assignment("RUSTCANE_API_KEY", &config.rustcane.api_key)?,
+        dotenv_assignment("RUSTCANE_MCP_HOST", &config.mcp.host)?,
+        dotenv_assignment("RUSTCANE_MCP_PORT", &config.mcp.port.to_string())?,
+        dotenv_assignment("RUSTCANE_MCP_NO_AUTH", &config.mcp.no_auth.to_string())?,
     ];
 
     if let Some(token) = config.mcp.api_token.as_deref().filter(|v| !v.is_empty()) {
-        lines.push(dotenv_assignment("EXAMPLE_MCP_TOKEN", token)?);
+        lines.push(dotenv_assignment("RUSTCANE_MCP_TOKEN", token)?);
     }
     if config.mcp.auth.mode == AuthMode::OAuth {
-        lines.push("EXAMPLE_MCP_AUTH_MODE=oauth".into());
+        lines.push("RUSTCANE_MCP_AUTH_MODE=oauth".into());
         if let Some(v) = &config.mcp.auth.public_url {
-            lines.push(dotenv_assignment("EXAMPLE_MCP_PUBLIC_URL", v)?);
+            lines.push(dotenv_assignment("RUSTCANE_MCP_PUBLIC_URL", v)?);
         }
         if let Some(v) = &config.mcp.auth.google_client_id {
-            lines.push(dotenv_assignment("EXAMPLE_MCP_GOOGLE_CLIENT_ID", v)?);
+            lines.push(dotenv_assignment("RUSTCANE_MCP_GOOGLE_CLIENT_ID", v)?);
         }
         if let Some(v) = &config.mcp.auth.google_client_secret {
-            lines.push(dotenv_assignment("EXAMPLE_MCP_GOOGLE_CLIENT_SECRET", v)?);
+            lines.push(dotenv_assignment("RUSTCANE_MCP_GOOGLE_CLIENT_SECRET", v)?);
         }
         if !config.mcp.auth.admin_email.is_empty() {
             lines.push(dotenv_assignment(
-                "EXAMPLE_MCP_AUTH_ADMIN_EMAIL",
+                "RUSTCANE_MCP_AUTH_ADMIN_EMAIL",
                 &config.mcp.auth.admin_email,
             )?);
         }

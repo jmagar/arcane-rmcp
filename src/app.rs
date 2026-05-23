@@ -2,14 +2,20 @@
 //!
 //! **All business logic lives here.** CLI and MCP are thin shims that call into this.
 //!
-//! `ExampleService` owns an `ExampleClient` and exposes typed methods.
+//! `ArcaneService` owns an `ArcaneClient` and exposes typed methods.
 //! If you need caching, retries, data transformation, or validation, do it here —
 //! never in `cli.rs` or `mcp/tools.rs`.
 
 use anyhow::Result;
+use reqwest::Method;
 use serde_json::{json, Value};
 
-use crate::example::ExampleClient;
+use crate::{
+    actions::{
+        rest_help, spec_for, validate_relative_path, ArcaneAction, BodyMode, ValidationError,
+    },
+    arcane::{encode_path_segment, ArcaneClient},
+};
 
 // Unit tests live in a sidecar file — see src/app_tests.rs for the pattern.
 #[cfg(test)]
@@ -21,8 +27,8 @@ mod tests;
 /// **Template**: rename this to `MyServiceService` (or whatever fits).
 /// Add any fields you need: caches, config, metrics, etc.
 #[derive(Clone)]
-pub struct ExampleService {
-    client: ExampleClient,
+pub struct ArcaneService {
+    client: ArcaneClient,
 }
 
 #[derive(Debug, Clone)]
@@ -75,24 +81,38 @@ impl std::fmt::Display for ScaffoldIntentValidationError {
 
 impl std::error::Error for ScaffoldIntentValidationError {}
 
-impl ExampleService {
-    pub fn new(client: ExampleClient) -> Self {
+impl ArcaneService {
+    pub fn new(client: ArcaneClient) -> Self {
         Self { client }
     }
 
-    /// Return a greeting for `name`, defaulting to "World".
-    pub async fn greet(&self, name: Option<&str>) -> Result<Value> {
-        self.client.greet(name).await
-    }
-
-    /// Echo `message` back unchanged.
-    pub async fn echo(&self, message: &str) -> Result<Value> {
-        self.client.echo(message).await
-    }
-
-    /// Return the server status.
+    /// Return local server status without leaking Arcane topology or credentials.
     pub async fn status(&self) -> Result<Value> {
-        self.client.status().await
+        Ok(json!({
+            "status": "ok",
+            "server": "rustcane",
+            "upstream": "arcane",
+        }))
+    }
+
+    pub async fn dispatch(&self, action: &ArcaneAction) -> Result<Value> {
+        if action.action == "help" {
+            return Ok(help_value(action.subaction.as_deref()));
+        }
+        if action.action == "status" {
+            return self.status().await;
+        }
+        let spec = spec_for(&action.action, action.subaction.as_deref())?;
+        validate_request(spec, action)?;
+        let path = build_path(spec.path, action)?;
+        let query = query_params(spec, action)?;
+        let body = body_params(spec.body, &action.params);
+        let method = Method::from_bytes(spec.method.as_bytes())?;
+        let value = self
+            .client
+            .request(method, &path, query.as_ref(), body.as_ref(), spec.timeout())
+            .await?;
+        Ok(normalize_response(value))
     }
 
     /// Build the response for the elicited-name demo after the MCP shim collects input.
@@ -107,7 +127,7 @@ impl ExampleService {
                     })
                 } else {
                     json!({
-                        "greeting": format!("Hello, {name}! Welcome to the example MCP server."),
+                        "greeting": format!("Hello, {name}! Welcome to the rustcane MCP server."),
                         "name": name,
                     })
                 }
@@ -144,7 +164,7 @@ impl ExampleService {
         let env_prefix = input.env_prefix.trim().to_ascii_uppercase();
 
         Ok(json!({
-            "kind": "rmcp_template_scaffold_intent",
+            "kind": "rustcane_scaffold_intent",
             "schema_version": 1,
             "server_category": category,
             "required_surfaces": required_surfaces,
@@ -184,6 +204,172 @@ impl ExampleService {
             }
         }))
     }
+}
+
+fn validate_request(spec: &crate::actions::ActionSpec, action: &ArcaneAction) -> Result<()> {
+    if spec.requires_env && action.env_id.as_deref().unwrap_or_default().is_empty() {
+        return Err(ValidationError::MissingEnvId {
+            action: action.action.clone(),
+            subaction: action.subaction.clone().unwrap_or_default(),
+        }
+        .into());
+    }
+    if let Some(label) = spec.id_label {
+        if label == "backupId" {
+            let Some(value) = action.params.get("backupId").and_then(Value::as_str) else {
+                return Err(ValidationError::MissingId {
+                    label: "backupId".into(),
+                }
+                .into());
+            };
+            if value.is_empty() {
+                return Err(ValidationError::MissingId {
+                    label: "backupId".into(),
+                }
+                .into());
+            }
+        } else if action.id.as_deref().unwrap_or_default().is_empty() {
+            if spec.action == "environment" {
+                // Preserve TypeScript prior art: environment single-resource ops accept envId fallback.
+                if action.env_id.as_deref().unwrap_or_default().is_empty() {
+                    return Err(ValidationError::MissingId {
+                        label: label.into(),
+                    }
+                    .into());
+                }
+            } else {
+                return Err(ValidationError::MissingId {
+                    label: label.into(),
+                }
+                .into());
+            }
+        }
+    }
+    if matches!(
+        (spec.action, spec.subaction),
+        ("volume", Some("browse")) | ("gitops", Some("browse"))
+    ) {
+        validate_relative_path(&action.params, "path")?;
+    }
+    if spec.action == "image-update" && spec.subaction == Some("check") {
+        let has_id = action.id.as_deref().is_some_and(|id| !id.is_empty());
+        let has_ref = action
+            .params
+            .get("imageRef")
+            .and_then(Value::as_str)
+            .is_some_and(|image_ref| !image_ref.is_empty());
+        if !has_id && !has_ref {
+            return Err(ValidationError::MissingId {
+                label: "image id or params.imageRef".into(),
+            }
+            .into());
+        }
+    }
+    if spec.destructive && !allow_destructive() && !confirmed(&action.params) {
+        return Err(ValidationError::DestructiveConfirmationRequired {
+            action: action.action.clone(),
+            subaction: action.subaction.clone().unwrap_or_default(),
+        }
+        .into());
+    }
+    Ok(())
+}
+
+fn build_path(template: &str, action: &ArcaneAction) -> Result<String> {
+    let env_id = action.env_id.as_deref().unwrap_or_default();
+    let id = action
+        .id
+        .as_deref()
+        .or_else(|| {
+            (action.action == "environment")
+                .then_some(action.env_id.as_deref())
+                .flatten()
+        })
+        .unwrap_or_default();
+    let backup_id = action
+        .params
+        .get("backupId")
+        .and_then(Value::as_str)
+        .unwrap_or_default();
+    let mut path = template.replace("{envId}", &encode_path_segment(env_id));
+    path = path.replace("{id}", &encode_path_segment(id));
+    path = path.replace("{backupId}", &encode_path_segment(backup_id));
+    if action.action == "image-update"
+        && action.subaction.as_deref() == Some("check")
+        && action.id.as_deref().unwrap_or_default().is_empty()
+    {
+        path = format!(
+            "/environments/{}/image-updates/check",
+            encode_path_segment(env_id)
+        );
+    }
+    Ok(path)
+}
+
+fn query_params(spec: &crate::actions::ActionSpec, action: &ArcaneAction) -> Result<Option<Value>> {
+    if spec.method != "GET" {
+        return Ok(None);
+    }
+    let mut query = serde_json::Map::new();
+    for key in ["offset", "limit", "sort_order", "query", "path", "imageRef"] {
+        if let Some(value) = action.params.get(key) {
+            query.insert(key.to_string(), value.clone());
+        }
+    }
+    Ok((!query.is_empty()).then_some(Value::Object(query)))
+}
+
+fn body_params(mode: BodyMode, params: &Value) -> Option<Value> {
+    match mode {
+        BodyMode::None => None,
+        BodyMode::Params => Some(strip_control_params(params)),
+        BodyMode::ParamsWithoutControl => Some(strip_control_params(params)),
+    }
+}
+
+fn strip_control_params(params: &Value) -> Value {
+    let mut object = params.as_object().cloned().unwrap_or_default();
+    for key in ["confirm", "offset", "limit", "sort_order", "query"] {
+        object.remove(key);
+    }
+    Value::Object(object)
+}
+
+fn confirmed(params: &Value) -> bool {
+    params.get("confirm") == Some(&Value::Bool(true))
+}
+
+fn allow_destructive() -> bool {
+    std::env::var("RUSTCANE_MCP_ALLOW_DESTRUCTIVE")
+        .map(|value| matches!(value.to_ascii_lowercase().as_str(), "1" | "true" | "yes"))
+        .unwrap_or(false)
+}
+
+fn normalize_response(value: Value) -> Value {
+    value.get("data").cloned().unwrap_or(value)
+}
+
+fn help_value(domain: Option<&str>) -> Value {
+    let mut actions = crate::actions::ACTION_SPECS
+        .iter()
+        .filter(|spec| domain.is_none_or(|domain| spec.action == domain))
+        .map(|spec| {
+            json!({
+                "action": spec.action,
+                "subaction": spec.subaction,
+                "scope": spec.required_scope,
+                "destructive": spec.destructive,
+                "requiresEnvId": spec.requires_env,
+                "requiresId": spec.id_label,
+            })
+        })
+        .collect::<Vec<_>>();
+    actions.sort_by_key(|value| value["action"].as_str().unwrap_or_default().to_owned());
+    json!({
+        "tool": "arcane",
+        "summary": rest_help(),
+        "actions": actions,
+    })
 }
 
 fn validate_scaffold_intent(input: &ScaffoldIntent) -> Result<()> {

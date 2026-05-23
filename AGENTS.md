@@ -1,15 +1,15 @@
-# rmcp-template — Agent instructions
+# rustcane — Agent instructions
 
 ## What this project is
 
-A Rust template for building MCP servers with the rmcp crate. The stub binary is named `example`. All `Example*` / `EXAMPLE_*` identifiers are renamed when the template is adapted for a real service.
+A Rust template for building MCP servers with the rmcp crate. The stub binary is named `rustcane`. All `Arcane*` / `RUSTCANE_*` identifiers are renamed when the template is adapted for a real service.
 
 ## Key files
 
 | File | Role |
 |------|------|
-| `src/example.rs` | `ExampleClient` — transport stub; replace with your HTTP/API client |
-| `src/app.rs` | `ExampleService` — ALL business logic lives here |
+| `src/rustcane.rs` | `ArcaneClient` — transport stub; replace with your HTTP/API client |
+| `src/app.rs` | `ArcaneService` — ALL business logic lives here |
 | `src/mcp/tools.rs` | MCP dispatch shim — parse args, call service, return Value |
 | `src/mcp/schemas.rs` | Tool JSON schema and action list |
 | `src/mcp/rmcp_server.rs` | `ServerHandler` impl: tools, resources, prompts, scope enforcement |
@@ -25,9 +25,9 @@ A Rust template for building MCP servers with the rmcp crate. The stub binary is
 ## Architecture
 
 ```
-ExampleClient  (example.rs)    ← network calls only
+ArcaneClient  (rustcane.rs)    ← network calls only
       ↓
-ExampleService (app.rs)        ← all business logic
+ArcaneService (app.rs)        ← all business logic
       ↓
   ┌─────────────────────────────┐
   │  MCP shim (mcp/tools.rs)   │  JSON args → service → Value
@@ -52,13 +52,13 @@ Exception: `scaffold_intent` is MCP-only because it is specifically an MCP elici
 
 ## Invariant: zero logic in shims
 
-`mcp/tools.rs` and `cli.rs` must not contain business logic. They parse inputs and delegate to `ExampleService`. All computation, validation, and transformation belongs in `app.rs`.
+`mcp/tools.rs` and `cli.rs` must not contain business logic. They parse inputs and delegate to `ArcaneService`. All computation, validation, and transformation belongs in `app.rs`.
 
 ## How to add an action
 
 MCP + CLI steps are mandatory for every business action:
 
-1. `src/example.rs` — add transport method returning `Result<Value>`
+1. `src/rustcane.rs` — add transport method returning `Result<Value>`
 2. `src/app.rs` — add service method delegating to client
 3. `src/actions.rs` — add action metadata to `ACTION_SPECS`
 4. `src/mcp/schemas.rs` — add new parameter schema entries to `tool_definitions()`
@@ -76,54 +76,54 @@ For application/platform servers only, also update:
 | State | Condition | Behavior |
 |-------|-----------|----------|
 | `LoopbackDev` | `no_auth=true` or host starts with `127.` | No auth, no scope checks |
-| `TrustedGatewayUnscoped` | `EXAMPLE_NOAUTH=true` behind an authz-enforcing gateway | No auth, no scope checks |
+| `TrustedGatewayUnscoped` | `RUSTCANE_NOAUTH=true` behind an authz-enforcing gateway | No auth, no scope checks |
 | `Mounted { auth_state: None }` | Default non-loopback | Static bearer token required |
-| `Mounted { auth_state: Some(_) }` | `EXAMPLE_MCP_AUTH_MODE=oauth` | Google OAuth + RS256 JWT |
+| `Mounted { auth_state: Some(_) }` | `RUSTCANE_MCP_AUTH_MODE=oauth` | Google OAuth + RS256 JWT |
 
-`help` action requires no scope. Read actions require `example:read`; mutating actions require `example:write`, which satisfies read.
+`help` action requires no scope. Read actions require `rustcane:read`; mutating actions require `rustcane:write`, which satisfies read.
 
 ## Environment variables
 
 ```
-EXAMPLE_API_URL              Upstream service base URL
-EXAMPLE_API_KEY              Upstream service API key
-EXAMPLE_MCP_HOST             Bind host (default 0.0.0.0)
-EXAMPLE_MCP_PORT             Bind port (default 3100)
-EXAMPLE_MCP_NO_AUTH          Disable auth — loopback only (1/true/yes)
-EXAMPLE_MCP_TOKEN            Static bearer token
-EXAMPLE_MCP_ALLOWED_HOSTS    Comma-separated extra Host header values
-EXAMPLE_MCP_ALLOWED_ORIGINS  Comma-separated extra CORS origins
-EXAMPLE_MCP_PUBLIC_URL       Public URL for OAuth metadata
-EXAMPLE_MCP_AUTH_MODE        bearer (default) or oauth
-EXAMPLE_MCP_GOOGLE_CLIENT_ID     Google OAuth client ID (OAuth mode)
-EXAMPLE_MCP_GOOGLE_CLIENT_SECRET  Google OAuth client secret (OAuth mode)
-EXAMPLE_MCP_AUTH_ADMIN_EMAIL  OAuth admin email (OAuth mode)
+RUSTCANE_API_URL              Upstream service base URL
+RUSTCANE_API_KEY              Upstream service API key
+RUSTCANE_MCP_HOST             Bind host (default 0.0.0.0)
+RUSTCANE_MCP_PORT             Bind port (default 3100)
+RUSTCANE_MCP_NO_AUTH          Disable auth — loopback only (1/true/yes)
+RUSTCANE_MCP_TOKEN            Static bearer token
+RUSTCANE_MCP_ALLOWED_HOSTS    Comma-separated extra Host header values
+RUSTCANE_MCP_ALLOWED_ORIGINS  Comma-separated extra CORS origins
+RUSTCANE_MCP_PUBLIC_URL       Public URL for OAuth metadata
+RUSTCANE_MCP_AUTH_MODE        bearer (default) or oauth
+RUSTCANE_MCP_GOOGLE_CLIENT_ID     Google OAuth client ID (OAuth mode)
+RUSTCANE_MCP_GOOGLE_CLIENT_SECRET  Google OAuth client secret (OAuth mode)
+RUSTCANE_MCP_AUTH_ADMIN_EMAIL  OAuth admin email (OAuth mode)
 RUST_LOG                     Log filter (e.g. info,rmcp=warn)
 ```
 
 ## Transports
 
-- `example serve` (or no args) — Streamable HTTP on `EXAMPLE_MCP_PORT` (default 3100)
-- `example mcp` — stdio transport for child-process MCP clients
-- `example greet / echo / status` — direct CLI
+- `rustcane serve` (or no args) — Streamable HTTP on `RUSTCANE_MCP_PORT` (default 3100)
+- `rustcane mcp` — stdio transport for child-process MCP clients
+- `rustcane greet / echo / status` — direct CLI
 
 ## MCP tool actions
 
-Single tool `example`, dispatched by `action` parameter:
+Single tool `rustcane`, dispatched by `action` parameter:
 
 | Action | Scope | Description |
 |--------|-------|-------------|
-| `greet` | `example:read` | Greeting; optional `name` string |
-| `echo` | `example:read` | Echo; required `message` string |
-| `status` | `example:read` | Server status |
-| `elicit_name` | `example:read` | Elicitation demo — asks user for name mid-call |
-| `scaffold_intent` | `example:read` | Elicitation setup wizard — returns JSON for the scaffold-project skill |
+| `greet` | `rustcane:read` | Greeting; optional `name` string |
+| `echo` | `rustcane:read` | Echo; required `message` string |
+| `status` | `rustcane:read` | Server status |
+| `elicit_name` | `rustcane:read` | Elicitation demo — asks user for name mid-call |
+| `scaffold_intent` | `rustcane:read` | Elicitation setup wizard — returns JSON for the scaffold-project skill |
 | `help` | none (public) | Full action reference |
 
 ## MCP features implemented
 
-- **Tools** — `example` tool with action dispatch
-- **Resources** — `example://schema/mcp-tool` (JSON schema for the tool)
+- **Tools** — `rustcane` tool with action dispatch
+- **Resources** — `rustcane://schema/mcp-tool` (JSON schema for the tool)
 - **Prompts** — `quick_start` prompt
 - **Elicitation** — `elicit_name` and `scaffold_intent` actions use `peer.elicit::<...>(...)` (spec 2025-06-18)
 - **Scaffold handoff** — `scaffold_intent` returns JSON only; the `scaffold-project` plugin skill turns it into an approval-first plan
@@ -143,7 +143,7 @@ cargo fmt
 
 ## Test helpers
 
-`rmcp_template::testing::loopback_state()` builds `AppState` with no auth — use in all integration tests. `bearer_state(token)` builds a bearer-only state.
+`rustcane::testing::loopback_state()` builds `AppState` with no auth — use in all integration tests. `bearer_state(token)` builds a bearer-only state.
 
 <!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:ca08a54f -->
 ## Beads Issue Tracker
@@ -194,6 +194,6 @@ bd close <id>         # Complete work
 
 ## Plugin setup hooks
 
-Plugin setup is owned by the binary. Keep `plugins/example/hooks/plugin-setup.sh` as a thin adapter that maps `CLAUDE_PLUGIN_OPTION_*` values to environment variables, prepares appdata, ensures `example` is on `PATH`, and then calls `example setup plugin-hook "$@"`.
+Plugin setup is owned by the binary. Keep `plugins/rustcane/hooks/plugin-setup.sh` as a thin adapter that maps `CLAUDE_PLUGIN_OPTION_*` values to environment variables, prepares appdata, ensures `rustcane` is on `PATH`, and then calls `rustcane setup plugin-hook "$@"`.
 
-`example setup check` is read-only, `example setup repair` is idempotent, and `example setup plugin-hook --no-repair` is audit mode. Do not add Docker Compose, systemd, or service bootstrap logic back into the hook script. Use `scripts/check-plugin-hook-contract.py` to audit this pattern across the Rust servers.
+`rustcane setup check` is read-only, `rustcane setup repair` is idempotent, and `rustcane setup plugin-hook --no-repair` is audit mode. Do not add Docker Compose, systemd, or service bootstrap logic back into the hook script. Use `scripts/check-plugin-hook-contract.py` to audit this pattern across the Rust servers.

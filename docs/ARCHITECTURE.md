@@ -2,7 +2,7 @@
 title: "Architecture"
 doc_type: "guide"
 status: "active"
-owner: "rmcp-template"
+owner: "rustcane"
 audience:
   - "contributors"
   - "agents"
@@ -15,13 +15,13 @@ last_reviewed: "2026-05-15"
 
 # Architecture
 
-`rmcp-template` is a Rust template for MCP servers built on `rmcp`. The architecture is intentionally layered so transports stay thin and business logic stays testable.
+`rustcane` is a Rust template for MCP servers built on `rmcp`. The architecture is intentionally layered so transports stay thin and business logic stays testable.
 
 ## Layer diagram
 
 ```
-ExampleClient  (src/example.rs)   → HTTP/API transport ONLY — network calls, no logic
-ExampleService (src/app.rs)       → ALL business logic, validation, enrichment
+ArcaneClient  (src/rustcane.rs)   → HTTP/API transport ONLY — network calls, no logic
+ArcaneService (src/app.rs)       → ALL business logic, validation, enrichment
 MCP shim       (src/mcp/tools.rs) → parse JSON args → call service → return Value
 CLI shim       (src/cli.rs)       → parse argv → call service → print
 REST shim      (src/api.rs)       → parse HTTP JSON → call service → return JSON
@@ -62,7 +62,7 @@ src/
 
 | File | Responsibility |
 |---|---|
-| `src/example.rs` | Upstream/client transport stub. Replace with your service API client. |
+| `src/rustcane.rs` | Upstream/client transport stub. Replace with your service API client. |
 | `src/app.rs` | Service layer. All business rules live here. |
 | `src/actions.rs` | Canonical action metadata, parsing, REST dispatch helpers. |
 | `src/mcp/tools.rs` | MCP tool dispatch and elicitation-only actions. |
@@ -80,7 +80,7 @@ src/
 pub struct AppState {
     pub config: McpConfig,        // MCP server config (host, port, auth settings)
     pub auth_policy: AuthPolicy,  // LoopbackDev | Mounted
-    pub service: ExampleService,  // The service layer — everything routes through here
+    pub service: ArcaneService,  // The service layer — everything routes through here
 }
 ```
 
@@ -95,7 +95,7 @@ Port 40060
   ├── /mcp                  → Streamable HTTP MCP transport
   ├── /health               → Unauthenticated liveness probe
   ├── /status               → Runtime state (auth required)
-  ├── /v1/example           → REST API action dispatch
+  ├── /v1/rustcane           → REST API action dispatch
   ├── /.well-known/*        → OAuth metadata (when auth_mode=oauth)
   └── /*                    → SPA fallback (serves embedded web UI)
 ```
@@ -108,7 +108,7 @@ pub fn router(state: AppState) -> Router {
         .route("/status", get(status));
 
     let api = Router::new()
-        .route("/v1/example", post(api_dispatch))
+        .route("/v1/rustcane", post(api_dispatch))
         .route_layer(auth_layer.clone());
 
     let mcp = Router::new()
@@ -129,7 +129,7 @@ pub fn router(state: AppState) -> Router {
 
 ```rust
 // cli.rs — binary module (uses `example_mcp::` not `crate::`)
-use example_mcp::app::ExampleService;
+use example_mcp::app::ArcaneService;
 
 pub enum CliCommand {
     Things,
@@ -149,13 +149,13 @@ impl CliCommand {
             ["things"]         => Self::Things,
             ["thing", id, ..]  => Self::Thing { id: id.to_string() },
             ["delete", id, ..] => Self::DeleteThing { id: id.to_string(), confirm },
-            other => bail!("unknown command: {}\n\nRun `example --help`", other.join(" ")),
+            other => bail!("unknown command: {}\n\nRun `rustcane --help`", other.join(" ")),
         };
         Ok((cmd, json))
     }
 }
 
-pub async fn run(service: &ExampleService, cmd: CliCommand, json: bool) -> Result<()> {
+pub async fn run(service: &ArcaneService, cmd: CliCommand, json: bool) -> Result<()> {
     let (label, data) = match cmd {
         CliCommand::Things                            => ("things", service.list_things().await?),
         CliCommand::Thing { ref id }                  => ("thing",  service.get_thing(id).await?),
@@ -213,8 +213,8 @@ Zero validation, zero defaults, zero error message crafting in shims. All of tha
 
 - Shims do not contain business logic.
 - All action metadata starts in `src/actions.rs`.
-- Read actions require `example:read`; write actions require `example:write`; `help` is public.
+- Read actions require `rustcane:read`; write actions require `rustcane:write`; `help` is public.
 - Stdio is local trusted transport; HTTP is protected unless in loopback or explicit trusted-gateway mode.
-- Plugin setup is binary-owned: hook scripts delegate to `example setup plugin-hook`.
+- Plugin setup is binary-owned: hook scripts delegate to `rustcane setup plugin-hook`.
 
 See `docs/PATTERNS.md` §1, §7, §A1, §45 for full pattern details.

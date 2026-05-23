@@ -1,6 +1,6 @@
 # Scaffold intent examples
 
-Checked-in example payloads for `docs/contracts/scaffold-intent.schema.json`.
+Checked-in rustcane payloads for `docs/contracts/scaffold-intent.schema.json`.
 
 | File | Use case |
 |---|---|

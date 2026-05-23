@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# install.sh — One-line installer for the Example MCP server
+# install.sh — One-line installer for the Arcane MCP server
 #
 # TEMPLATE: Replace the values in the "CONFIGURATION" section below with your
 #           service's actual binary name, URL, and version.
@@ -24,20 +24,20 @@ set -euo pipefail
 # ── CONFIGURATION — edit these values for your service ───────────────────────
 
 # TEMPLATE: Replace with your GitHub org/repo (e.g. "jmagar/myservice-mcp")
-REPO="your-org/example-mcp"
+REPO="your-org/rustcane-mcp"
 
 # TEMPLATE: Replace with your binary name (matches Cargo.toml [[bin]] name)
-BINARY_NAME="example"
+BINARY_NAME="rustcane"
 
 # TEMPLATE: Replace with your service display name (shown in messages)
-SERVICE_NAME="example-mcp"
+SERVICE_NAME="rustcane-mcp"
 
 # TEMPLATE: Set a pinned version, or leave as "latest" to always install the
 #           most recent release. Pinned is safer for production automation.
-VERSION="${EXAMPLE_MCP_VERSION:-latest}"
+VERSION="${RUSTCANE_MCP_VERSION:-latest}"
 
 # Install directory — default is ~/.local/bin (in PATH on most modern systems)
-INSTALL_DIR="${EXAMPLE_MCP_INSTALL_DIR:-${HOME}/.local/bin}"
+INSTALL_DIR="${RUSTCANE_MCP_INSTALL_DIR:-${HOME}/.local/bin}"
 
 # ── END CONFIGURATION ─────────────────────────────────────────────────────────
 
@@ -182,8 +182,8 @@ post_install_message() {
   printf '\n'
   printf '%b=== Next steps ===%b\n' "${C_BOLD}" "${C_RESET}"
   # TEMPLATE: Customize these instructions for your service.
-  printf '  1. Copy the example config:   cp .env.example .env\n'
-  printf '  2. Edit .env and set:         EXAMPLE_API_URL, EXAMPLE_API_KEY\n'
+  printf '  1. Copy the rustcane config:   cp .env.rustcane .env\n'
+  printf '  2. Edit .env and set:         RUSTCANE_API_URL, RUSTCANE_API_KEY\n'
   printf '  3. Generate an auth token:    openssl rand -hex 32\n'
   printf '  4. Start the server:          %s serve\n' "${BINARY_NAME}"
   printf '  5. Check health:              curl http://localhost:3000/health\n'

@@ -1,7 +1,7 @@
 use std::sync::Mutex;
 
 use super::{SetupCommand, SetupReport};
-use crate::config::{Config, ExampleConfig, McpConfig};
+use crate::config::{ArcaneConfig, Config, McpConfig};
 
 static ENV_LOCK: Mutex<()> = Mutex::new(());
 
@@ -88,8 +88,8 @@ fn all_variants_are_distinct() {
 
 fn valid_config() -> Config {
     Config {
-        example: ExampleConfig {
-            api_url: "https://example.test/api".into(),
+        rustcane: ArcaneConfig {
+            api_url: "https://rustcane.test/api".into(),
             api_key: "secret with spaces".into(),
         },
         mcp: McpConfig {
@@ -152,8 +152,8 @@ fn setup_repair_creates_env_file() {
     assert!(report.blocking_failures.is_empty());
     let env_path = dir.path().join(".env");
     let contents = std::fs::read_to_string(&env_path).unwrap();
-    assert!(contents.contains("EXAMPLE_API_URL=https://example.test/api"));
-    assert!(contents.contains("EXAMPLE_API_KEY=\"secret with spaces\""));
+    assert!(contents.contains("RUSTCANE_API_URL=https://rustcane.test/api"));
+    assert!(contents.contains("RUSTCANE_API_KEY=\"secret with spaces\""));
 
     #[cfg(unix)]
     {
@@ -166,13 +166,13 @@ fn setup_repair_creates_env_file() {
 #[test]
 fn dotenv_values_quote_special_characters_and_escape_quotes() {
     assert_eq!(
-        super::dotenv_assignment("EXAMPLE_API_KEY", "secret # \"quoted\"").unwrap(),
-        "EXAMPLE_API_KEY=\"secret # \\\"quoted\\\"\""
+        super::dotenv_assignment("RUSTCANE_API_KEY", "secret # \"quoted\"").unwrap(),
+        "RUSTCANE_API_KEY=\"secret # \\\"quoted\\\"\""
     );
 }
 
 #[test]
 fn dotenv_values_reject_newlines() {
-    let error = super::dotenv_assignment("EXAMPLE_API_KEY", "line\nbreak").unwrap_err();
+    let error = super::dotenv_assignment("RUSTCANE_API_KEY", "line\nbreak").unwrap_err();
     assert!(error.to_string().contains("newlines"));
 }

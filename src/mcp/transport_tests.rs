@@ -32,9 +32,9 @@ fn allowed_hosts_always_includes_loopback() {
 
 #[test]
 fn allowed_hosts_includes_bound_host_and_port_variant() {
-    let hosts = allowed_hosts(&config("myhost.example.com", 8080));
-    assert!(hosts.contains(&"myhost.example.com".to_string()));
-    assert!(hosts.contains(&"myhost.example.com:8080".to_string()));
+    let hosts = allowed_hosts(&config("myhost.rustcane.com", 8080));
+    assert!(hosts.contains(&"myhost.rustcane.com".to_string()));
+    assert!(hosts.contains(&"myhost.rustcane.com:8080".to_string()));
 }
 
 #[test]
@@ -90,11 +90,11 @@ fn allowed_origins_includes_extra_allowed_origins() {
     let cfg = McpConfig {
         host: "0.0.0.0".to_string(),
         port: 3000,
-        allowed_origins: vec!["https://app.example.com".to_string()],
+        allowed_origins: vec!["https://app.rustcane.com".to_string()],
         ..Default::default()
     };
     let origins = allowed_origins(&cfg);
-    assert!(origins.contains(&"https://app.example.com".to_string()));
+    assert!(origins.contains(&"https://app.rustcane.com".to_string()));
 }
 
 #[test]
@@ -102,12 +102,12 @@ fn allowed_origins_normalizes_extra_allowed_origins() {
     let cfg = McpConfig {
         host: "0.0.0.0".to_string(),
         port: 3000,
-        allowed_origins: vec!["https://app.example.com/some/path?ignored=true".to_string()],
+        allowed_origins: vec!["https://app.rustcane.com/some/path?ignored=true".to_string()],
         ..Default::default()
     };
     let origins = allowed_origins(&cfg);
-    assert!(origins.contains(&"https://app.example.com".to_string()));
-    assert!(!origins.contains(&"https://app.example.com/some/path?ignored=true".to_string()));
+    assert!(origins.contains(&"https://app.rustcane.com".to_string()));
+    assert!(!origins.contains(&"https://app.rustcane.com/some/path?ignored=true".to_string()));
 }
 
 #[test]
@@ -115,12 +115,15 @@ fn allowed_origins_skips_invalid_and_wildcard_origins() {
     let cfg = McpConfig {
         host: "0.0.0.0".to_string(),
         port: 3000,
-        allowed_origins: vec!["not-a-url".to_string(), "https://*.example.com".to_string()],
+        allowed_origins: vec![
+            "not-a-url".to_string(),
+            "https://*.rustcane.com".to_string(),
+        ],
         ..Default::default()
     };
     let origins = allowed_origins(&cfg);
     assert!(!origins.contains(&"not-a-url".to_string()));
-    assert!(!origins.contains(&"https://*.example.com".to_string()));
+    assert!(!origins.contains(&"https://*.rustcane.com".to_string()));
 }
 
 #[test]
@@ -128,11 +131,11 @@ fn allowed_origins_preserves_non_http_configured_origins() {
     let cfg = McpConfig {
         host: "0.0.0.0".to_string(),
         port: 3000,
-        allowed_origins: vec!["vscode-webview://extension.example".to_string()],
+        allowed_origins: vec!["vscode-webview://extension.rustcane".to_string()],
         ..Default::default()
     };
     let origins = allowed_origins(&cfg);
-    assert!(origins.contains(&"vscode-webview://extension.example".to_string()));
+    assert!(origins.contains(&"vscode-webview://extension.rustcane".to_string()));
 }
 
 #[test]
@@ -154,13 +157,13 @@ fn allowed_origins_includes_public_url_origin() {
         host: "0.0.0.0".to_string(),
         port: 3000,
         auth: AuthConfig {
-            public_url: Some("https://mcp.example.com".to_string()),
+            public_url: Some("https://mcp.rustcane.com".to_string()),
             ..Default::default()
         },
         ..Default::default()
     };
     let origins = allowed_origins(&cfg);
-    assert!(origins.contains(&"https://mcp.example.com".to_string()));
+    assert!(origins.contains(&"https://mcp.rustcane.com".to_string()));
 }
 
 // ── has_port (private, tested via allowed_hosts behaviour) ───────────────────

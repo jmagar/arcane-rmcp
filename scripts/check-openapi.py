@@ -15,7 +15,7 @@ CARGO = ROOT / "Cargo.toml"
 ACTIONS = ROOT / "src/actions.rs"
 OUT = ROOT / "docs/generated/openapi.json"
 
-REST_ENDPOINT = "/v1/example"
+REST_ENDPOINT = "/v1/rustcane"
 
 # Action-specific param examples. Actions not listed here get an empty params object.
 _PARAM_EXAMPLES: dict[str, dict] = {
@@ -50,11 +50,11 @@ def action_entries() -> list[dict[str, str]]:
         if scope_expr == "None":
             scope = "public"
         elif scope_expr == "Some(READ_SCOPE)":
-            scope = "example:read"
+            scope = "rustcane:read"
         elif scope_expr == "Some(WRITE_SCOPE)":
-            scope = "example:write"
+            scope = "rustcane:write"
         else:
-            scope = "example:__deny__"
+            scope = "rustcane:__deny__"
         actions.append(
             {
                 "name": name_match.group(1),
@@ -84,13 +84,13 @@ def render() -> dict[str, Any]:
     return {
         "openapi": "3.1.0",
         "info": {
-            "title": "Example MCP REST API",
+            "title": "Arcane MCP REST API",
             "version": version,
             "description": (
-                "Generated OpenAPI schema for rmcp-template's REST surface. "
-                "TEMPLATE: rename Example identifiers and action schemas when adapting. "
+                "Generated OpenAPI schema for rustcane's REST surface. "
+                "TEMPLATE: rename Arcane identifiers and action schemas when adapting. "
                 "Auth modes: loopback/trusted-gateway deployments may have no local auth; "
-                "mounted bearer mode uses EXAMPLE_MCP_TOKEN; OAuth mode uses bearer JWTs. "
+                "mounted bearer mode uses RUSTCANE_MCP_TOKEN; OAuth mode uses bearer JWTs. "
                 "REST actions require their action-specific scopes when auth is mounted."
             ),
         },
@@ -165,9 +165,9 @@ def render() -> dict[str, Any]:
                         "Thin REST shim over the shared service layer. MCP-only actions are "
                         "not exposed here. Current REST actions: " + ", ".join(action_names) + ". "
                         "When auth is mounted, each action requires its declared scope; "
-                        "example:write satisfies example:read."
+                        "rustcane:write satisfies rustcane:read."
                     ),
-                    "operationId": "dispatchExampleAction",
+                    "operationId": "dispatchArcaneAction",
                     "security": [{"BearerAuth": []}, {}],
                     "requestBody": {
                         "required": True,

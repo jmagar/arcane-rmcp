@@ -1,7 +1,7 @@
 # =============================================================================
 # docker-compose.yml — Local development stack for an rmcp-based MCP server
 #
-# TEMPLATE: Replace all occurrences of "example" with your service name.
+# TEMPLATE: Replace all occurrences of "rustcane" with your service name.
 #           Replace all occurrences of "EXAMPLE" with your service name in caps.
 #
 # Usage:
@@ -10,15 +10,15 @@
 #   docker compose down            # stop and remove containers
 # =============================================================================
 
-name: rmcp-template
+name: rustcane
 
 services:
-  # TEMPLATE: Replace "example-mcp" with your service name throughout this file.
-  example-mcp:
+  # TEMPLATE: Replace "rustcane-mcp" with your service name throughout this file.
+  rustcane-mcp:
     extends:
       file: docker-compose.prod.yml
-      service: example-mcp
-    image: rmcp-template:dev
+      service: rustcane-mcp
+    image: rustcane:dev
     pull_policy: build
     build:
       context: .

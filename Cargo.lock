@@ -2204,32 +2204,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "rmcp-template"
-version = "0.4.0"
-dependencies = [
- "anyhow",
- "axum",
- "chrono",
- "dirs",
- "include_dir",
- "lab-auth",
- "reqwest 0.12.28",
- "rmcp",
- "rmcp-template",
- "schemars",
- "serde",
- "serde_json",
- "tempfile",
- "tokio",
- "toml",
- "tower",
- "tower-http",
- "tracing",
- "tracing-subscriber",
- "url",
-]
-
-[[package]]
 name = "rsa"
 version = "0.9.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2305,6 +2279,32 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cfcb3a22ef46e85b45de6ee7e79d063319ebb6594faafcf1c225ea92ab6e9b92"
 dependencies = [
  "semver",
+]
+
+[[package]]
+name = "rustcane"
+version = "0.4.0"
+dependencies = [
+ "anyhow",
+ "axum",
+ "chrono",
+ "dirs",
+ "include_dir",
+ "lab-auth",
+ "reqwest 0.12.28",
+ "rmcp",
+ "rustcane",
+ "schemars",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "tokio",
+ "toml",
+ "tower",
+ "tower-http",
+ "tracing",
+ "tracing-subscriber",
+ "url",
 ]
 
 [[package]]

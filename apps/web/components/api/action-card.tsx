@@ -5,7 +5,7 @@ export function ActionCard({ action }: { action: (typeof ACTIONS)[number] }) {
   const isRestAction = action.transport === "rest";
   const curlExample = `curl -X POST http://localhost:3100${WEB_APP_CONFIG.restEndpoint} \\
   -H "Content-Type: application/json" \\
-  -d '${JSON.stringify(action.example)}'`;
+  -d '${JSON.stringify(action.rustcane)}'`;
 
   return (
     <div

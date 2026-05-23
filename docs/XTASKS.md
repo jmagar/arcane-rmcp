@@ -2,7 +2,7 @@
 title: "xtasks"
 doc_type: "guide"
 status: "active"
-owner: "rmcp-template"
+owner: "rustcane"
 audience:
   - "contributors"
   - "agents"
@@ -28,7 +28,7 @@ xtask/
 
 | Command | Purpose |
 |---|---|
-| `cargo xtask dist` | Build release binary and copy it to `bin/example`. |
+| `cargo xtask dist` | Build release binary and copy it to `bin/rustcane`. |
 | `cargo xtask ci` | Run local CI sequence: fmt, clippy, tests, taplo, patterns, audit when tools exist. |
 | `cargo xtask symlink-docs` | Create `AGENTS.md` and `GEMINI.md` symlinks next to each `CLAUDE.md`. |
 | `cargo xtask check-env` | Validate required environment before server start. |
@@ -85,9 +85,9 @@ Run `just symlink-docs` after adding any new `CLAUDE.md` file.
 `cargo xtask check-env` reports missing or misconfigured environment before startup:
 
 ```
-✓ EXAMPLE_API_URL:   https://example.internal/api (set)
-✗ EXAMPLE_API_KEY:   not set
-  → Set EXAMPLE_API_KEY in ~/.example/.env or your environment
+✓ RUSTCANE_API_URL:   https://rustcane.internal/api (set)
+✗ RUSTCANE_API_KEY:   not set
+  → Set RUSTCANE_API_KEY in ~/.rustcane/.env or your environment
 ```
 
 See `docs/PATTERNS.md` §24 and §48 for the xtask and doctor patterns.

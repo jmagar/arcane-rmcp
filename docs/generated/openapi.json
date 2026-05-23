@@ -1,9 +1,9 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Example MCP REST API",
+    "title": "Arcane MCP REST API",
     "version": "0.4.0",
-    "description": "Generated OpenAPI schema for rmcp-template's REST surface. TEMPLATE: rename Example identifiers and action schemas when adapting. Auth modes: loopback/trusted-gateway deployments may have no local auth; mounted bearer mode uses EXAMPLE_MCP_TOKEN; OAuth mode uses bearer JWTs. REST actions require their action-specific scopes when auth is mounted."
+    "description": "Generated OpenAPI schema for rustcane's REST surface. TEMPLATE: rename Arcane identifiers and action schemas when adapting. Auth modes: loopback/trusted-gateway deployments may have no local auth; mounted bearer mode uses RUSTCANE_MCP_TOKEN; OAuth mode uses bearer JWTs. REST actions require their action-specific scopes when auth is mounted."
   },
   "servers": [
     {
@@ -99,14 +99,14 @@
         }
       }
     },
-    "/v1/example": {
+    "/v1/rustcane": {
       "post": {
         "tags": [
           "actions"
         ],
         "summary": "Dispatch a REST action",
-        "description": "Thin REST shim over the shared service layer. MCP-only actions are not exposed here. Current REST actions: greet, echo, status, help. When auth is mounted, each action requires its declared scope; example:write satisfies example:read.",
-        "operationId": "dispatchExampleAction",
+        "description": "Thin REST shim over the shared service layer. MCP-only actions are not exposed here. Current REST actions: greet, echo, status, help. When auth is mounted, each action requires its declared scope; rustcane:write satisfies rustcane:read.",
+        "operationId": "dispatchArcaneAction",
         "security": [
           {
             "BearerAuth": []

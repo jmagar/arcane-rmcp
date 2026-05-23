@@ -12,7 +12,7 @@
 //! scaffolding.
 
 use super::*;
-use crate::config::{ExampleConfig, McpConfig};
+use crate::config::{ArcaneConfig, McpConfig};
 
 // ── check_required_var ────────────────────────────────────────────────────────
 
@@ -179,8 +179,8 @@ async fn upstream_passes_for_local_health_endpoint() {
 
 fn auth_config(host: &str) -> Config {
     Config {
-        example: ExampleConfig {
-            api_url: "https://example.test".into(),
+        rustcane: ArcaneConfig {
+            api_url: "https://rustcane.test".into(),
             api_key: "secret".into(),
         },
         mcp: McpConfig {
@@ -219,5 +219,5 @@ fn auth_config_rejects_non_loopback_without_auth() {
     let check = check_auth_config(&config);
 
     assert!(!check.ok);
-    assert!(check.hint.unwrap().contains("EXAMPLE_MCP_TOKEN"));
+    assert!(check.hint.unwrap().contains("RUSTCANE_MCP_TOKEN"));
 }

@@ -1,18 +1,18 @@
 # =============================================================================
 # docker-compose.prod.yml — Production deployment template
 #
-# TEMPLATE: Replace all occurrences of "example" with your service name.
+# TEMPLATE: Replace all occurrences of "rustcane" with your service name.
 #           Replace all occurrences of "EXAMPLE" with your service name in caps.
 #
 # Key substitutions:
-#   "example-mcp"          -> your Docker service/container name
-#   "example-mcp-data"     -> your Docker volume name
-#   "ghcr.io/.../example"  -> your published Docker image path
+#   "rustcane-mcp"          -> your Docker service/container name
+#   "rustcane-mcp-data"     -> your Docker volume name
+#   "ghcr.io/.../rustcane"  -> your published Docker image path
 #   port 40060             -> your service's MCP port
-#   EXAMPLE_*              -> your env var prefix
+#   RUSTCANE_*              -> your env var prefix
 # =============================================================================
 
-name: rmcp-template
+name: rustcane
 
 x-common-service: &common-service
   networks:
@@ -32,21 +32,21 @@ x-common-service: &common-service
       compress: "true"
 
 services:
-  example-mcp:
+  rustcane-mcp:
     <<: *common-service
     # TEMPLATE: Replace with your image path.
-    image: ghcr.io/your-org/example-mcp:${EXAMPLE_MCP_VERSION:-latest}
-    container_name: example-mcp
+    image: ghcr.io/your-org/rustcane-mcp:${RUSTCANE_MCP_VERSION:-latest}
+    container_name: rustcane-mcp
     env_file:
       - path: .env
         required: false
     environment:
-      EXAMPLE_MCP_HOST: 0.0.0.0
-      EXAMPLE_NOAUTH: "true"
+      RUSTCANE_MCP_HOST: 0.0.0.0
+      RUSTCANE_NOAUTH: "true"
     ports:
-      - "${EXAMPLE_MCP_HOST_PORT:-40060}:40060/tcp"
+      - "${RUSTCANE_MCP_HOST_PORT:-40060}:40060/tcp"
     volumes:
-      - ${HOME}/.example:/data
+      - ${HOME}/.rustcane:/data
     cap_drop:
       - ALL
     security_opt:
@@ -68,7 +68,7 @@ services:
           cpus: '0.5'
 
 volumes:
-  example-mcp-data:
+  rustcane-mcp-data:
 
 networks:
   mcp:
