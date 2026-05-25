@@ -37,7 +37,7 @@ Set `RUSTCANE_MCP_TOKEN` in your environment or `.env` file. Clients authenticat
 Authorization: Bearer <token>
 ```
 
-That's all. The server validates the header on every request to `/mcp` and `/v1/rustcane`.
+That's all. The server validates the header on every request to `/mcp`.
 
 ---
 

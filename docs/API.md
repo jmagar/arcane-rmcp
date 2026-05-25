@@ -1,6 +1,6 @@
 # rustcane API
 
-`rustcane` exposes one MCP tool named `arcane`, one REST action endpoint at `/v1/rustcane`, and equivalent CLI commands.
+`rustcane` exposes one MCP tool named `arcane` and equivalent CLI commands.
 
 ## MCP Tool
 
@@ -33,20 +33,6 @@ rustcane help container
 rustcane call --action container --subaction list --env-id default
 rustcane call --action container --subaction stop --env-id default --id nginx --confirm
 rustcane call --action image --subaction pull --env-id default --params '{"image":"alpine:latest"}'
-```
-
-## REST Endpoint
-
-`POST /v1/rustcane`
-
-```json
-{
-  "action": "container",
-  "params": {
-    "subaction": "list",
-    "envId": "default"
-  }
-}
 ```
 
 ## Safety and Auth

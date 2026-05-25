@@ -10,8 +10,8 @@ Rust MCP and CLI server for Arcane Docker management.
 |---|---:|---|
 | MCP | Required | Agent-facing Docker/Arcane operations through the `arcane` tool |
 | CLI | Required | Scriptable parity surface for debugging and automation |
-| REST | Present | Thin local HTTP action endpoint from the template |
-| Web | Present | Lightweight template admin shell, not the primary surface |
+| REST | Not shipped | Upstream-client servers do not expose a local REST action API |
+| Web | Not shipped | Upstream-client servers do not serve an embedded web UI |
 
 ## Actions
 

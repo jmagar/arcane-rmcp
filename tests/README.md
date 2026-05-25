@@ -1,6 +1,6 @@
 # Tests
 
-Tests cover CLI parsing, service/action behavior, REST routes, plugin contracts, template invariants, and live MCP HTTP integration.
+Tests cover CLI parsing, service/action behavior, plugin contracts, template invariants, and live MCP HTTP integration.
 
 ## Running tests
 
@@ -47,12 +47,6 @@ Tests MCP action behavior below HTTP. These use `rustcane::testing::loopback_sta
 Current checks assert semantic behavior for `greet`, `echo`, `status`, schema/action exposure, and all non-elicitation actions returning JSON objects.
 
 > Template rule: add one semantic test per business action. Assert response values, not only JSON validity.
-
-### `api_routes.rs` — REST and route behavior
-
-Tests REST action dispatch, validation errors, `/status`, and auth policy behavior at the Axum route layer.
-
-This is the right place for HTTP status-code behavior and REST/MCP action surface differences, such as REST excluding MCP-only elicitation actions.
 
 ### `plugin_contract.rs` — Plugin package contract
 
