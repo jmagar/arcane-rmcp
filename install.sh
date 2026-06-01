@@ -27,7 +27,7 @@ set -euo pipefail
 REPO="your-org/rustcane-mcp"
 
 # TEMPLATE: Replace with your binary name (matches Cargo.toml [[bin]] name)
-BINARY_NAME="rustcane"
+BINARY_NAME="rarcane"
 
 # TEMPLATE: Replace with your service display name (shown in messages)
 SERVICE_NAME="rustcane-mcp"

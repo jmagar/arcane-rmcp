@@ -287,7 +287,7 @@ health:
 
 # Verify that the running Docker/systemd service matches the current artifact
 runtime-current:
-    bash scripts/check-runtime-current.sh --expected-binary target/release/rustcane
+    bash scripts/check-runtime-current.sh --expected-binary target/release/rarcane
 
 # Smoke-test the protected MCP HTTP auth path (requires running bearer-auth server)
 auth-smoke:
@@ -321,13 +321,13 @@ build-plugin: build-release
     #!/bin/sh
     set -eu
     target_dir="${CARGO_TARGET_DIR:-target}"
-    if [ ! -x "${target_dir}/release/rustcane" ] && [ -x ".cache/cargo/release/rustcane" ]; then
+    if [ ! -x "${target_dir}/release/rarcane" ] && [ -x ".cache/cargo/release/rarcane" ]; then
         target_dir=".cache/cargo"
     fi
     mkdir -p bin plugins/rustcane/bin
-    install -m 755 "${target_dir}/release/rustcane" bin/rustcane
-    install -m 755 "${target_dir}/release/rustcane" plugins/rustcane/bin/rustcane
-    echo "Installed bin/rustcane and plugins/rustcane/bin/rustcane"
+    install -m 755 "${target_dir}/release/rarcane" bin/rarcane
+    install -m 755 "${target_dir}/release/rarcane" plugins/rustcane/bin/rarcane
+    echo "Installed bin/rarcane and plugins/rustcane/bin/rarcane"
 
 # Install the release binary into bin/ (alias for build-plugin kept for compatibility)
 install: build-plugin
@@ -335,8 +335,8 @@ install: build-plugin
 # Install the release binary on the local PATH for runtime smoke testing
 install-local: build-release
     mkdir -p "${HOME}/.local/bin"
-    install -m 755 target/release/rustcane "${HOME}/.local/bin/rustcane"
-    @echo "Installed ${HOME}/.local/bin/rustcane"
+    install -m 755 target/release/rarcane "${HOME}/.local/bin/rarcane"
+    @echo "Installed ${HOME}/.local/bin/rarcane"
 
 # Validate all plugin manifests, MCP config, hooks, and skills
 validate-plugin:

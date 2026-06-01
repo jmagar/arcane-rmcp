@@ -27,7 +27,7 @@
 # =============================================================================
 set -e
 
-SERVICE_NAME="rustcane"
+SERVICE_NAME="rarcane"
 BINARY="/usr/local/bin/${SERVICE_NAME}"
 
 # ── Data directory ─────────────────────────────────────────────────────────────

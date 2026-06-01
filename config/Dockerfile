@@ -72,7 +72,7 @@ RUN --mount=type=cache,id=rustcane-cargo-registry,target=/usr/local/cargo/regist
     --mount=type=cache,id=rustcane-cargo-git,target=/usr/local/cargo/git,sharing=locked \
     --mount=type=cache,id=rustcane-cargo-target,target=/app/target,sharing=locked \
     touch src/main.rs && cargo build --release --locked -p rustcane && \
-    cp target/release/rustcane /usr/local/bin/rustcane
+    cp target/release/rarcane /usr/local/bin/rarcane
 
 # ── Stage 3: Runtime ──────────────────────────────────────────────────────────
 # Minimal Debian image — no Rust toolchain, no build tools.
@@ -95,7 +95,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # TEMPLATE: Replace "rustcane" with your binary name in both COPY and target path.
-COPY --from=builder /usr/local/bin/rustcane /usr/local/bin/rustcane
+COPY --from=builder /usr/local/bin/rarcane /usr/local/bin/rarcane
 
 # Wire in the entrypoint.
 # TEMPLATE: entrypoint.sh lives at the repo root. It runs as root, fixes /data

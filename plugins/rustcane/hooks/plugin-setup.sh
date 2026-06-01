@@ -24,11 +24,11 @@ export_if_set() {
 }
 
 ensure_example_binary() {
-  if command -v rustcane >/dev/null 2>&1; then
+  if command -v rarcane >/dev/null 2>&1; then
     return 0
   fi
 
-  local bundled="${CLAUDE_PLUGIN_ROOT}/bin/rustcane"
+  local bundled="${CLAUDE_PLUGIN_ROOT}/bin/rarcane"
   if [[ ! -x "${bundled}" ]]; then
     printf 'rustcane plugin setup: bundled binary not found at %s\n' "${bundled}" >&2
     printf '  → run: just install   (builds release binary and copies to plugins/rustcane/bin/)\n' >&2
@@ -36,10 +36,10 @@ ensure_example_binary() {
   fi
 
   mkdir -p "${HOME}/.local/bin"
-  ln -sf "${bundled}" "${HOME}/.local/bin/rustcane"
+  ln -sf "${bundled}" "${HOME}/.local/bin/rarcane"
   export PATH="${HOME}/.local/bin:${PATH}"
 
-  command -v rustcane >/dev/null 2>&1 || {
+  command -v rarcane >/dev/null 2>&1 || {
     printf 'rustcane plugin setup: symlink created but rustcane still not found in PATH\n' >&2
     printf '  → ensure %s is on your PATH\n' "${HOME}/.local/bin" >&2
     exit 1
@@ -64,7 +64,7 @@ main() {
   export RUSTCANE_HOME
 
   ensure_example_binary
-  rustcane setup plugin-hook "$@"
+  rarcane setup plugin-hook "$@"
 }
 
 main "$@"

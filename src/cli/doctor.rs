@@ -64,7 +64,7 @@ pub async fn run_doctor(config: &Config, json: bool) -> Result<()> {
     // ── 2. Binary in PATH ─────────────────────────────────────────────────────
     //
     // TEMPLATE: Replace "rustcane" with your binary name (Cargo.toml [[bin]] name).
-    checks.push(check_binary_in_path("rustcane"));
+    checks.push(check_binary_in_path("rarcane"));
 
     // ── 3. Required environment variables / config ────────────────────────────
     //
