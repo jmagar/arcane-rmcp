@@ -1,13 +1,13 @@
 ---
 date: 2026-05-16 07:19:24 EST
-repo: git@github.com:jmagar/rustcane.git
+repo: git@github.com:jmagar/rarcane.git
 branch: main
 head: 885cd05
 plan: none
 agent: Claude (claude-sonnet-4-6)
 session id: ce23ca96-f6b3-4bad-b4b2-4cb20de89bb8
-transcript: /home/jmagar/.claude/projects/-home-jmagar-workspace-rustcane/ce23ca96-f6b3-4bad-b4b2-4cb20de89bb8.jsonl
-working directory: /home/jmagar/workspace/rustcane
+transcript: /home/jmagar/.claude/projects/-home-jmagar-workspace-rarcane/ce23ca96-f6b3-4bad-b4b2-4cb20de89bb8.jsonl
+working directory: /home/jmagar/workspace/rarcane
 ---
 
 ## User Request
@@ -71,7 +71,7 @@ Final state: **213 tests passing, 8 ignored, 0 clippy warnings under `-D warning
 - **Python script for inline test extraction** — used `str.rfind` on the inline test block marker + regex to strip separator comments, then rewrote each file atomically. More reliable than Edit tool on 100-line old_string matches.
 - **`ValidationError` without `thiserror`** — implemented `Display` and `std::error::Error` manually to avoid adding a new dependency. Five variants cover all parse-error sites; `anyhow::Error::downcast_ref` provides the typed check.
 - **`ignore` not `no_run` for doc fragments** — the formatter and logging doc examples are match-arm and context-dependent fragments, not compilable programs. `no_run` still compiles; `ignore` skips both compilation and execution.
-- **`pub mod logging` in `lib.rs`** — `logging` is reusable infrastructure (dual console+file logging with Aurora formatting). Correct placement in the public lib; `main.rs` calls `rustcane::logging::init()` in practice.
+- **`pub mod logging` in `lib.rs`** — `logging` is reusable infrastructure (dual console+file logging with Aurora formatting). Correct placement in the public lib; `main.rs` calls `rarcane::logging::init()` in practice.
 - **BufWriter capture harness for formatter tests** — implemented `Clone + Write + MakeWriter<'_>` on a `Arc<Mutex<Vec<u8>>>` wrapper. Passed to `tracing_subscriber::fmt()` with `AuroraFormatter` to capture real formatted output without touching stderr.
 
 ---

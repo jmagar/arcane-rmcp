@@ -1,12 +1,12 @@
 ---
 date: 2026-05-15 01:58:34 EST
-repo: git@github.com:jmagar/rustcane.git
+repo: git@github.com:jmagar/rarcane.git
 branch: main
 head: 379ef87
 agent: Claude (claude-sonnet-4-6)
 session_id: 191d2a6c-515e-46a7-b3a8-a50a9e26b84f
-transcript: /home/jmagar/.claude/projects/-home-jmagar-workspace-rustcane/191d2a6c-515e-46a7-b3a8-a50a9e26b84f.jsonl
-working_directory: /home/jmagar/workspace/rustcane
+transcript: /home/jmagar/.claude/projects/-home-jmagar-workspace-rarcane/191d2a6c-515e-46a7-b3a8-a50a9e26b84f.jsonl
+working_directory: /home/jmagar/workspace/rarcane
 ---
 
 ## User Request

@@ -20,10 +20,10 @@ pub struct ArcaneClient {
 impl ArcaneClient {
     pub fn new(cfg: &ArcaneConfig) -> Result<Self> {
         if cfg.api_url.trim().is_empty() {
-            anyhow::bail!("RUSTCANE_API_URL is not set");
+            anyhow::bail!("RARCANE_API_URL is not set");
         }
         if cfg.api_key.trim().is_empty() {
-            anyhow::bail!("RUSTCANE_API_KEY is not set");
+            anyhow::bail!("RARCANE_API_KEY is not set");
         }
         let http = reqwest::ClientBuilder::new()
             .timeout(Duration::from_secs(30))

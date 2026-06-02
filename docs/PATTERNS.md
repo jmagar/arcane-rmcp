@@ -2,7 +2,7 @@
 
 Canonical reference for all patterns used across the Rust MCP server family:
 `lab`, `axon_rust` (Axon), `syslog-mcp`, `rustify` (Gotify), `rustifi` (UniFi),
-`apprise-mcp`, `rustscale` (Tailscale), `rustcane` (this repo), and
+`apprise-mcp`, `rustscale` (Tailscale), `rarcane` (this repo), and
 `unrust` (Unraid).
 
 Every server in the family MUST follow these patterns. Deviation requires an explicit
@@ -29,7 +29,7 @@ Allowed exceptions:
 
 - MCP-only protocol interactions, such as elicitation, may omit CLI when there is no
   equivalent non-interactive command. `scaffold_intent` is the template's explicit
-  rustcane: it combines MCP elicitation with plugin skill handoff, which has no true
+  rarcane: it combines MCP elicitation with plugin skill handoff, which has no true
   CLI equivalent inside the user's agent/editor permission model. Document the reason
   in the action metadata/docs.
 - CLI-only operational commands, such as `serve`, `mcp`, `doctor`, `watch`, and
@@ -222,7 +222,7 @@ The service is where you add:
 - Input validation and defaults
 - Business rules (e.g. "don't allow deletes without confirm")
 - Cross-cutting concerns (logging, metrics, caching)
-- Error enrichment ("couldn't connect to X: check RUSTCANE_URL")
+- Error enrichment ("couldn't connect to X: check RARCANE_URL")
 
 ---
 
@@ -238,7 +238,7 @@ pub struct ArcaneClient {
 
 impl ArcaneClient {
     pub fn new(cfg: &ArcaneConfig) -> Result<Self> {
-        if cfg.url.is_empty() { anyhow::bail!("RUSTCANE_URL is not set"); }
+        if cfg.url.is_empty() { anyhow::bail!("RARCANE_URL is not set"); }
         let client = reqwest::ClientBuilder::new()
             .danger_accept_invalid_certs(cfg.skip_tls_verify)
             .build()?;
@@ -291,7 +291,7 @@ site = "default"
 [mcp]
 host = "0.0.0.0"
 port = 3000
-server_name = "rustcane-mcp"
+server_name = "rarcane-mcp"
 
 [mcp.auth]
 mode = "bearer"           # or "oauth"
@@ -307,15 +307,15 @@ auth_code_ttl_secs = 300
 
 ```bash
 # .env — secrets and URLs ONLY
-RUSTCANE_API_URL=https://rustcane.internal/api
-RUSTCANE_API_KEY=your_api_key_here
+RARCANE_API_URL=https://rarcane.internal/api
+RARCANE_API_KEY=your_api_key_here
 
 # MCP auth
-RUSTCANE_MCP_TOKEN=your_bearer_token_here
+RARCANE_MCP_TOKEN=your_bearer_token_here
 
 # OAuth (only when auth_mode=oauth in config.toml)
-# RUSTCANE_MCP_GOOGLE_CLIENT_ID=...
-# RUSTCANE_MCP_GOOGLE_CLIENT_SECRET=...
+# RARCANE_MCP_GOOGLE_CLIENT_ID=...
+# RARCANE_MCP_GOOGLE_CLIENT_SECRET=...
 
 # Docker runtime
 PUID=1000
@@ -339,11 +339,11 @@ impl Config {
         }
 
         // 2. Env overrides (secrets + any setting the user wants to override)
-        env_str("RUSTCANE_MCP_HOST", &mut config.mcp.host);
-        env_parse("RUSTCANE_MCP_PORT", &mut config.mcp.port)?;
-        env_opt_str("RUSTCANE_MCP_TOKEN", &mut config.mcp.api_token);
-        env_str("RUSTCANE_API_URL", &mut config.rustcane.url);
-        env_str("RUSTCANE_API_KEY", &mut config.rustcane.api_key);
+        env_str("RARCANE_MCP_HOST", &mut config.mcp.host);
+        env_parse("RARCANE_MCP_PORT", &mut config.mcp.port)?;
+        env_opt_str("RARCANE_MCP_TOKEN", &mut config.mcp.api_token);
+        env_str("RARCANE_API_URL", &mut config.rarcane.url);
+        env_str("RARCANE_API_KEY", &mut config.rarcane.api_key);
         // ...
         Ok(config)
     }
@@ -374,10 +374,10 @@ async fn build_auth_policy(config: &Config) -> Result<AuthPolicy> {
     }
     if config.mcp.auth.mode == AuthMode::OAuth {
         let auth_cfg = lab_auth::config::AuthConfigBuilder::new()
-            .env_prefix("RUSTCANE_MCP")
+            .env_prefix("RARCANE_MCP")
             .session_cookie_name("example_mcp_session")
-            .scopes_supported(vec!["rustcane:read".into(), "rustcane:write".into()])
-            .default_scope("rustcane:read")
+            .scopes_supported(vec!["rarcane:read".into(), "rarcane:write".into()])
+            .default_scope("rarcane:read")
             .resource_path("/mcp")
             .enable_dynamic_registration(true)
             .build_from_sources(vec![])  // reads from env vars
@@ -405,7 +405,7 @@ pub fn build_auth_layer(
             AuthLayer::new()
                 .with_static_token(static_token)
                 .with_auth_state(auth_state.clone())
-                .with_static_token_scopes(vec!["rustcane:read".into(), "rustcane:write".into()])
+                .with_static_token_scopes(vec!["rarcane:read".into(), "rarcane:write".into()])
                 .with_resource_url(resource_url)
                 .with_allow_session_cookie(false),
         ),
@@ -428,7 +428,7 @@ When `auth_state: Some(_)`, the OAuth router is automatically mounted:
 Both transports build the same `AppState` and serve the same `ServerHandler`:
 
 ```rust
-// HTTP mode (default: `rustcane` or `rustcane serve`)
+// HTTP mode (default: `rarcane` or `rarcane serve`)
 async fn serve_mcp() -> Result<()> {
     let config = Config::load()?;
     let state = build_state(config).await?;
@@ -439,7 +439,7 @@ async fn serve_mcp() -> Result<()> {
         .with_graceful_shutdown(shutdown_signal()).await?;
 }
 
-// stdio mode (`rustcane mcp` — for Claude Code local use)
+// stdio mode (`rarcane mcp` — for Claude Code local use)
 async fn serve_stdio_mcp() -> Result<()> {
     let config = Config::load()?;
     let state = build_state(config).await?;
@@ -481,7 +481,7 @@ sub-functions. This is the canonical pattern across all servers:
 // mcp/tools.rs
 pub(super) async fn execute_tool(state: &AppState, name: &str, args: Value) -> anyhow::Result<Value> {
     match name {
-        "rustcane" => dispatch(state, args).await,
+        "rarcane" => dispatch(state, args).await,
         _ => Err(anyhow::anyhow!("unknown tool: {name}")),
     }
 }
@@ -519,7 +519,7 @@ pub const ACTION_SPECS: &[ActionSpec] = &[
 
 pub(super) fn tool_definitions() -> Vec<Value> {
     vec![json!({
-        "name": "rustcane",
+        "name": "rarcane",
         "description": "Query and manage Arcane service. Use action=help for documentation.",
         "inputSchema": {
             "type": "object",
@@ -537,9 +537,9 @@ pub(super) fn tool_definitions() -> Vec<Value> {
 ### Scope enforcement (mcp/rmcp_server.rs)
 
 ```rust
-const READ_SCOPE:  &str = "rustcane:read";
-const WRITE_SCOPE: &str = "rustcane:write";
-const DENY_SCOPE:  &str = "rustcane:__deny__";  // sentinel — never granted
+const READ_SCOPE:  &str = "rarcane:read";
+const WRITE_SCOPE: &str = "rarcane:write";
+const DENY_SCOPE:  &str = "rarcane:__deny__";  // sentinel — never granted
 
 fn required_scope_for(action: &str) -> Option<&'static str> {
     required_scope_for_action(action)
@@ -553,7 +553,7 @@ fn required_scope_for(action: &str) -> Option<&'static str> {
 Every server exposes its tool JSON schema as a readable resource:
 
 ```rust
-const SCHEMA_RESOURCE_URI: &str = "rustcane://schema/mcp-tool";
+const SCHEMA_RESOURCE_URI: &str = "rarcane://schema/mcp-tool";
 
 async fn read_resource(&self, request: ReadResourceRequestParams, ...) -> Result<ReadResourceResult> {
     if request.uri != SCHEMA_RESOURCE_URI {
@@ -588,7 +588,7 @@ pub(super) fn get_prompt(request: GetPromptRequestParams) -> anyhow::Result<GetP
     match request.name.as_str() {
         "quick_start" => Ok(GetPromptResult::new(vec![
             PromptMessage::new_text(PromptMessageRole::User,
-                "Use the rustcane tool with action=status, then action=things to get an overview.")
+                "Use the rarcane tool with action=status, then action=things to get an overview.")
         ]).with_description("Get an overview")),
         other => Err(anyhow::anyhow!("unknown prompt: {other}")),
     }
@@ -621,7 +621,7 @@ impl CliCommand {
             ["things"]          => Self::Things,
             ["thing", id, ..]   => Self::Thing { id: id.to_string() },
             ["delete", id, ..]  => Self::DeleteThing { id: id.to_string(), confirm },
-            other => bail!("unknown command: {}\n\nRun `rustcane --help`", other.join(" ")),
+            other => bail!("unknown command: {}\n\nRun `rarcane --help`", other.join(" ")),
         };
         Ok((cmd, json))
     }
@@ -681,7 +681,7 @@ use example_mcp::testing::loopback_state;
 #[tokio::test]
 async fn help_returns_help_key() {
     let state = loopback_state();
-    let result = execute_tool(&state, "rustcane", json!({"action": "help"})).await.unwrap();
+    let result = execute_tool(&state, "rarcane", json!({"action": "help"})).await.unwrap();
     assert!(result.get("help").is_some());
     assert!(!result["help"].as_str().unwrap().is_empty());
 }
@@ -737,7 +737,7 @@ Adding an explicit version creates drift and requires manual bumping on every re
 
 ```json
 {
-  "name": "rustcane",
+  "name": "rarcane",
   "userConfig": {
     "server_url":    { "type": "string",  "title": "MCP server URL",    "default": "http://localhost:3000", "required": true },
     "api_token":     { "type": "string",  "title": "API token",          "sensitive": true },
@@ -747,8 +747,8 @@ Adding an explicit version creates drift and requires manual bumping on every re
     "google_client_id":     { "type": "string", "title": "Google client ID",     "sensitive": true },
     "google_client_secret": { "type": "string", "title": "Google client secret", "sensitive": true },
     "auth_admin_email":     { "type": "string", "title": "OAuth admin email" },
-    "example_api_url": { "type": "string", "title": "Arcane API URL", "sensitive": true, "required": true },
-    "example_api_key": { "type": "string", "title": "Arcane API key", "sensitive": true, "required": true }
+    "rarcane_api_url": { "type": "string", "title": "Arcane API URL", "sensitive": true, "required": true },
+    "rarcane_api_key": { "type": "string", "title": "Arcane API key", "sensitive": true, "required": true }
   },
   "mcpServers": "./plugins/<service>/.mcp.json",
   "hooks": "./plugins/<service>/hooks/hooks.json",
@@ -761,7 +761,7 @@ Adding an explicit version creates drift and requires manual bumping on every re
 ```json
 {
   "mcpServers": {
-    "rustcane": {
+    "rarcane": {
       "type": "http",
       "url": "${user_config.server_url}/mcp",
       "headers": { "Authorization": "Bearer ${user_config.api_token}" }
@@ -804,29 +804,29 @@ RUN apt-get update && apt-get install -y pkg-config libssl-dev && rm -rf /var/li
 
 # Cache dependencies
 COPY Cargo.toml Cargo.lock ./
-RUN --mount=type=cache,id=rustcane-cargo-registry,target=/usr/local/cargo/registry,sharing=locked \
-    --mount=type=cache,id=rustcane-cargo-target,target=/app/target,sharing=locked \
+RUN --mount=type=cache,id=rarcane-cargo-registry,target=/usr/local/cargo/registry,sharing=locked \
+    --mount=type=cache,id=rarcane-cargo-target,target=/app/target,sharing=locked \
     mkdir src && echo "fn main() {}" > src/main.rs && cargo build --release --locked && rm -rf src
 
 # Build real binary
 COPY src/ src/
-RUN --mount=type=cache,id=rustcane-cargo-registry,target=/usr/local/cargo/registry,sharing=locked \
-    --mount=type=cache,id=rustcane-cargo-target,target=/app/target,sharing=locked \
+RUN --mount=type=cache,id=rarcane-cargo-registry,target=/usr/local/cargo/registry,sharing=locked \
+    --mount=type=cache,id=rarcane-cargo-target,target=/app/target,sharing=locked \
     touch src/main.rs && cargo build --release --locked && \
-    cp target/release/rustcane /usr/local/bin/rustcane
+    cp target/release/rarcane /usr/local/bin/rarcane
 
 FROM debian:bookworm-slim
 RUN apt-get update && apt-get install -y ca-certificates curl && rm -rf /var/lib/apt/lists/*
-COPY --from=builder /usr/local/bin/rustcane /usr/local/bin/rustcane
-RUN groupadd --gid 1000 rustcane && \
-    useradd --uid 1000 --gid rustcane --no-create-home --shell /sbin/nologin rustcane && \
-    mkdir -p /data && chown rustcane:rustcane /data
+COPY --from=builder /usr/local/bin/rarcane /usr/local/bin/rarcane
+RUN groupadd --gid 1000 rarcane && \
+    useradd --uid 1000 --gid rarcane --no-create-home --shell /sbin/nologin rarcane && \
+    mkdir -p /data && chown rarcane:rarcane /data
 
 USER 1000:1000
 EXPOSE 3000/tcp
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD curl -sf http://localhost:3000/health || exit 1
-CMD ["rustcane", "serve", "mcp"]
+CMD ["rarcane", "serve", "mcp"]
 ```
 
 ---
@@ -835,21 +835,21 @@ CMD ["rustcane", "serve", "mcp"]
 
 ```yaml
 services:
-  rustcane-mcp:
-    image: ghcr.io/jmagar/rustcane-mcp:${VERSION:-latest}
+  rarcane-mcp:
+    image: ghcr.io/jmagar/rarcane-mcp:${VERSION:-latest}
     build:
       context: .
       dockerfile: config/Dockerfile
-    container_name: rustcane-mcp
+    container_name: rarcane-mcp
     restart: unless-stopped
     user: "${PUID:-1000}:${PGID:-1000}"
     env_file:
       - path: .env
         required: false
     ports:
-      - "${RUSTCANE_MCP_HOST_PORT:-3000}:3000/tcp"
+      - "${RARCANE_MCP_HOST_PORT:-3000}:3000/tcp"
     volumes:
-      - ${RUSTCANE_DATA_VOLUME:-rustcane-mcp-data}:/data
+      - ${RARCANE_DATA_VOLUME:-rarcane-mcp-data}:/data
     networks:
       - mcp
     healthcheck:
@@ -865,11 +865,11 @@ services:
           cpus: '0.5'
 
 volumes:
-  rustcane-mcp-data:
+  rarcane-mcp-data:
 
 networks:
   mcp:
-    name: ${DOCKER_NETWORK:-rustcane-mcp}
+    name: ${DOCKER_NETWORK:-rarcane-mcp}
     external: true
 ```
 
@@ -885,11 +885,11 @@ networks:
 
 ```bash
 #!/usr/bin/env bash
-# One-line install: curl -fsSL https://raw.githubusercontent.com/jmagar/rustcane-mcp/main/install.sh | bash
+# One-line install: curl -fsSL https://raw.githubusercontent.com/jmagar/rarcane-mcp/main/install.sh | bash
 set -euo pipefail
 
-REPO="jmagar/rustcane-mcp"
-BINARY="rustcane"
+REPO="jmagar/rarcane-mcp"
+BINARY="rarcane"
 INSTALL_DIR="${HOME}/.local/bin"
 
 # Detect platform
@@ -910,9 +910,9 @@ chmod +x "${INSTALL_DIR}/${BINARY}"
 if [[ ! -f .env ]]; then
   cat > .env << 'ENV'
 # Required — set these before running
-RUSTCANE_API_URL=https://your-service.internal/api
-RUSTCANE_API_KEY=your_api_key_here
-RUSTCANE_MCP_TOKEN=$(openssl rand -hex 32)
+RARCANE_API_URL=https://your-service.internal/api
+RARCANE_API_KEY=your_api_key_here
+RARCANE_MCP_TOKEN=$(openssl rand -hex 32)
 # Docker
 PUID=1000
 PGID=1000
@@ -945,11 +945,11 @@ and structurally correct. Resource tests follow the same rule: prove the resourc
 
 ```bash
 # Bad test — only proves MCP responded
-run_test "server info" "rustcane" '{"action":"server_info"}'
+run_test "server info" "rarcane" '{"action":"server_info"}'
 
 # Good test — proves the API actually returned real data
-run_test "server info has hostname" "rustcane" '{"action":"server_info"}' "hostname"
-run_test "server info hostname non-empty" "rustcane" '{"action":"server_info"}' \
+run_test "server info has hostname" "rarcane" '{"action":"server_info"}' "hostname"
+run_test "server info hostname non-empty" "rarcane" '{"action":"server_info"}' \
   && assert_nonempty "$(last_output | jq -r '.hostname')" "hostname"
 ```
 
@@ -958,7 +958,7 @@ run_test "server info hostname non-empty" "rustcane" '{"action":"server_info"}' 
 ```json
 {
   "mcpServers": {
-    "rustcane": {
+    "rarcane": {
       "url": "http://localhost:3000/mcp",
       "transport": "http"
     }
@@ -986,11 +986,11 @@ assert node is not None and node != '' and node != [] and node != {}
 
 ### Resource validation
 
-MCP resources are public contract, not implementation detail. Test every stable resource URI exported by the server. The template validates `rustcane://schema/mcp-tool` by asserting:
+MCP resources are public contract, not implementation detail. Test every stable resource URI exported by the server. The template validates `rarcane://schema/mcp-tool` by asserting:
 
 - the resource URI resolves
 - the returned content parses as JSON
-- the tool name is `rustcane`
+- the tool name is `rarcane`
 - `inputSchema.type` is `object`
 - `inputSchema.properties.action` exists
 
@@ -1017,30 +1017,30 @@ test tag/app (`APPRISE_TEST_TAG`, `GOTIFY_TEST_APP_ID`) gated by an env var.
 Every server has a skill covering three fallback tiers:
 
 ```markdown
-# rustcane — Claude Code Skill
+# rarcane — Claude Code Skill
 
 Use this skill whenever... [trigger phrases]
 
 ## Tier 1: MCP tool (preferred)
-Use when the rustcane MCP server is configured.
+Use when the rarcane MCP server is configured.
 
-rustcane(action="things")
-rustcane(action="thing", id="abc123")
-rustcane(action="help")          # always available
+rarcane(action="things")
+rarcane(action="thing", id="abc123")
+rarcane(action="help")          # always available
 
 ## Tier 2: CLI binary
 Use when MCP is unavailable but the binary is installed.
 
-rustcane things [--json]
-rustcane thing <id> [--json]
+rarcane things [--json]
+rarcane thing <id> [--json]
 
-Env required: RUSTCANE_API_URL, RUSTCANE_API_KEY
+Env required: RARCANE_API_URL, RARCANE_API_KEY
 
 ## Tier 3: Direct API (last resort)
 Use when neither MCP nor CLI is available.
 
-curl -H "Authorization: Bearer $RUSTCANE_API_KEY" \
-     "$RUSTCANE_API_URL/things"
+curl -H "Authorization: Bearer $RARCANE_API_KEY" \
+     "$RARCANE_API_URL/things"
 
 ## Gotchas
 - [service-specific pitfalls]
@@ -1060,15 +1060,15 @@ curl -H "Authorization: Bearer $RUSTCANE_API_KEY" \
 | unifi-mcp (rustifi) | 7474 | `unifi` |
 | tailscale-mcp (rustscale) | 7575 | `tailscale` |
 | apprise-mcp | 8765 | `apprise` |
-| rustcane | 40060 | `rustcane` |
+| rarcane | 40060 | `rarcane` |
 
 ---
 
 ## 20. Checklist for New Servers
 
-Use this when creating a new server from rustcane:
+Use this when creating a new server from rarcane:
 
-- [ ] Replace every occurrence of `rustcane`/`Arcane`/`EXAMPLE` with your service name
+- [ ] Replace every occurrence of `rarcane`/`Arcane`/`EXAMPLE` with your service name
 - [ ] Implement API client in `src/<service>.rs` (transport only)
 - [ ] Add service methods to `src/app.rs` (all logic here)
 - [ ] Add tool actions to `src/mcp/tools.rs` and `src/mcp/schemas.rs`
@@ -1237,14 +1237,14 @@ fn default_data_dir() -> PathBuf {
     // Local: use ~/.<service>
     dirs::home_dir()
         .unwrap_or_else(|| PathBuf::from("."))
-        .join(".rustcane")  // replace with actual service name
+        .join(".rarcane")  // replace with actual service name
 }
 ```
 
 `docker-compose.yml` always mounts the host `~/.<service>` to `/data`:
 ```yaml
 volumes:
-  - ${HOME}/.rustcane:/data
+  - ${HOME}/.rarcane:/data
 ```
 
 This means `config.toml`, `.env`, `auth.db`, `auth-jwt.pem`, etc. are all in the same
@@ -1281,8 +1281,8 @@ if [ -f "${DATA_DIR}/.env" ]; then
 fi
 
 # Validate required env vars are set (fail fast)
-if [ -z "${RUSTCANE_API_KEY:-}" ]; then
-    echo "ERROR: RUSTCANE_API_KEY is not set" >&2
+if [ -z "${RARCANE_API_KEY:-}" ]; then
+    echo "ERROR: RARCANE_API_KEY is not set" >&2
     exit 1
 fi
 
@@ -1295,7 +1295,7 @@ Dockerfile:
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh && apk add --no-cache su-exec  # or use gosu on debian
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["rustcane", "serve", "mcp"]
+CMD ["rarcane", "serve", "mcp"]
 ```
 
 ---
@@ -1307,11 +1307,11 @@ configured, unless the operator explicitly opts out.
 
 Centralize this decision in library code, not the binary:
 
-- loopback bind with `RUSTCANE_MCP_NO_AUTH=true` → `LoopbackDev`
-- non-loopback with `RUSTCANE_NOAUTH=true` → `TrustedGatewayUnscoped`
+- loopback bind with `RARCANE_MCP_NO_AUTH=true` → `LoopbackDev`
+- non-loopback with `RARCANE_NOAUTH=true` → `TrustedGatewayUnscoped`
 - non-loopback with bearer token → mounted bearer auth
 - non-loopback with OAuth mode → mounted OAuth auth
-- non-loopback with `RUSTCANE_MCP_NO_AUTH=true` but no gateway acknowledgment → startup error
+- non-loopback with `RARCANE_MCP_NO_AUTH=true` but no gateway acknowledgment → startup error
 
 Called in `serve_mcp()` before binding the TCP listener.
 
@@ -1331,7 +1331,7 @@ fn is_containerized() -> bool {
 fn resolve_data_dir(config_path: Option<&str>) -> PathBuf {
     if let Some(p) = config_path { return PathBuf::from(p); }
     if is_containerized() { return PathBuf::from("/data"); }
-    dirs::home_dir().unwrap_or_default().join(".rustcane")
+    dirs::home_dir().unwrap_or_default().join(".rarcane")
 }
 
 fn resolve_bind_host(configured: &str) -> &str {
@@ -1475,7 +1475,7 @@ Run `just symlink-docs` after adding any new `CLAUDE.md` file.
 Use the canonical files from syslog-mcp as the base. Copy them without modification.
 
 Key `.gitignore` rules:
-- `.env` and `.env.*` ignored, `.env.rustcane` committed
+- `.env` and `.env.*` ignored, `.env.rarcane` committed
 - `target/` ignored
 - `*.db`, `*.db-shm`, `*.db-wal` ignored
 - AI tooling dirs ignored (`.claude/`, `.omc/`, `.lavra/`, etc.)
@@ -1520,7 +1520,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Updated Checklist for New Servers
 
-- [ ] Replace `rustcane`/`EXAMPLE` with your service name throughout
+- [ ] Replace `rarcane`/`EXAMPLE` with your service name throughout
 - [ ] Implement API client in `src/<service>.rs` (transport only)
 - [ ] Add service methods to `src/app.rs` (ALL logic here)
 - [ ] Add actions to `src/actions.rs`, `src/mcp/tools.rs`, and `src/mcp/schemas.rs` (thin shim ONLY)
@@ -1584,34 +1584,34 @@ Or via GitHub OAuth:
 ```json
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "tv.tootie/rustcane-mcp",
+  "name": "tv.tootie/rarcane-mcp",
   "title": "Arcane MCP",
   "description": "One-line description of what the server does.",
   "repository": {
-    "url": "https://github.com/jmagar/rustcane-mcp",
+    "url": "https://github.com/jmagar/rarcane-mcp",
     "source": "github"
   },
   "version": "0.1.0",
   "packages": [
     {
       "registryType": "oci",
-      "identifier": "ghcr.io/jmagar/rustcane-mcp:0.1.0",
+      "identifier": "ghcr.io/jmagar/rarcane-mcp:0.1.0",
       "version": "0.1.0",
       "environmentVariables": [
         {
-          "name": "RUSTCANE_API_URL",
+          "name": "RARCANE_API_URL",
           "description": "Base URL of your Arcane service.",
           "isRequired": true,
           "isSecret": false
         },
         {
-          "name": "RUSTCANE_API_KEY",
+          "name": "RARCANE_API_KEY",
           "description": "API key for authentication.",
           "isRequired": true,
           "isSecret": true
         },
         {
-          "name": "RUSTCANE_MCP_TOKEN",
+          "name": "RARCANE_MCP_TOKEN",
           "description": "Bearer token for MCP endpoint auth.",
           "isRequired": false,
           "isSecret": true
@@ -1622,7 +1622,7 @@ Or via GitHub OAuth:
   "remotes": [
     {
       "type": "streamable-http",
-      "url": "https://rustcane.yourdomain.com/mcp"
+      "url": "https://rarcane.yourdomain.com/mcp"
     }
   ]
 }
@@ -1636,7 +1636,7 @@ The `release.yml` workflow updates `server.json` version automatically on tag:
   run: |
     VERSION="${GITHUB_REF_NAME#v}"
     jq --arg v "$VERSION" \
-       --arg img "ghcr.io/jmagar/rustcane-mcp:${VERSION}" \
+       --arg img "ghcr.io/jmagar/rarcane-mcp:${VERSION}" \
        '.version = $v | .packages[0].identifier = $img | .packages[0].version = $v' \
        server.json > server.tmp && mv server.tmp server.json
 ```
@@ -1668,12 +1668,12 @@ plugins/
 
 ```json
 {
-  "name": "rustcane-mcp",
+  "name": "rarcane-mcp",
   "description": "Arcane service MCP server for Codex.",
-  "homepage": "https://github.com/jmagar/rustcane-mcp",
-  "repository": "https://github.com/jmagar/rustcane-mcp",
+  "homepage": "https://github.com/jmagar/rarcane-mcp",
+  "repository": "https://github.com/jmagar/rarcane-mcp",
   "license": "MIT",
-  "keywords": ["rustcane", "mcp", "homelab"],
+  "keywords": ["rarcane", "mcp", "homelab"],
   "skills": "./skills/",
   "mcpServers": "./.mcp.json",
   "interface": {
@@ -1683,7 +1683,7 @@ plugins/
     "developerName": "Jacob Magar",
     "category": "Infrastructure",
     "capabilities": ["Read"],
-    "websiteURL": "https://github.com/jmagar/rustcane-mcp",
+    "websiteURL": "https://github.com/jmagar/rarcane-mcp",
     "defaultPrompt": [
       "Check Arcane service status.",
       "List all items in Arcane.",
@@ -1717,27 +1717,27 @@ Maintain a parity table in `CLAUDE.md`:
 
 | Service Method | MCP Action | CLI Command |
 |---|---|---|
-| `service.list_things()` | `rustcane(action="things")` | `rustcane things` |
-| `service.get_thing(id)` | `rustcane(action="thing", id=...)` | `rustcane thing <id>` |
-| `service.create_thing(name)` | `rustcane(action="create_thing", name=...)` | `rustcane create <name>` |
-| `service.delete_thing(id)` | `rustcane(action="delete_thing", id=...)` | `rustcane delete <id> [--confirm]` |
+| `service.list_things()` | `rarcane(action="things")` | `rarcane things` |
+| `service.get_thing(id)` | `rarcane(action="thing", id=...)` | `rarcane thing <id>` |
+| `service.create_thing(name)` | `rarcane(action="create_thing", name=...)` | `rarcane create <name>` |
+| `service.delete_thing(id)` | `rarcane(action="delete_thing", id=...)` | `rarcane delete <id> [--confirm]` |
 
 ### Common parity gaps to check
 
-- `help` action in MCP → `rustcane --help` or `rustcane help` in CLI
+- `help` action in MCP → `rarcane --help` or `rarcane help` in CLI
 - Resource listing in MCP → no CLI equivalent needed (resources are MCP-only)
 - Prompts in MCP → no CLI equivalent needed (prompts are MCP-only)
-- `health` action in MCP → `rustcane health` in CLI
+- `health` action in MCP → `rarcane health` in CLI
 - Actions with optional params → CLI needs `--flag` for each optional param
 
-### Template parity table (rustcane)
+### Template parity table (rarcane)
 
 | Method | MCP | CLI |
 |---|---|---|
-| `service.greet(name)` | `rustcane(action="greet", name="...")` | `rustcane greet [--name N]` |
-| `service.echo(message)` | `rustcane(action="echo", message="...")` | `rustcane echo <message>` |
-| `service.status()` | `rustcane(action="status")` | `rustcane status` |
-| `service.help()` | `rustcane(action="help")` | `rustcane --help` |
+| `service.greet(name)` | `rarcane(action="greet", name="...")` | `rarcane greet [--name N]` |
+| `service.echo(message)` | `rarcane(action="echo", message="...")` | `rarcane echo <message>` |
+| `service.status()` | `rarcane(action="status")` | `rarcane status` |
+| `service.help()` | `rarcane(action="help")` | `rarcane --help` |
 
 ---
 
@@ -1767,7 +1767,7 @@ Adapted from `agentcast/scripts/refresh-docs.sh`. The core mechanics are identic
 | rustifi | developer.ui.com, modelcontextprotocol.io | Art-of-WiFi/UniFi-API-client, mcp/rust-sdk |
 | rustscale | tailscale.com/api, modelcontextprotocol.io | tailscale/tailscale (filtered), mcp/rust-sdk |
 | apprise-mcp | github.com/caronc/apprise/wiki, modelcontextprotocol.io | caronc/apprise, caronc/apprise-api, mcp/rust-sdk |
-| rustcane | modelcontextprotocol.io, code.claude.com | mcp/rust-sdk, mcp/spec, mcp/registry, openclaw/mcporter |
+| rarcane | modelcontextprotocol.io, code.claude.com | mcp/rust-sdk, mcp/spec, mcp/registry, openclaw/mcporter |
 
 ### docs/references/ layout
 
@@ -1851,7 +1851,7 @@ Err(anyhow::anyhow!("not found"))
 Err(anyhow::anyhow!(
     "docker_logs: container not found: id={id}\n\
      Hint: use action=docker to list available container IDs first.\n\
-     Arcane: rustcane(action=\"docker\") → pick an id from the results"
+     Arcane: rarcane(action=\"docker\") → pick an id from the results"
 ))
 ```
 
@@ -1884,16 +1884,16 @@ Every MCP error message must include:
 - **Missing required arg**: `"`id` is required for docker_logs — pass id=<container_id>"`
 - **Wrong type**: `"`tail` must be an integer, got \"fifty\""`
 - **Unknown action**: `"unknown action: \"florp\" — valid actions: array, disks, docker, ..., help"`
-- **API unreachable**: `"RUSTCANE_URL unreachable: connection refused (http://localhost:8765) — is the service running?"`
-- **Auth failure**: `"API key rejected (RUSTCANE_API_KEY) — check the key is valid and has not expired"`
+- **API unreachable**: `"RARCANE_URL unreachable: connection refused (http://localhost:8765) — is the service running?"`
+- **Auth failure**: `"API key rejected (RARCANE_API_KEY) — check the key is valid and has not expired"`
 
 ### CLI error messages
 
 CLI errors go to stderr, always include the failing command, and suggest the fix:
 
 ```
-Error: `rustcane thing abc` — id must be numeric
-       Run `rustcane things` to list valid IDs
+Error: `rarcane thing abc` — id must be numeric
+       Run `rarcane things` to list valid IDs
 ```
 
 ---
@@ -1965,7 +1965,7 @@ Every CLI command that outputs data MUST support `--json`. JSON output:
 - Is machine-readable without parsing
 - Matches the MCP response shape exactly
 - Goes to stdout (human-readable output goes to stderr)
-- Enables piping: `rustcane things --json | jq '.items[].name'`
+- Enables piping: `rarcane things --json | jq '.items[].name'`
 
 ### Stable output shapes
 
@@ -1976,14 +1976,14 @@ renames are breaking changes. Every field returned must be documented.
 
 ```
 # Default: summary view (fits on screen)
-$ rustcane things
+$ rarcane things
   ID   NAME               STATE    UPDATED
   42   my-thing           active   2m ago
   43   other-thing        idle     1h ago
 
 # Full detail: --verbose or specific action
-$ rustcane thing 42
-$ rustcane thing 42 --json
+$ rarcane thing 42
+$ rarcane thing 42 --json
 ```
 
 ---
@@ -2027,13 +2027,13 @@ server is up even if the upstream service is down.
     "version": "0.1.0",
     "uptime_secs": 3600,
     "pid": 12345,
-    "data_dir": "/home/user/.rustcane"
+    "data_dir": "/home/user/.rarcane"
   },
   "config": {
     "host": "0.0.0.0",
     "port": 3000,
     "auth_mode": "bearer",
-    "upstream_url": "https://rustcane.com/api"
+    "upstream_url": "https://rarcane.com/api"
   },
   "counters": {
     "requests_total": 1234,
@@ -2251,7 +2251,7 @@ pub async fn list_things(&self) -> Result<Value> {
         .timeout(Duration::from_secs(30))
         .send()
         .await
-        .context("upstream request failed — is RUSTCANE_URL correct?")?
+        .context("upstream request failed — is RARCANE_URL correct?")?
         .json::<Value>()
         .await
         .context("upstream returned invalid JSON")
@@ -2263,8 +2263,8 @@ pub async fn list_things(&self) -> Result<Value> {
         if e.to_string().contains("connection refused") {
             anyhow::anyhow!(
                 "upstream unreachable: {}\n\
-                 Hint: run `rustcane health` to check service status\n\
-                 Config: RUSTCANE_URL={}",
+                 Hint: run `rarcane health` to check service status\n\
+                 Config: RARCANE_URL={}",
                 e, self.base_url
             )
         } else {
@@ -2450,7 +2450,7 @@ Every server binary exposes exactly two server modes and a CLI:
 | Command | Mode | Description |
 |---|---|---|
 | `<service> mcp` | stdio MCP transport | For Claude Code `.claude/settings.json` stdio servers; output goes to stdout, logs to stderr |
-| `<service> serve` | Streamable HTTP MCP | For remote/Docker deployment; binds to `RUSTCANE_MCP_HOST:RUSTCANE_MCP_PORT` |
+| `<service> serve` | Streamable HTTP MCP | For remote/Docker deployment; binds to `RARCANE_MCP_HOST:RARCANE_MCP_PORT` |
 | `<service> [subcommand]` | CLI | Direct API access; all subcommands support `--json` |
 | `<service> doctor` | Pre-flight check | Validates environment and config before deployment (see §48) |
 | `<service> --help` | Help | Print usage |
@@ -2461,9 +2461,9 @@ Every server binary exposes exactly two server modes and a CLI:
 ```json
 {
   "mcpServers": {
-    "rustcane": {
+    "rarcane": {
       "type": "stdio",
-      "command": "rustcane",
+      "command": "rarcane",
       "args": ["mcp"]
     }
   }
@@ -2486,9 +2486,9 @@ INSTALL_DIR="${HOME}/.local/bin"
 mkdir -p "${INSTALL_DIR}"
 
 # Download and install
-BINARY_URL="https://github.com/jmagar/rustcane-mcp/releases/latest/download/rustcane-linux-amd64"
-curl -fsSL "${BINARY_URL}" -o "${INSTALL_DIR}/rustcane"
-chmod +x "${INSTALL_DIR}/rustcane"
+BINARY_URL="https://github.com/jmagar/rarcane-mcp/releases/latest/download/rarcane-linux-amd64"
+curl -fsSL "${BINARY_URL}" -o "${INSTALL_DIR}/rarcane"
+chmod +x "${INSTALL_DIR}/rarcane"
 
 # Ensure ~/.local/bin is in PATH
 if ! echo "$PATH" | grep -q "${HOME}/.local/bin"; then
@@ -2496,9 +2496,9 @@ if ! echo "$PATH" | grep -q "${HOME}/.local/bin"; then
     echo "   echo 'export PATH=\"\$HOME/.local/bin:\$PATH\"' >> ~/.bashrc"
 fi
 
-echo "✓ rustcane installed to ${INSTALL_DIR}/rustcane"
-echo "  Run: rustcane doctor    # validate environment"
-echo "  Run: rustcane --version # verify install"
+echo "✓ rarcane installed to ${INSTALL_DIR}/rarcane"
+echo "  Run: rarcane doctor    # validate environment"
+echo "  Run: rarcane --version # verify install"
 ```
 
 ### plugin-setup.sh binary symlinking
@@ -2523,34 +2523,34 @@ environment and reports what's missing before the user tries to start the server
 ### doctor output format
 
 ```
-$ rustcane doctor
+$ rarcane doctor
 
-rustcane-mcp v0.1.0 — environment check
+rarcane-mcp v0.1.0 — environment check
 
   Config
   ──────────────────────────────────────────────
-  ✓ Config file:       ~/.rustcane/config.toml
-  ✓ Data directory:    ~/.rustcane/ (writable)
-  ✓ Log directory:     ~/.rustcane/logs/ (writable, 1.2 MB)
-  ✓ Binary in PATH:    /home/user/.local/bin/rustcane
+  ✓ Config file:       ~/.rarcane/config.toml
+  ✓ Data directory:    ~/.rarcane/ (writable)
+  ✓ Log directory:     ~/.rarcane/logs/ (writable, 1.2 MB)
+  ✓ Binary in PATH:    /home/user/.local/bin/rarcane
 
   Service credentials
   ──────────────────────────────────────────────
-  ✓ RUSTCANE_API_URL:   https://rustcane.internal/api (set)
-  ✗ RUSTCANE_API_KEY:   not set
-    → Set RUSTCANE_API_KEY in ~/.rustcane/.env or your environment
+  ✓ RARCANE_API_URL:   https://rarcane.internal/api (set)
+  ✗ RARCANE_API_KEY:   not set
+    → Set RARCANE_API_KEY in ~/.rarcane/.env or your environment
 
   Connectivity
   ──────────────────────────────────────────────
-  ✓ Upstream reachable: https://rustcane.internal/api → 200 OK (42 ms)
+  ✓ Upstream reachable: https://rarcane.internal/api → 200 OK (42 ms)
 
   MCP server
   ──────────────────────────────────────────────
-  ✓ MCP port 40060:    available  # TEMPLATE: canonical rustcane port is 40060 (RUSTCANE_MCP_PORT)
-  ✓ Auth mode:         no-auth (RUSTCANE_NOAUTH=true)
+  ✓ MCP port 40060:    available  # TEMPLATE: canonical rarcane port is 40060 (RARCANE_MCP_PORT)
+  ✓ Auth mode:         no-auth (RARCANE_NOAUTH=true)
 
   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  1 issue found. Fix it before running: rustcane serve
+  1 issue found. Fix it before running: rarcane serve
 
 ```
 
@@ -2566,15 +2566,15 @@ pub async fn run_doctor(config: &Config, json: bool) -> anyhow::Result<()> {
     checks.push(check_config_file(&data_dir));
     checks.push(check_dir_writable("Data directory", &data_dir));
     checks.push(check_dir_writable("Log directory", &data_dir.join("logs")));
-    checks.push(check_binary_in_path("rustcane"));
+    checks.push(check_binary_in_path("rarcane"));
 
     // 2. Required env vars / config
-    checks.push(check_required_var("RUSTCANE_API_URL", &config.rustcane.url));
-    checks.push(check_required_var("RUSTCANE_API_KEY", &config.rustcane.api_key));
+    checks.push(check_required_var("RARCANE_API_URL", &config.rarcane.url));
+    checks.push(check_required_var("RARCANE_API_KEY", &config.rarcane.api_key));
 
     // 3. Connectivity (non-fatal if unreachable)
-    if !config.rustcane.url.is_empty() {
-        checks.push(check_upstream(&config.rustcane.url, &config.rustcane.api_key).await);
+    if !config.rarcane.url.is_empty() {
+        checks.push(check_upstream(&config.rarcane.url, &config.rarcane.api_key).await);
     }
 
     // 4. MCP port availability
@@ -2612,8 +2612,8 @@ struct DoctorCheck {
 
 ```json
 [
-  {"category": "config", "name": "Config file", "ok": true, "value": "~/.rustcane/config.toml"},
-  {"category": "credentials", "name": "RUSTCANE_API_KEY", "ok": false, "hint": "Set RUSTCANE_API_KEY in ~/.rustcane/.env"},
+  {"category": "config", "name": "Config file", "ok": true, "value": "~/.rarcane/config.toml"},
+  {"category": "credentials", "name": "RARCANE_API_KEY", "ok": false, "hint": "Set RARCANE_API_KEY in ~/.rarcane/.env"},
   {"category": "connectivity", "name": "Upstream", "ok": true, "value": "200 OK", "latency_ms": 42}
 ]
 ```
@@ -2677,18 +2677,18 @@ preflight() {
         || echo "⚠  PATH: ~/.local/bin not in PATH — will print instructions"
 
     # 6. Required env vars (warn, don't fail — can be set post-install)
-    [[ -n "${RUSTCANE_API_URL:-}" ]] \
-        && echo "✓ RUSTCANE_API_URL: set" \
-        || echo "⚠  RUSTCANE_API_URL: not set (required before running the server)"
-    [[ -n "${RUSTCANE_API_KEY:-}" ]] \
-        && echo "✓ RUSTCANE_API_KEY: set" \
-        || echo "⚠  RUSTCANE_API_KEY: not set (required before running the server)"
+    [[ -n "${RARCANE_API_URL:-}" ]] \
+        && echo "✓ RARCANE_API_URL: set" \
+        || echo "⚠  RARCANE_API_URL: not set (required before running the server)"
+    [[ -n "${RARCANE_API_KEY:-}" ]] \
+        && echo "✓ RARCANE_API_KEY: set" \
+        || echo "⚠  RARCANE_API_KEY: not set (required before running the server)"
 
     # 7. Port availability (warn only)
-    # TEMPLATE: canonical rustcane port is 40060; update this default when adapting
-    local port="${RUSTCANE_MCP_PORT:-40060}"
+    # TEMPLATE: canonical rarcane port is 40060; update this default when adapting
+    local port="${RARCANE_MCP_PORT:-40060}"
     if ss -tlnp "sport = :${port}" 2>/dev/null | awk 'NR>1' | grep -q .; then
-        echo "⚠  Port ${port}: already in use (change RUSTCANE_MCP_PORT if needed)"
+        echo "⚠  Port ${port}: already in use (change RARCANE_MCP_PORT if needed)"
     else
         echo "✓ Port ${port}: available"
     fi
@@ -2749,7 +2749,7 @@ The Docker entrypoint must be defensive at every step. Never assume anything is 
 set -e
 
 DATA_DIR="${DATA_DIR:-/data}"
-SERVICE_NAME="rustcane"
+SERVICE_NAME="rarcane"
 BINARY="/usr/local/bin/${SERVICE_NAME}"
 
 # ── 1. Binary exists and is executable ───────────────────────────────────────
@@ -2762,7 +2762,7 @@ fi
 # Fail fast with a clear message rather than a cryptic runtime error.
 # TEMPLATE: Add your service's required vars here.
 missing_vars=""
-for var in RUSTCANE_API_URL RUSTCANE_API_KEY; do
+for var in RARCANE_API_URL RARCANE_API_KEY; do
     eval "val=\${${var}:-}"
     if [ -z "${val}" ]; then
         missing_vars="${missing_vars} ${var}"
@@ -2802,8 +2802,8 @@ echo "[entrypoint] Data dir: ${DATA_DIR}"
 echo "[entrypoint] Binary:   ${BINARY}"
 echo "[entrypoint] User:     1000:1000"
 # Log non-secret config
-[ -n "${RUSTCANE_MCP_PORT:-}" ] && echo "[entrypoint] MCP port: ${RUSTCANE_MCP_PORT}"
-[ -n "${RUSTCANE_MCP_HOST:-}" ] && echo "[entrypoint] MCP host: ${RUSTCANE_MCP_HOST}"
+[ -n "${RARCANE_MCP_PORT:-}" ] && echo "[entrypoint] MCP port: ${RARCANE_MCP_PORT}"
+[ -n "${RARCANE_MCP_HOST:-}" ] && echo "[entrypoint] MCP host: ${RARCANE_MCP_HOST}"
 
 # ── 6. Signal handling ────────────────────────────────────────────────────────
 # Let su-exec / the service handle SIGTERM cleanly.
@@ -2865,7 +2865,7 @@ pub fn router(state: AppState) -> Router {
 
     // 2. REST API — action dispatch (same methods as MCP tools)
     let api = Router::new()
-        .route("/v1/rustcane", post(api_dispatch))  // see §A2
+        .route("/v1/rarcane", post(api_dispatch))  // see §A2
         .route_layer(auth_layer.clone());
 
     // 3. MCP transport
@@ -2936,7 +2936,7 @@ async fn api_dispatch(
         }
         "status" => state.service.status().await,
         other => Err(anyhow::anyhow!(
-            "unknown action: {other}. POST to /v1/rustcane with action=help"
+            "unknown action: {other}. POST to /v1/rarcane with action=help"
         )),
     };
 
@@ -2954,9 +2954,9 @@ async fn api_dispatch(
 
 | Surface | Call pattern |
 |---|---|
-| MCP | `rustcane(action="greet", name="Alice")` |
-| REST | `POST /v1/rustcane {"action":"greet","params":{"name":"Alice"}}` |
-| CLI | `rustcane greet --name Alice` |
+| MCP | `rarcane(action="greet", name="Alice")` |
+| REST | `POST /v1/rarcane {"action":"greet","params":{"name":"Alice"}}` |
+| CLI | `rarcane greet --name Alice` |
 
 All three call `state.service.greet(Some("Alice"))`.
 

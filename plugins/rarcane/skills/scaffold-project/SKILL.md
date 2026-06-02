@@ -1,11 +1,11 @@
 ---
 name: scaffold-project
-description: Use this skill when the user wants to adapt rustcane for a new MCP server, especially after calling the scaffold_intent elicitation action. It turns the returned JSON intent into an approval-first implementation plan without directly mutating files.
+description: Use this skill when the user wants to adapt rarcane for a new MCP server, especially after calling the scaffold_intent elicitation action. It turns the returned JSON intent into an approval-first implementation plan without directly mutating files.
 ---
 
 # Scaffold Project Skill
 
-Use this skill to turn scaffold intent JSON into a concrete, user-approved plan for adapting `rustcane` into a real server.
+Use this skill to turn scaffold intent JSON into a concrete, user-approved plan for adapting `rarcane` into a real server.
 
 Canonical spec: `docs/specs/scaffold-intent-handoff.md`.
 Machine-readable contract: `docs/contracts/scaffold-intent.schema.json`.
@@ -15,7 +15,7 @@ Arcane payloads: `docs/contracts/examples/scaffold-intent-upstream-client.json` 
 
 Use this skill when the user says they want to:
 
-- scaffold a new project from `rustcane`
+- scaffold a new project from `rarcane`
 - adapt this template for a named service
 - decide whether a server should be MCP + CLI or API + CLI + MCP + Web
 - turn `scaffold_intent` JSON into an implementation plan
@@ -46,7 +46,7 @@ The tool returns an object like:
 
 ```json
 {
-  "kind": "rustcane_scaffold_intent",
+  "kind": "rarcane_scaffold_intent",
   "schema_version": 1,
   "server_category": "upstream-client",
   "required_surfaces": ["mcp", "cli"],
@@ -225,13 +225,13 @@ Use this approval wording:
 ### 3. Rename Map
 | Template identifier | New identifier |
 |---|---|
-| `rustcane` | `<binary_name>` |
-| `rustcane` | `<crate_name>` |
+| `rarcane` | `<binary_name>` |
+| `rarcane` | `<crate_name>` |
 | `ArcaneService` | `<ServiceName>Service` |
-| `RUSTCANE_*` | `<ENV_PREFIX>_*` |
-| `rustcane:read` | `<service_name>:read` |
+| `RARCANE_*` | `<ENV_PREFIX>_*` |
+| `rarcane:read` | `<service_name>:read` |
 
-Keep `scaffold_intent` MCP-only in scaffolded projects and rename its scope from `rustcane:read` to `<service_name>:read`.
+Keep `scaffold_intent` MCP-only in scaffolded projects and rename its scope from `rarcane:read` to `<service_name>:read`.
 
 ### 4. Runtime / Plugins / Deployment
 - Host/port: `<host>:<port>`

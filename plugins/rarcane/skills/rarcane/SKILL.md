@@ -1,20 +1,20 @@
 ---
-name: rustcane
-description: Use when the user wants to inspect or manage Arcane Docker resources through rustcane, including projects, containers, images, networks, volumes, registries, vulnerability scans, image updates, environments, system operations, or GitOps syncs.
+name: rarcane
+description: Use when the user wants to inspect or manage Arcane Docker resources through rarcane, including projects, containers, images, networks, volumes, registries, vulnerability scans, image updates, environments, system operations, or GitOps syncs.
 ---
 
-# rustcane
+# rarcane
 
 Use the `arcane` MCP tool for Arcane Docker management. Prefer read actions first. For destructive actions, explain the likely effect and pass `params.confirm=true` only after the user has clearly asked for the operation.
 
 ## Common Calls
 
 ```text
-mcp__rustcane__arcane(action="status")
-mcp__rustcane__arcane(action="container", subaction="list", envId="default")
-mcp__rustcane__arcane(action="project", subaction="list", envId="default")
-mcp__rustcane__arcane(action="system", subaction="docker-info", envId="default")
-mcp__rustcane__arcane(action="container", subaction="stop", envId="default", id="nginx", params={"confirm":true})
+mcp__rarcane__arcane(action="status")
+mcp__rarcane__arcane(action="container", subaction="list", envId="default")
+mcp__rarcane__arcane(action="project", subaction="list", envId="default")
+mcp__rarcane__arcane(action="system", subaction="docker-info", envId="default")
+mcp__rarcane__arcane(action="container", subaction="stop", envId="default", id="nginx", params={"confirm":true})
 ```
 
 ## Domains

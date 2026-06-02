@@ -2,7 +2,7 @@
 title: "Architecture"
 doc_type: "guide"
 status: "active"
-owner: "rustcane"
+owner: "rarcane"
 audience:
   - "contributors"
   - "agents"
@@ -15,12 +15,12 @@ last_reviewed: "2026-05-15"
 
 # Architecture
 
-`rustcane` is a Rust template for MCP servers built on `rmcp`. The architecture is intentionally layered so transports stay thin and business logic stays testable.
+`rarcane` is a Rust template for MCP servers built on `rmcp`. The architecture is intentionally layered so transports stay thin and business logic stays testable.
 
 ## Layer diagram
 
 ```
-ArcaneClient  (src/rustcane.rs)   → HTTP/API transport ONLY — network calls, no logic
+ArcaneClient  (src/rarcane.rs)   → HTTP/API transport ONLY — network calls, no logic
 ArcaneService (src/app.rs)       → ALL business logic, validation, enrichment
 MCP shim       (src/mcp/tools.rs) → parse JSON args → call service → return Value
 CLI shim       (src/cli.rs)       → parse argv → call service → print
@@ -62,7 +62,7 @@ src/
 
 | File | Responsibility |
 |---|---|
-| `src/rustcane.rs` | Upstream/client transport stub. Replace with your service API client. |
+| `src/rarcane.rs` | Upstream/client transport stub. Replace with your service API client. |
 | `src/app.rs` | Service layer. All business rules live here. |
 | `src/actions.rs` | Canonical action metadata, parsing, REST dispatch helpers. |
 | `src/mcp/tools.rs` | MCP tool dispatch and elicitation-only actions. |
@@ -95,7 +95,7 @@ Port 40060
   ├── /mcp                  → Streamable HTTP MCP transport
   ├── /health               → Unauthenticated liveness probe
   ├── /status               → Runtime state (auth required)
-  ├── /v1/rustcane           → REST API action dispatch
+  ├── /v1/rarcane           → REST API action dispatch
   ├── /.well-known/*        → OAuth metadata (when auth_mode=oauth)
   └── /*                    → SPA fallback (serves embedded web UI)
 ```
@@ -108,7 +108,7 @@ pub fn router(state: AppState) -> Router {
         .route("/status", get(status));
 
     let api = Router::new()
-        .route("/v1/rustcane", post(api_dispatch))
+        .route("/v1/rarcane", post(api_dispatch))
         .route_layer(auth_layer.clone());
 
     let mcp = Router::new()
@@ -149,7 +149,7 @@ impl CliCommand {
             ["things"]         => Self::Things,
             ["thing", id, ..]  => Self::Thing { id: id.to_string() },
             ["delete", id, ..] => Self::DeleteThing { id: id.to_string(), confirm },
-            other => bail!("unknown command: {}\n\nRun `rustcane --help`", other.join(" ")),
+            other => bail!("unknown command: {}\n\nRun `rarcane --help`", other.join(" ")),
         };
         Ok((cmd, json))
     }
@@ -213,8 +213,8 @@ Zero validation, zero defaults, zero error message crafting in shims. All of tha
 
 - Shims do not contain business logic.
 - All action metadata starts in `src/actions.rs`.
-- Read actions require `rustcane:read`; write actions require `rustcane:write`; `help` is public.
+- Read actions require `rarcane:read`; write actions require `rarcane:write`; `help` is public.
 - Stdio is local trusted transport; HTTP is protected unless in loopback or explicit trusted-gateway mode.
-- Plugin setup is binary-owned: hook scripts delegate to `rustcane setup plugin-hook`.
+- Plugin setup is binary-owned: hook scripts delegate to `rarcane setup plugin-hook`.
 
 See `docs/PATTERNS.md` §1, §7, §A1, §45 for full pattern details.

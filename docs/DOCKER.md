@@ -2,7 +2,7 @@
 title: "Docker"
 doc_type: "guide"
 status: "active"
-owner: "rustcane"
+owner: "rarcane"
 audience:
   - "contributors"
   - "agents"
@@ -38,50 +38,50 @@ RUN apt-get update && apt-get install -y pkg-config libssl-dev && rm -rf /var/li
 
 # Cache dependencies
 COPY Cargo.toml Cargo.lock ./
-RUN --mount=type=cache,id=rustcane-cargo-registry,target=/usr/local/cargo/registry,sharing=locked \
-    --mount=type=cache,id=rustcane-cargo-target,target=/app/target,sharing=locked \
+RUN --mount=type=cache,id=rarcane-cargo-registry,target=/usr/local/cargo/registry,sharing=locked \
+    --mount=type=cache,id=rarcane-cargo-target,target=/app/target,sharing=locked \
     mkdir src && echo "fn main() {}" > src/main.rs && cargo build --release --locked && rm -rf src
 
 # Build real binary
 COPY src/ src/
-RUN --mount=type=cache,id=rustcane-cargo-registry,target=/usr/local/cargo/registry,sharing=locked \
-    --mount=type=cache,id=rustcane-cargo-target,target=/app/target,sharing=locked \
+RUN --mount=type=cache,id=rarcane-cargo-registry,target=/usr/local/cargo/registry,sharing=locked \
+    --mount=type=cache,id=rarcane-cargo-target,target=/app/target,sharing=locked \
     touch src/main.rs && cargo build --release --locked && \
-    cp target/release/rustcane /usr/local/bin/rustcane
+    cp target/release/rarcane /usr/local/bin/rarcane
 
 FROM debian:bookworm-slim
 RUN apt-get update && apt-get install -y ca-certificates curl && rm -rf /var/lib/apt/lists/*
-COPY --from=builder /usr/local/bin/rustcane /usr/local/bin/rustcane
-RUN groupadd --gid 1000 rustcane && \
-    useradd --uid 1000 --gid rustcane --no-create-home --shell /sbin/nologin rustcane && \
-    mkdir -p /data && chown rustcane:rustcane /data
+COPY --from=builder /usr/local/bin/rarcane /usr/local/bin/rarcane
+RUN groupadd --gid 1000 rarcane && \
+    useradd --uid 1000 --gid rarcane --no-create-home --shell /sbin/nologin rarcane && \
+    mkdir -p /data && chown rarcane:rarcane /data
 
 USER 1000:1000
 EXPOSE 40060/tcp
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD curl -sf http://localhost:40060/health || exit 1
-CMD ["rustcane", "serve", "mcp"]
+CMD ["rarcane", "serve", "mcp"]
 ```
 
 ## docker-compose.yml pattern
 
 ```yaml
 services:
-  rustcane-mcp:
-    image: ghcr.io/jmagar/rustcane-mcp:${VERSION:-latest}
+  rarcane-mcp:
+    image: ghcr.io/jmagar/rarcane-mcp:${VERSION:-latest}
     build:
       context: .
       dockerfile: config/Dockerfile
-    container_name: rustcane-mcp
+    container_name: rarcane-mcp
     restart: unless-stopped
     user: "${PUID:-1000}:${PGID:-1000}"
     env_file:
       - path: .env
         required: false
     ports:
-      - "${RUSTCANE_MCP_HOST_PORT:-40060}:40060/tcp"
+      - "${RARCANE_MCP_HOST_PORT:-40060}:40060/tcp"
     volumes:
-      - ${HOME}/.rustcane:/data
+      - ${HOME}/.rarcane:/data
     networks:
       - mcp
     healthcheck:
@@ -98,7 +98,7 @@ services:
 
 networks:
   mcp:
-    name: ${DOCKER_NETWORK:-rustcane-mcp}
+    name: ${DOCKER_NETWORK:-rarcane-mcp}
     external: true
 ```
 
@@ -120,16 +120,16 @@ Local binary and Docker use the same data directory:
 
 | Deployment | Data directory |
 |---|---|
-| Local binary | `~/.rustcane/` |
-| Docker | `/data/` inside container, mounted from `~/.rustcane/` on host |
-| Plugin | `$CLAUDE_PLUGIN_DATA` (symlinked to `~/.rustcane/`) |
+| Local binary | `~/.rarcane/` |
+| Docker | `/data/` inside container, mounted from `~/.rarcane/` on host |
+| Plugin | `$CLAUDE_PLUGIN_DATA` (symlinked to `~/.rarcane/`) |
 
 ```rust
 fn default_data_dir() -> PathBuf {
     if std::path::Path::new("/.dockerenv").exists() {
         return PathBuf::from("/data");
     }
-    dirs::home_dir().unwrap_or_default().join(".rustcane")
+    dirs::home_dir().unwrap_or_default().join(".rarcane")
 }
 ```
 
@@ -143,7 +143,7 @@ set -e
 DATA_DIR="${DATA_DIR:-/data}"
 
 # Validate required vars before starting
-for var in RUSTCANE_API_URL RUSTCANE_API_KEY; do
+for var in RARCANE_API_URL RARCANE_API_KEY; do
     eval "val=\${${var}:-}"
     [ -z "${val}" ] && { echo "FATAL: ${var} is not set" >&2; exit 1; }
 done
@@ -174,6 +174,6 @@ docker compose up -d --force-recreate
 
 ## Build artifacts
 
-`just build-plugin` copies the release binary to both `bin/rustcane` and `plugins/rustcane/bin/rustcane`. The plugin binary path is allowlisted in `scripts/blob-size-allowlist.txt`.
+`just build-plugin` copies the release binary to both `bin/rarcane` and `plugins/rarcane/bin/rarcane`. The plugin binary path is allowlisted in `scripts/blob-size-allowlist.txt`.
 
 See `docs/PATTERNS.md` §14, §15, §25, §26, §50 for the full Dockerfile, compose, appdata, and entrypoint patterns.

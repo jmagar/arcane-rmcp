@@ -7,9 +7,9 @@
 //! # Usage
 //!
 //! ```text
-//! rustcane call --action container --subaction list --env-id env-abc
-//! rustcane status
-//! rustcane doctor [--json]
+//! rarcane call --action container --subaction list --env-id env-abc
+//! rarcane status
+//! rarcane doctor [--json]
 //! ```
 
 use crate::{
@@ -26,28 +26,28 @@ pub mod watch;
 pub use setup::{apply_plugin_options, run_setup, SetupCommand};
 
 pub const USAGE: &str = "Usage:
-  rustcane [serve]          Start MCP HTTP server (default)
-  rustcane mcp              Start MCP stdio transport
+  rarcane [serve]          Start MCP HTTP server (default)
+  rarcane mcp              Start MCP stdio transport
 
-  rustcane call --action ACTION [--subaction SUB] [--env-id ENV] [--id ID] [--params-json JSON] [--confirm]
-  rustcane status                    Show local server status
-  rustcane help [--domain DOMAIN]    Show JSON action reference
-  rustcane doctor [--json]           Run environment pre-flight checks
-  rustcane watch [--url URL] [--interval N]  Poll /health and emit on state change
-  rustcane setup check               Check plugin setup without mutating appdata
-  rustcane setup repair              Create missing appdata/env setup files
-  rustcane setup plugin-hook [--no-repair]  Plugin hook JSON contract
+  rarcane call --action ACTION [--subaction SUB] [--env-id ENV] [--id ID] [--params-json JSON] [--confirm]
+  rarcane status                    Show local server status
+  rarcane help [--domain DOMAIN]    Show JSON action reference
+  rarcane doctor [--json]           Run environment pre-flight checks
+  rarcane watch [--url URL] [--interval N]  Poll /health and emit on state change
+  rarcane setup check               Check plugin setup without mutating appdata
+  rarcane setup repair              Create missing appdata/env setup files
+  rarcane setup plugin-hook [--no-repair]  Plugin hook JSON contract
 
-  rustcane --help                    Show this help
-  rustcane --version                 Show version
+  rarcane --help                    Show this help
+  rarcane --version                 Show version
 
 Environment:
-  RUSTCANE_API_URL          Upstream service URL
-  RUSTCANE_API_KEY          Upstream service API key
-  RUSTCANE_MCP_HOST         Bind host (default 127.0.0.1)
-  RUSTCANE_MCP_PORT         Bind port (default 40060)
-  RUSTCANE_MCP_NO_AUTH      Disable auth (loopback only)
-  RUSTCANE_MCP_TOKEN        Static bearer token
+  RARCANE_API_URL          Upstream service URL
+  RARCANE_API_KEY          Upstream service API key
+  RARCANE_MCP_HOST         Bind host (default 127.0.0.1)
+  RARCANE_MCP_PORT         Bind port (default 40060)
+  RARCANE_MCP_NO_AUTH      Disable auth (loopback only)
+  RARCANE_MCP_TOKEN        Static bearer token
   RUST_LOG                 Log filter (e.g. info,rmcp=warn)";
 
 pub fn usage() -> &'static str {
@@ -80,7 +80,7 @@ pub enum Command {
     /// Designed to be run as a plugin monitor — stdout is the event stream,
     /// stderr is debug output. Exits only on CTRL+C.
     Watch {
-        /// Base URL of the MCP server (default: http://localhost:{RUSTCANE_MCP_PORT}).
+        /// Base URL of the MCP server (default: http://localhost:{RARCANE_MCP_PORT}).
         url: Option<String>,
         /// Poll interval in seconds (default: 10).
         interval: u64,

@@ -1,5 +1,5 @@
 {
-  "kind": "rustcane_scaffold_intent",
+  "kind": "rarcane_scaffold_intent",
   "schema_version": 1,
   "server_category": "upstream-client",
   "required_surfaces": ["mcp", "cli"],

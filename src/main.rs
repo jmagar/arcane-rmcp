@@ -1,13 +1,13 @@
 //! Binary entry point — mode dispatch only.
 //!
 //! Modes:
-//!   `rustcane [serve]`        Start MCP HTTP server (default if no args)
-//!   `rustcane mcp`            Start MCP stdio transport
-//!   `rustcane greet ...`      CLI greet command
-//!   `rustcane echo ...`       CLI echo command
-//!   `rustcane status`         CLI status command
-//!   `rustcane --help`         Print usage
-//!   `rustcane --version`      Print version
+//!   `rarcane [serve]`        Start MCP HTTP server (default if no args)
+//!   `rarcane mcp`            Start MCP stdio transport
+//!   `rarcane greet ...`      CLI greet command
+//!   `rarcane echo ...`       CLI echo command
+//!   `rarcane status`         CLI status command
+//!   `rarcane --help`         Print usage
+//!   `rarcane --version`      Print version
 //!
 //! **Template**: add your binary name in Cargo.toml `[[bin]] name = "..."`.
 //! Extend `run_cli` if you add more CLI subcommands.
@@ -16,7 +16,7 @@ use anyhow::Result;
 use std::sync::Arc;
 
 use rmcp::{transport::stdio, ServiceExt};
-use rustcane::{
+use rarcane::{
     app::ArcaneService,
     arcane::ArcaneClient,
     cli,
@@ -38,7 +38,7 @@ async fn main() -> Result<()> {
             return Ok(());
         }
         [f] if matches!(f.as_str(), "--version" | "-V" | "version") => {
-            println!("rustcane {}", env!("CARGO_PKG_VERSION"));
+            println!("rarcane {}", env!("CARGO_PKG_VERSION"));
             return Ok(());
         }
         _ => {}
@@ -84,7 +84,7 @@ async fn serve_mcp() -> Result<()> {
         bind = %state.config.bind_addr(),
         server_name = %state.config.server_name,
         auth = ?state.auth_policy,
-        "rustcane-mcp starting"
+        "rarcane-mcp starting"
     );
 
     let bind = state.config.bind_addr();
@@ -105,7 +105,7 @@ async fn serve_mcp() -> Result<()> {
 /// breaks all stdio clients with "forbidden: missing http context".
 async fn serve_stdio_mcp() -> Result<()> {
     let config = Config::load()?;
-    let service = ArcaneService::new(ArcaneClient::new(&config.rustcane)?);
+    let service = ArcaneService::new(ArcaneClient::new(&config.rarcane)?);
     let state = AppState {
         config: config.mcp,
         auth_policy: AuthPolicy::LoopbackDev, // stdio = trusted local transport
@@ -119,9 +119,9 @@ async fn serve_stdio_mcp() -> Result<()> {
 /// Dispatch CLI subcommands.
 async fn run_cli() -> Result<()> {
     let parsed = cli::parse_args()?;
-    // Translate CLAUDE_PLUGIN_OPTION_* into RUSTCANE_* env vars BEFORE Config::load()
+    // Translate CLAUDE_PLUGIN_OPTION_* into RARCANE_* env vars BEFORE Config::load()
     // so the plugin hook can call the binary directly (no plugin-setup.sh wrapper).
-    // rustcane is template-style: setup_check validates the pre-loaded &Config.
+    // rarcane is template-style: setup_check validates the pre-loaded &Config.
     if matches!(
         parsed,
         Some(cli::Command::Setup(cli::SetupCommand::PluginHook { .. }))
@@ -141,9 +141,9 @@ async fn run_cli() -> Result<()> {
             cli::watch::run_watch(&base, interval).await
         }
         Some(cli::Command::Setup(command)) => cli::run_setup(&config, command).await,
-        Some(cmd) => cli::run(cmd, &config.rustcane).await,
+        Some(cmd) => cli::run(cmd, &config.rarcane).await,
         None => {
-            eprintln!("Unknown command. Run `rustcane --help` for usage.");
+            eprintln!("Unknown command. Run `rarcane --help` for usage.");
             std::process::exit(1);
         }
     }
@@ -153,7 +153,7 @@ async fn run_cli() -> Result<()> {
 
 async fn build_state(config: Config) -> Result<AppState> {
     let auth_policy = build_auth_policy(&config).await?;
-    let service = ArcaneService::new(ArcaneClient::new(&config.rustcane)?);
+    let service = ArcaneService::new(ArcaneClient::new(&config.rarcane)?);
     Ok(AppState {
         config: config.mcp,
         auth_policy,
@@ -168,13 +168,13 @@ async fn build_auth_policy(config: &Config) -> Result<AuthPolicy> {
         AuthPolicyKind::MountedBearer => Ok(AuthPolicy::Mounted { auth_state: None }),
         AuthPolicyKind::MountedOAuth => {
             let auth_cfg = lab_auth::config::AuthConfigBuilder::new()
-                .env_prefix("RUSTCANE_MCP")
+                .env_prefix("RARCANE_MCP")
                 .session_cookie_name("example_mcp_session")
                 .scopes_supported(vec![
-                    rustcane::actions::READ_SCOPE.into(),
-                    rustcane::actions::WRITE_SCOPE.into(),
+                    rarcane::actions::READ_SCOPE.into(),
+                    rarcane::actions::WRITE_SCOPE.into(),
                 ])
-                .default_scope("rustcane:read")
+                .default_scope("rarcane:read")
                 .resource_path("/mcp")
                 .enable_dynamic_registration(true)
                 .build_from_sources(vec![])

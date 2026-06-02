@@ -1,4 +1,4 @@
-use rustcane::{
+use rarcane::{
     actions::ArcaneAction, mcp::execute_tool_without_peer_for_test, testing::loopback_state,
 };
 use serde_json::json;

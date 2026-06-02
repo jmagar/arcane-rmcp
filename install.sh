@@ -24,20 +24,20 @@ set -euo pipefail
 # ── CONFIGURATION — edit these values for your service ───────────────────────
 
 # TEMPLATE: Replace with your GitHub org/repo (e.g. "jmagar/myservice-mcp")
-REPO="your-org/rustcane-mcp"
+REPO="your-org/rarcane-mcp"
 
 # TEMPLATE: Replace with your binary name (matches Cargo.toml [[bin]] name)
 BINARY_NAME="rarcane"
 
 # TEMPLATE: Replace with your service display name (shown in messages)
-SERVICE_NAME="rustcane-mcp"
+SERVICE_NAME="rarcane-mcp"
 
 # TEMPLATE: Set a pinned version, or leave as "latest" to always install the
 #           most recent release. Pinned is safer for production automation.
-VERSION="${RUSTCANE_MCP_VERSION:-latest}"
+VERSION="${RARCANE_MCP_VERSION:-latest}"
 
 # Install directory — default is ~/.local/bin (in PATH on most modern systems)
-INSTALL_DIR="${RUSTCANE_MCP_INSTALL_DIR:-${HOME}/.local/bin}"
+INSTALL_DIR="${RARCANE_MCP_INSTALL_DIR:-${HOME}/.local/bin}"
 
 # ── END CONFIGURATION ─────────────────────────────────────────────────────────
 
@@ -182,8 +182,8 @@ post_install_message() {
   printf '\n'
   printf '%b=== Next steps ===%b\n' "${C_BOLD}" "${C_RESET}"
   # TEMPLATE: Customize these instructions for your service.
-  printf '  1. Copy the rustcane config:   cp .env.rustcane .env\n'
-  printf '  2. Edit .env and set:         RUSTCANE_API_URL, RUSTCANE_API_KEY\n'
+  printf '  1. Copy the rarcane config:   cp .env.rarcane .env\n'
+  printf '  2. Edit .env and set:         RARCANE_API_URL, RARCANE_API_KEY\n'
   printf '  3. Generate an auth token:    openssl rand -hex 32\n'
   printf '  4. Start the server:          %s serve\n' "${BINARY_NAME}"
   printf '  5. Check health:              curl http://localhost:3000/health\n'

@@ -2,7 +2,7 @@
 title: "Philosophy"
 doc_type: "guide"
 status: "active"
-owner: "rustcane"
+owner: "rarcane"
 audience:
   - "contributors"
   - "agents"
@@ -13,7 +13,7 @@ last_reviewed: "2026-05-15"
 
 # Philosophy
 
-`rustcane` exists to make new MCP servers safe, boring, and easy for agents to operate.
+`rarcane` exists to make new MCP servers safe, boring, and easy for agents to operate.
 
 ## Boring by design
 
@@ -40,7 +40,7 @@ Zero business logic in shims. If you're writing validation in `mcp/tools.rs`, mo
 ## Secure defaults
 
 - `.env` is ignored and blocked from commits by `scripts/block-env-commits.sh`.
-- Non-loopback HTTP requires auth unless explicitly behind a trusted gateway (`RUSTCANE_NOAUTH=true`).
+- Non-loopback HTTP requires auth unless explicitly behind a trusted gateway (`RARCANE_NOAUTH=true`).
 - Secrets in plugin settings must be marked `sensitive: true`.
 - Plugin manifests do not carry version fields — marketplace versioning comes from git SHA/tags.
 - Never hard-code tokens in unit files or documentation.

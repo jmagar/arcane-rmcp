@@ -76,7 +76,7 @@ SERVERS = [
         WORKSPACE / "apprise-mcp",
         "apprise",
         "plugins/apprise/hooks/plugin-setup.sh",
-        env=(("APPRISE_URL", "http://apprise.rustcane:8000"), ("APPRISE_MCP_TOKEN", "test-token")),
+        env=(("APPRISE_URL", "http://apprise.rarcane:8000"), ("APPRISE_MCP_TOKEN", "test-token")),
     ),
     Server(
         "unraid",
@@ -84,25 +84,25 @@ SERVERS = [
         "unraid",
         "plugins/unraid/hooks/plugin-setup.sh",
         env=(
-            ("UNRAID_API_URL", "https://tower.rustcane/graphql"),
+            ("UNRAID_API_URL", "https://tower.rarcane/graphql"),
             ("UNRAID_API_KEY", "test-key"),
             ("UNRAID_MCP_TOKEN", "test-token"),
         ),
         appdata_env="UNRAID_HOME",
     ),
     Server(
-        "rustcane",
+        "rarcane",
         ROOT,
         "rarcane",
         # Hook calls the binary directly now (no plugin-setup.sh wrapper); the
         # env-var mapping lives in apply_plugin_options() in src/cli/setup.rs.
         None,
         env=(
-            ("RUSTCANE_API_URL", "https://api.rustcane.test"),
-            ("RUSTCANE_API_KEY", "test-key"),
-            ("RUSTCANE_MCP_TOKEN", "test-token"),
+            ("RARCANE_API_URL", "https://api.rarcane.test"),
+            ("RARCANE_API_KEY", "test-key"),
+            ("RARCANE_MCP_TOKEN", "test-token"),
         ),
-        appdata_env="RUSTCANE_HOME",
+        appdata_env="RARCANE_HOME",
     ),
     Server(
         "lab",

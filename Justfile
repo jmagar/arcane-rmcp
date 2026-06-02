@@ -1,7 +1,7 @@
 # =============================================================================
 # Justfile — Development and deployment commands for the Arcane MCP server
 #
-# TEMPLATE: Replace "rustcane" with your binary/service name throughout.
+# TEMPLATE: Replace "rarcane" with your binary/service name throughout.
 #           Replace port 40060 with your service's port if different.
 #
 # Usage: just <recipe>   (install just: cargo install just)
@@ -14,9 +14,9 @@ default:
 # ── Development ───────────────────────────────────────────────────────────────
 
 # Run the MCP server in development mode (HTTP transport 40060, no auth)
-# WARNING: RUSTCANE_MCP_NO_AUTH=true is safe only because HOST is 127.0.0.1 (loopback)
+# WARNING: RARCANE_MCP_NO_AUTH=true is safe only because HOST is 127.0.0.1 (loopback)
 dev:
-    RUSTCANE_MCP_HOST=127.0.0.1 RUSTCANE_MCP_NO_AUTH=true cargo run -- serve mcp
+    RARCANE_MCP_HOST=127.0.0.1 RARCANE_MCP_NO_AUTH=true cargo run -- serve mcp
 
 # Run in stdio MCP transport mode (for Claude Desktop or direct pipe)
 mcp:
@@ -223,21 +223,21 @@ uninstall-hooks:
 
 # ── Utilities ─────────────────────────────────────────────────────────────────
 
-# Generate a cryptographically random bearer token for RUSTCANE_MCP_TOKEN
+# Generate a cryptographically random bearer token for RARCANE_MCP_TOKEN
 # Copy the output into your .env file
 gen-token:
     openssl rand -hex 32
 
-# Copy .env.rustcane to .env (safe — won't overwrite an existing .env)
+# Copy .env.rarcane to .env (safe — won't overwrite an existing .env)
 setup:
-    cp -n .env.rustcane .env || echo ".env already exists — skipping"
+    cp -n .env.rarcane .env || echo ".env already exists — skipping"
     @echo "Edit .env and fill in your credentials"
 
 # ── Docker ────────────────────────────────────────────────────────────────────
 
 # Build the Docker image from source (does not start the container)
 docker-build:
-    docker build -f config/Dockerfile -t rustcane-mcp .
+    docker build -f config/Dockerfile -t rarcane-mcp .
 
 # Start the Docker Compose stack in detached mode
 # TEMPLATE: The compose file references the "jakenet" external network.
@@ -293,20 +293,20 @@ runtime-current:
 auth-smoke:
     bash scripts/test-mcp-auth.sh
 
-# Call the status action via the REST API (requires RUSTCANE_MCP_TOKEN in env)
+# Call the status action via the REST API (requires RARCANE_MCP_TOKEN in env)
 status:
     #!/usr/bin/env bash
     set -euo pipefail
-    TOKEN="${RUSTCANE_MCP_TOKEN:-}"
+    TOKEN="${RARCANE_MCP_TOKEN:-}"
     if [[ -z "${TOKEN}" ]]; then
-        echo "Set RUSTCANE_MCP_TOKEN or use 'just dev' (no-auth mode)"
+        echo "Set RARCANE_MCP_TOKEN or use 'just dev' (no-auth mode)"
         exit 1
     fi
     curl -sf http://localhost:40060/mcp \
         -H "Authorization: Bearer ${TOKEN}" \
         -H "Content-Type: application/json" \
         -H "Accept: application/json, text/event-stream" \
-        -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"rustcane","arguments":{"action":"status"}}}' \
+        -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"rarcane","arguments":{"action":"status"}}}' \
         | { if command -v jq >/dev/null 2>&1; then jq .; else python3 -m json.tool; fi; }
 
 # ── Plugin ────────────────────────────────────────────────────────────────────
@@ -316,7 +316,7 @@ repair:
     bash scripts/repair.sh
 
 # Copy the release binary into plugin bin/ for local plugin packaging.
-# TEMPLATE: Replace "rustcane" with your binary name
+# TEMPLATE: Replace "rarcane" with your binary name
 build-plugin: build-release
     #!/bin/sh
     set -eu
@@ -324,10 +324,10 @@ build-plugin: build-release
     if [ ! -x "${target_dir}/release/rarcane" ] && [ -x ".cache/cargo/release/rarcane" ]; then
         target_dir=".cache/cargo"
     fi
-    mkdir -p bin plugins/rustcane/bin
+    mkdir -p bin plugins/rarcane/bin
     install -m 755 "${target_dir}/release/rarcane" bin/rarcane
-    install -m 755 "${target_dir}/release/rarcane" plugins/rustcane/bin/rarcane
-    echo "Installed bin/rarcane and plugins/rustcane/bin/rarcane"
+    install -m 755 "${target_dir}/release/rarcane" plugins/rarcane/bin/rarcane
+    echo "Installed bin/rarcane and plugins/rarcane/bin/rarcane"
 
 # Install the release binary into bin/ (alias for build-plugin kept for compatibility)
 install: build-plugin

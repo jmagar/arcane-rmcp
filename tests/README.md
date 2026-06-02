@@ -24,7 +24,7 @@ bash tests/mcporter/test-mcp.sh
 just template-check
 
 # Protected MCP auth smoke (requires running bearer-auth server)
-RUSTCANE_MCP_TOKEN=<token> just auth-smoke
+RARCANE_MCP_TOKEN=<token> just auth-smoke
 
 # Full release-readiness gate
 scripts/pre-release-check.sh
@@ -42,7 +42,7 @@ Add tests here when adding or changing CLI flags.
 
 ### `tool_dispatch.rs` — Service/action behavior
 
-Tests MCP action behavior below HTTP. These use `rustcane::testing::loopback_state()` and the stub `ArcaneClient`, so no real credentials or upstream service are required.
+Tests MCP action behavior below HTTP. These use `rarcane::testing::loopback_state()` and the stub `ArcaneClient`, so no real credentials or upstream service are required.
 
 Current checks assert semantic behavior for `greet`, `echo`, `status`, schema/action exposure, and all non-elicitation actions returning JSON objects.
 
@@ -83,7 +83,7 @@ bash tests/mcporter/test-mcp.sh --verbose
 
 # Default target is http://localhost:40060/mcp (the `just dev` port).
 # Override target when testing another deployment:
-RUSTCANE_MCP_HOST=127.0.0.1 RUSTCANE_MCP_PORT=3100 bash tests/mcporter/test-mcp.sh
+RARCANE_MCP_HOST=127.0.0.1 RARCANE_MCP_PORT=3100 bash tests/mcporter/test-mcp.sh
 ```
 
 Prerequisites:
@@ -99,9 +99,9 @@ Suites:
 
 | Suite | What it validates |
 |---|---|
-| `suite_auth` | Missing and bad bearer tokens return `401` when `RUSTCANE_MCP_TOKEN` is set. |
+| `suite_auth` | Missing and bad bearer tokens return `401` when `RARCANE_MCP_TOKEN` is set. |
 | `suite_core` | `greet`, `echo`, `status`, and `help` return semantically correct values. |
-| `suite_schema_resource` | `rustcane://schema/mcp-tool` resolves and contains a valid tool schema with `inputSchema.properties.action`. |
+| `suite_schema_resource` | `rarcane://schema/mcp-tool` resolves and contains a valid tool schema with `inputSchema.properties.action`. |
 
 The script logs all calls to `/tmp/test-mcp.<timestamp>.log`.
 
@@ -111,7 +111,7 @@ The script logs all calls to `/tmp/test-mcp.<timestamp>.log`.
 
 ## Test helpers
 
-`src/lib.rs` exports helpers under `rustcane::testing`:
+`src/lib.rs` exports helpers under `rarcane::testing`:
 
 | Helper | Returns | Use for |
 |---|---|---|

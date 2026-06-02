@@ -49,12 +49,12 @@ git init -q "$TMPDIR_ROOT/repo"
 
 (
   cd "$TMPDIR_ROOT/repo"
-  git config user.email test@rustcane.invalid
+  git config user.email test@rarcane.invalid
   git config user.name "Template Test"
   cp "$REPO_ROOT/scripts/block-env-commits.sh" .
-  printf 'safe=true\n' > .env.rustcane
+  printf 'safe=true\n' > .env.rarcane
   printf 'secret=true\n' > .env
-  git add .env.rustcane .env
+  git add .env.rarcane .env
 )
 if (cd "$TMPDIR_ROOT/repo" && bash ./block-env-commits.sh >/dev/null 2>&1); then
   fail "env guard blocks staged .env (unexpected success)"
@@ -66,9 +66,9 @@ fi
   git reset -q .env
 )
 if (cd "$TMPDIR_ROOT/repo" && bash ./block-env-commits.sh >/dev/null 2>&1); then
-  pass "env guard allows .env.rustcane"
+  pass "env guard allows .env.rarcane"
 else
-  fail "env guard allows .env.rustcane"
+  fail "env guard allows .env.rarcane"
 fi
 
 mkdir -p "$TMPDIR_ROOT/docs/nested"

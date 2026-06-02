@@ -1,13 +1,13 @@
-# rustcane Quickstart
+# rarcane Quickstart
 
 ## 1. Configure Arcane
 
 ```bash
-export RUSTCANE_API_URL=https://arcane.example.com
-export RUSTCANE_API_KEY=change-me
-export RUSTCANE_MCP_HOST=127.0.0.1
-export RUSTCANE_MCP_PORT=3100
-export RUSTCANE_MCP_NO_AUTH=true
+export RARCANE_API_URL=https://arcane.example.com
+export RARCANE_API_KEY=change-me
+export RARCANE_MCP_HOST=127.0.0.1
+export RARCANE_MCP_PORT=3100
+export RARCANE_MCP_NO_AUTH=true
 ```
 
 ## 2. Try the CLI

@@ -179,8 +179,8 @@ async fn upstream_passes_for_local_health_endpoint() {
 
 fn auth_config(host: &str) -> Config {
     Config {
-        rustcane: ArcaneConfig {
-            api_url: "https://rustcane.test".into(),
+        rarcane: ArcaneConfig {
+            api_url: "https://rarcane.test".into(),
             api_key: "secret".into(),
         },
         mcp: McpConfig {
@@ -219,5 +219,5 @@ fn auth_config_rejects_non_loopback_without_auth() {
     let check = check_auth_config(&config);
 
     assert!(!check.ok);
-    assert!(check.hint.unwrap().contains("RUSTCANE_MCP_TOKEN"));
+    assert!(check.hint.unwrap().contains("RARCANE_MCP_TOKEN"));
 }

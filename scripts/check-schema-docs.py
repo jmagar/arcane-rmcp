@@ -16,7 +16,7 @@ TOOLS_RS = ROOT / "src/mcp/tools.rs"
 PROMPTS_RS = ROOT / "src/mcp/prompts.rs"
 RMCP_SERVER_RS = ROOT / "src/mcp/rmcp_server.rs"
 README = ROOT / "README.md"
-SKILL = ROOT / "plugins/rustcane/skills/rustcane/SKILL.md"
+SKILL = ROOT / "plugins/rarcane/skills/rarcane/SKILL.md"
 DOC = ROOT / "docs/MCP_SCHEMA.md"
 
 
@@ -43,11 +43,11 @@ def extract_scope_for_actions() -> dict[str, str]:
         if scope_expr == "None":
             scopes[name] = "public"
         elif scope_expr == "Some(READ_SCOPE)":
-            scopes[name] = "`rustcane:read`"
+            scopes[name] = "`rarcane:read`"
         elif scope_expr == "Some(WRITE_SCOPE)":
-            scopes[name] = "`rustcane:write`"
+            scopes[name] = "`rarcane:write`"
         else:
-            scopes[name] = "`rustcane:__deny__`"
+            scopes[name] = "`rarcane:__deny__`"
     return scopes
 
 
@@ -82,8 +82,8 @@ def render() -> str:
         "",
         "| Field | Value |",
         "|---|---|",
-        "| Tool name | `rustcane` |",
-        "| Schema resource | `rustcane://schema/mcp-tool` |",
+        "| Tool name | `rarcane` |",
+        "| Schema resource | `rarcane://schema/mcp-tool` |",
         "| Dispatch parameter | `action` |",
         "",
         "## Actions",
@@ -103,15 +103,15 @@ def render() -> str:
             "- `src/mcp/schemas.rs` must derive its enum from `ACTION_SPECS`.",
             "- The MCP tool schema must reject unknown top-level parameters and encode action-specific requirements that fit the single-tool dispatch model.",
             "- `help` is intentionally public and must have no required scope.",
-            "- `src/mcp/tools.rs`, `README.md`, and `plugins/rustcane/skills/rustcane/SKILL.md` must mention every action.",
-            "- `src/mcp/rmcp_server.rs` owns stable resources and must keep `rustcane://schema/mcp-tool` wired to `tool_definitions()`.",
+            "- `src/mcp/tools.rs`, `README.md`, and `plugins/rarcane/skills/rarcane/SKILL.md` must mention every action.",
+            "- `src/mcp/rmcp_server.rs` owns stable resources and must keep `rarcane://schema/mcp-tool` wired to `tool_definitions()`.",
             "- `src/mcp/prompts.rs` owns stable prompts and must keep `quick_start` covered by prompt tests.",
             "",
             "## Resources",
             "",
             "| URI | Source | Contract |",
             "|---|---|---|",
-            "| `rustcane://schema/mcp-tool` | `src/mcp/rmcp_server.rs` | Returns `tool_definitions()` as `application/json`. |",
+            "| `rarcane://schema/mcp-tool` | `src/mcp/rmcp_server.rs` | Returns `tool_definitions()` as `application/json`. |",
             "",
             "## Prompts",
             "",
@@ -136,7 +136,7 @@ def check_mentions(actions: list[str]) -> list[str]:
     failures: list[str] = []
     surfaces = {
         "README.md": read(README),
-        "plugins/rustcane/skills/rustcane/SKILL.md": read(SKILL),
+        "plugins/rarcane/skills/rarcane/SKILL.md": read(SKILL),
         "src/mcp/tools.rs HELP_TEXT": read(TOOLS_RS),
     }
     for label, text in surfaces.items():
@@ -164,7 +164,7 @@ def check_scope(actions: list[str]) -> list[str]:
     if '"const": "echo"' not in schema_text or '"required": ["message"]' not in schema_text:
         failures.append("src/mcp/schemas.rs must conditionally require message for echo")
     rmcp_server_text = read(RMCP_SERVER_RS)
-    if "rustcane://schema/mcp-tool" not in rmcp_server_text or "tool_definitions()" not in rmcp_server_text:
+    if "rarcane://schema/mcp-tool" not in rmcp_server_text or "tool_definitions()" not in rmcp_server_text:
         failures.append("src/mcp/rmcp_server.rs must expose the schema resource from tool_definitions()")
     prompts_text = read(PROMPTS_RS)
     if "quick_start" not in prompts_text:

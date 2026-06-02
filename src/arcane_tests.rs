@@ -9,7 +9,7 @@ fn client_requires_arcane_config() {
         .err()
         .expect("missing config should error")
         .to_string();
-    assert!(message.contains("RUSTCANE_API_URL"));
+    assert!(message.contains("RARCANE_API_URL"));
 }
 
 #[test]

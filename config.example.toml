@@ -1,11 +1,11 @@
 # =============================================================================
-# config.rustcane.toml — Annotated template of all config.toml fields
+# config.rarcane.toml — Annotated template of all config.toml fields
 #
 # TEMPLATE: This file documents every available configuration option.
 #           Copy it to config.toml and adjust for your deployment.
 #
 #           config.toml holds non-secret defaults. Secrets and URLs go in .env.
-#           See .env.rustcane for the secrets side of the split.
+#           See .env.rarcane for the secrets side of the split.
 #
 # SPLIT PHILOSOPHY:
 #   config.toml → ports, bind addresses, feature flags, timeouts, rate limits,
@@ -15,10 +15,10 @@
 #
 # Environment variables ALWAYS take priority over config.toml values.
 # Naming:
-#   RUSTCANE_MCP_*  → [mcp] section  (server config)
-#   RUSTCANE_API_*  → [rustcane] section  (upstream service config)
+#   RARCANE_MCP_*  → [mcp] section  (server config)
+#   RARCANE_API_*  → [rarcane] section  (upstream service config)
 #
-# TEMPLATE: Replace all "rustcane" / "EXAMPLE" references with your service name.
+# TEMPLATE: Replace all "rarcane" / "EXAMPLE" references with your service name.
 # =============================================================================
 
 # ── Upstream service ──────────────────────────────────────────────────────────
@@ -28,15 +28,15 @@
 #
 # IMPORTANT: Do NOT put real credentials here. Use .env for api_url and api_key.
 #            These comments show the format; actual values come from env vars.
-[rustcane]
-# api_url = "https://api.rustcane.com/v1"
-# TEMPLATE: Set via RUSTCANE_API_URL env var. Full base URL of the remote API.
-#   REST rustcane:    https://api.rustcane.com/v1
-#   GraphQL rustcane: https://graphql.rustcane.com/graphql
-#   Local rustcane:   http://192.168.1.100:8080
+[rarcane]
+# api_url = "https://api.rarcane.com/v1"
+# TEMPLATE: Set via RARCANE_API_URL env var. Full base URL of the remote API.
+#   REST rarcane:    https://api.rarcane.com/v1
+#   GraphQL rarcane: https://graphql.rarcane.com/graphql
+#   Local rarcane:   http://192.168.1.100:8080
 
 # api_key = ""
-# TEMPLATE: Set via RUSTCANE_API_KEY env var. API key or bearer token.
+# TEMPLATE: Set via RARCANE_API_KEY env var. API key or bearer token.
 #   Generate in your service's developer console or admin panel.
 #   Never commit a real value here.
 
@@ -45,78 +45,78 @@
 [mcp]
 
 # Bind host for the MCP HTTP server.
-# RUSTCANE_MCP_HOST env var overrides this.
+# RARCANE_MCP_HOST env var overrides this.
 #   0.0.0.0   → accept connections from all interfaces (for Docker, reverse proxy)
 #   127.0.0.1 → loopback only (safest for local dev; no auth required)
 # TEMPLATE: Leave as 0.0.0.0 for Docker deployments. By default, non-loopback
 #            binds require bearer/OAuth auth; trusted gateways may explicitly opt
-#            into upstream-enforced auth with RUSTCANE_NOAUTH=true.
+#            into upstream-enforced auth with RARCANE_NOAUTH=true.
 host = "0.0.0.0"
 
 # Bind port for the MCP HTTP server.
-# RUSTCANE_MCP_PORT env var overrides this.
+# RARCANE_MCP_PORT env var overrides this.
 # TEMPLATE: Change to your service's assigned port. See Pattern §19:
 #   unraid-mcp:   6970
 #   gotify-mcp:   9158
 #   unifi-mcp:    7474
 #   tailscale-mcp: 7575
 #   apprise-mcp:  8765
-#   rustcane: 3000
+#   rarcane: 3000
 port = 40060
 
 # Server name advertised to MCP clients in the tools/list response.
-# RUSTCANE_MCP_SERVER_NAME env var overrides this.
-# TEMPLATE: Replace "rustcane-mcp" with your service name (e.g. "unraid-mcp").
-server_name = "rustcane-mcp"
+# RARCANE_MCP_SERVER_NAME env var overrides this.
+# TEMPLATE: Replace "rarcane-mcp" with your service name (e.g. "unraid-mcp").
+server_name = "rarcane-mcp"
 
 # Disable authentication entirely.
 # ONLY safe when host = "127.0.0.1" (loopback — your machine only).
-# RUSTCANE_MCP_NO_AUTH env var overrides this.
+# RARCANE_MCP_NO_AUTH env var overrides this.
 # TEMPLATE: Never set to true in production. Use just dev for local no-auth mode.
 # no_auth = false
 
 # Static bearer token for /mcp authentication.
-# RUSTCANE_MCP_TOKEN env var overrides this.
+# RARCANE_MCP_TOKEN env var overrides this.
 # TEMPLATE: ALWAYS set via env var, never in config.toml.
 #   Generate with: openssl rand -hex 32   or   just gen-token
 # api_token = ""
 
 # Extra Host header values allowed by the RMCP host-validation middleware.
-# RUSTCANE_MCP_ALLOWED_HOSTS env var (comma-separated) overrides this.
+# RARCANE_MCP_ALLOWED_HOSTS env var (comma-separated) overrides this.
 # TEMPLATE: Add your reverse proxy hostname or local DNS name.
-# allowed_hosts = ["myservice.rustcane.com", "myservice.lan"]
+# allowed_hosts = ["myservice.rarcane.com", "myservice.lan"]
 
 # Extra CORS origins for browser-based MCP clients.
-# RUSTCANE_MCP_ALLOWED_ORIGINS env var (comma-separated) overrides this.
+# RARCANE_MCP_ALLOWED_ORIGINS env var (comma-separated) overrides this.
 # TEMPLATE: Add your frontend origin if building a browser-based client.
 # allowed_origins = ["https://claude.ai", "http://localhost:5173"]
 
 # ── OAuth / JWT authentication ────────────────────────────────────────────────
 # TEMPLATE: This sub-section configures the optional OAuth + JWT auth layer.
-#           Activate it by setting RUSTCANE_MCP_AUTH_MODE=oauth in .env.
+#           Activate it by setting RARCANE_MCP_AUTH_MODE=oauth in .env.
 #           Leave all sensitive values (client_id, client_secret, public_url)
 #           in .env — never in this file.
 [mcp.auth]
 
 # Authentication mode: "bearer" (default) or "oauth".
-# RUSTCANE_MCP_AUTH_MODE env var overrides this.
+# RARCANE_MCP_AUTH_MODE env var overrides this.
 # TEMPLATE: Start with "bearer" for simplicity. Switch to "oauth" when you
 #           need per-user identity and Google account-gated access.
 mode = "bearer"
 
 # Public URL of this MCP server (required in OAuth mode).
-# RUSTCANE_MCP_PUBLIC_URL env var overrides this.
+# RARCANE_MCP_PUBLIC_URL env var overrides this.
 # TEMPLATE: Must be reachable from Claude clients. Set in .env, not here.
-# public_url = "https://myservice.rustcane.com"
+# public_url = "https://myservice.rarcane.com"
 
 # Google OAuth 2.0 credentials — ALWAYS set via .env, never here.
-# RUSTCANE_MCP_GOOGLE_CLIENT_ID env var overrides this.
+# RARCANE_MCP_GOOGLE_CLIENT_ID env var overrides this.
 # google_client_id = ""
-# RUSTCANE_MCP_GOOGLE_CLIENT_SECRET env var overrides this.
+# RARCANE_MCP_GOOGLE_CLIENT_SECRET env var overrides this.
 # google_client_secret = ""
 
 # Bootstrap admin email — the first Google account allowed to authenticate.
-# RUSTCANE_MCP_AUTH_ADMIN_EMAIL env var overrides this.
+# RARCANE_MCP_AUTH_ADMIN_EMAIL env var overrides this.
 # TEMPLATE: Set to your Google account email. Additional accounts can be added
 #            via allowed_emails below or dynamically via the OAuth admin panel.
 admin_email = ""
@@ -126,14 +126,14 @@ admin_email = ""
 allowed_emails = []
 
 # Path to the SQLite database for OAuth sessions and client registrations.
-# TEMPLATE: In Docker, /data is bind-mounted from ~/.rustcane on the host.
-#           For bare-metal, change to ~/.rustcane/auth.db.
+# TEMPLATE: In Docker, /data is bind-mounted from ~/.rarcane on the host.
+#           For bare-metal, change to ~/.rarcane/auth.db.
 sqlite_path = "/data/auth.db"
 
 # Path to the RS256 private key for JWT signing.
 # Auto-generated on first run if it doesn't exist.
-# TEMPLATE: In Docker, /data is bind-mounted from ~/.rustcane on the host.
-#           For bare-metal, change to ~/.rustcane/auth-jwt.pem.
+# TEMPLATE: In Docker, /data is bind-mounted from ~/.rarcane on the host.
+#           For bare-metal, change to ~/.rarcane/auth-jwt.pem.
 key_path = "/data/auth-jwt.pem"
 
 # How long issued access tokens are valid (seconds).
@@ -157,7 +157,7 @@ register_rpm = 10
 # TEMPLATE: 60 allows normal OAuth flows. Reduce if you see abuse.
 authorize_rpm = 60
 
-# When OAuth is active, disable the static bearer token (RUSTCANE_MCP_TOKEN).
+# When OAuth is active, disable the static bearer token (RARCANE_MCP_TOKEN).
 # TEMPLATE: Set to false if you want both OAuth and static token active simultaneously.
 #           Useful during migration from bearer to OAuth.
 disable_static_token_with_oauth = true

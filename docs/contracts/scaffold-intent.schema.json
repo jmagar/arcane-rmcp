@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/jmagar/rustcane/docs/contracts/scaffold-intent.schema.json",
-  "title": "rustcane scaffold intent",
+  "$id": "https://github.com/jmagar/rarcane/docs/contracts/scaffold-intent.schema.json",
+  "title": "rarcane scaffold intent",
   "description": "Intent payload returned by the scaffold_intent MCP elicitation action and consumed by the scaffold-project skill. This contract is side-effect free: it describes what to plan, not permission to mutate files.",
   "type": "object",
   "additionalProperties": false,
@@ -23,7 +23,7 @@
   ],
   "properties": {
     "kind": {
-      "const": "rustcane_scaffold_intent",
+      "const": "rarcane_scaffold_intent",
       "description": "Discriminator for this payload type."
     },
     "schema_version": {
@@ -268,7 +268,7 @@
   },
   "examples": [
     {
-      "kind": "rustcane_scaffold_intent",
+      "kind": "rarcane_scaffold_intent",
       "schema_version": 1,
       "server_category": "upstream-client",
       "required_surfaces": ["mcp", "cli"],

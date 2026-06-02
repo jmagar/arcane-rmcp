@@ -1,9 +1,9 @@
-//! Tool JSON schemas for the MCP rustcane tool.
+//! Tool JSON schemas for the MCP rarcane tool.
 //!
 //! This file defines the action list and input schema for the `arcane` tool.
 //! MCP clients inspect this schema to know what arguments are valid.
 //!
-//! **Template**: rename `rustcane` to your tool name. Add/remove actions and
+//! **Template**: rename `rarcane` to your tool name. Add/remove actions and
 //! parameters to match your service. Use `"required": [...]` for mandatory args.
 
 use std::sync::OnceLock;
@@ -20,7 +20,7 @@ static TOOL_DEFINITIONS: OnceLock<Vec<Value>> = OnceLock::new();
 /// Returns a `Vec<Value>` where each item is a tool definition object matching
 /// the MCP `Tool` schema: `{ name, description, inputSchema }`.
 ///
-/// This is also used by the schema resource (`rustcane://schema/mcp-tool`).
+/// This is also used by the schema resource (`rarcane://schema/mcp-tool`).
 pub(super) fn tool_definitions() -> &'static Vec<Value> {
     TOOL_DEFINITIONS.get_or_init(build_tool_definitions)
 }

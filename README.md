@@ -1,8 +1,8 @@
-# rustcane
+# rarcane
 
 Rust MCP and CLI server for Arcane Docker management.
 
-`rustcane` is a Rust implementation of the existing TypeScript `arcane-mcp` behavior. It proxies Arcane API operations through a consistent MCP tool and equivalent CLI commands while keeping auth, validation, destructive-operation confirmation, and response shaping in the Rust service layer.
+`rarcane` is a Rust implementation of the existing TypeScript `arcane-mcp` behavior. It proxies Arcane API operations through a consistent MCP tool and equivalent CLI commands while keeping auth, validation, destructive-operation confirmation, and response shaping in the Rust service layer.
 
 ## Surfaces
 
@@ -20,7 +20,7 @@ The MCP tool is named `arcane`. Calls dispatch on `action` and, for most domains
 | Action | Examples | Scope |
 |---|---|---|
 | `help` | action reference | public |
-| `status` | local rustcane and Arcane config status | `rustcane:read` |
+| `status` | local rarcane and Arcane config status | `rarcane:read` |
 | `environment` | `list`, `get`, `create`, `update`, `delete`, `test` | read/write |
 | `project` | `list`, `get`, `create`, `up`, `down`, `restart`, `pull`, `destroy`, `redeploy`, `build` | read/write |
 | `container` | `list`, `get`, `create`, `start`, `stop`, `restart`, `update`, `delete`, `stats` | read/write |
@@ -38,11 +38,11 @@ Destructive subactions require explicit `params.confirm=true` or CLI `--confirm`
 ## Configuration
 
 ```bash
-RUSTCANE_API_URL=https://arcane.example.com
-RUSTCANE_API_KEY=...
-RUSTCANE_MCP_HOST=127.0.0.1
-RUSTCANE_MCP_PORT=3100
-RUSTCANE_MCP_TOKEN=change-me
+RARCANE_API_URL=https://arcane.example.com
+RARCANE_API_KEY=...
+RARCANE_MCP_HOST=127.0.0.1
+RARCANE_MCP_PORT=3100
+RARCANE_MCP_TOKEN=change-me
 ```
 
 Arcane API keys are read from config/env only. Do not pass credentials in MCP arguments.
@@ -96,4 +96,4 @@ Useful docs:
 - `docs/CONFIG.md` for environment and auth
 - `docs/QUICKSTART.md` for smoke tests
 - `docs/MCP_SCHEMA.md` for schema drift rules
-- `plugins/rustcane/skills/rustcane/SKILL.md` for agent usage guidance
+- `plugins/rarcane/skills/rarcane/SKILL.md` for agent usage guidance

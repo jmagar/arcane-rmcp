@@ -11,7 +11,7 @@ use super::{
 };
 
 const REQUIRED_PATTERN_FILES: &[&str] = &[
-    "src/rustcane.rs",
+    "src/rarcane.rs",
     "src/app.rs",
     "src/actions.rs",
     "src/mcp.rs",
@@ -25,7 +25,7 @@ const REQUIRED_PATTERN_FILES: &[&str] = &[
     "src/main.rs",
     "src/lib.rs",
     "tests/tool_dispatch.rs",
-    "config.rustcane.toml",
+    "config.rarcane.toml",
     "taplo.toml",
     "lefthook.yml",
     "install.sh",
@@ -240,9 +240,9 @@ pub(super) fn plugins(reporter: &mut PatternReporter) {
         reporter.fail("plugins", failures.join("; "));
     }
 
-    let hook_path = Path::new("plugins/rustcane/hooks/hooks.json");
+    let hook_path = Path::new("plugins/rarcane/hooks/hooks.json");
     if hook_path.exists() {
-        let hook = read_file("plugins/rustcane/hooks/hooks.json");
+        let hook = read_file("plugins/rarcane/hooks/hooks.json");
         // The hook must call the binary directly (no plugin-setup.sh wrapper).
         if hook.contains("plugin-setup.sh") {
             reporter.fail(

@@ -2,7 +2,7 @@
 title: "Scripts"
 doc_type: "guide"
 status: "active"
-owner: "rustcane"
+owner: "rarcane"
 audience:
   - "contributors"
   - "agents"
@@ -94,14 +94,14 @@ preflight() {
 
 One-line install:
 ```bash
-curl -fsSL https://raw.githubusercontent.com/jmagar/rustcane-mcp/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/jmagar/rarcane-mcp/main/install.sh | bash
 ```
 
-After install: `rustcane doctor` to validate the environment.
+After install: `rarcane doctor` to validate the environment.
 
 ## block-env-commits.sh
 
-Prevents accidentally committing `.env` files with secrets. Allows only `.env.rustcane`. Called by lefthook on every commit.
+Prevents accidentally committing `.env` files with secrets. Allows only `.env.rarcane`. Called by lefthook on every commit.
 
 ## Contract
 

@@ -1,6 +1,6 @@
 #!/bin/sh
 # =============================================================================
-# entrypoint.sh — Docker entrypoint for rustcane
+# entrypoint.sh — Docker entrypoint for rarcane
 #
 # TEMPLATE: This script runs as root before dropping privileges to UID 1000.
 #           Copy it to the repo root and update the TEMPLATE sections below.
@@ -16,11 +16,11 @@
 #   COPY entrypoint.sh /entrypoint.sh
 #   RUN chmod +x /entrypoint.sh
 #   ENTRYPOINT ["/entrypoint.sh"]
-#   CMD ["rustcane", "serve", "mcp"]
+#   CMD ["rarcane", "serve", "mcp"]
 #
 # The ENTRYPOINT + CMD split means:
-#   - `docker run image`                   → runs: /entrypoint.sh rustcane serve mcp
-#   - `docker run image rustcane --help`    → runs: /entrypoint.sh rustcane --help
+#   - `docker run image`                   → runs: /entrypoint.sh rarcane serve mcp
+#   - `docker run image rarcane --help`    → runs: /entrypoint.sh rarcane --help
 #   - `docker run image sh`                → runs: /entrypoint.sh sh  (useful for debugging)
 #
 # TEMPLATE: Update REQUIRED_VARS and binary name below.
@@ -84,8 +84,8 @@ fi
 #           The goal: fail loudly here rather than silently misbehave later.
 #
 # Arcane (uncomment for a real service):
-#   if [ -z "${RUSTCANE_API_KEY:-}" ]; then
-#       echo "ERROR: RUSTCANE_API_KEY is not set." >&2
+#   if [ -z "${RARCANE_API_KEY:-}" ]; then
+#       echo "ERROR: RARCANE_API_KEY is not set." >&2
 #       echo "       Set it in your .env file or Docker environment." >&2
 #       exit 1
 #   fi

@@ -1979,6 +1979,31 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "63b8176103e19a2643978565ca18b50549f6101881c443590420e4dc998a3c69"
 
 [[package]]
+name = "rarcane"
+version = "0.4.0"
+dependencies = [
+ "anyhow",
+ "axum",
+ "chrono",
+ "dirs",
+ "lab-auth",
+ "rarcane",
+ "reqwest 0.12.28",
+ "rmcp",
+ "schemars",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "tokio",
+ "toml",
+ "tower",
+ "tower-http",
+ "tracing",
+ "tracing-subscriber",
+ "url",
+]
+
+[[package]]
 name = "redox_syscall"
 version = "0.5.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2260,31 +2285,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cfcb3a22ef46e85b45de6ee7e79d063319ebb6594faafcf1c225ea92ab6e9b92"
 dependencies = [
  "semver",
-]
-
-[[package]]
-name = "rustcane"
-version = "0.4.0"
-dependencies = [
- "anyhow",
- "axum",
- "chrono",
- "dirs",
- "lab-auth",
- "reqwest 0.12.28",
- "rmcp",
- "rustcane",
- "schemars",
- "serde",
- "serde_json",
- "tempfile",
- "tokio",
- "toml",
- "tower",
- "tower-http",
- "tracing",
- "tracing-subscriber",
- "url",
 ]
 
 [[package]]

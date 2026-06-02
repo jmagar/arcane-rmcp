@@ -29,12 +29,12 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
 
-  "name": "tv.tootie/rustcane-mcp",
+  "name": "tv.tootie/rarcane-mcp",
   "title": "Arcane MCP",
   "description": "TEMPLATE: Replace with your server description — one sentence describing what service this MCP server exposes.",
 
   "repository": {
-    "url": "https://github.com/jmagar/rustcane-mcp",
+    "url": "https://github.com/jmagar/rarcane-mcp",
     "source": "github"
   },
 
@@ -43,23 +43,23 @@
   "packages": [
     {
       "registryType": "oci",
-      "identifier": "ghcr.io/jmagar/rustcane-mcp:0.4.0",
+      "identifier": "ghcr.io/jmagar/rarcane-mcp:0.4.0",
       "version": "0.4.0",
       "environmentVariables": [
         {
-          "name": "RUSTCANE_API_URL",
-          "description": "TEMPLATE: Replace with your service's base URL description. Arcane: 'Base URL of your Arcane service, e.g. https://api.rustcane.com/v1'.",
+          "name": "RARCANE_API_URL",
+          "description": "TEMPLATE: Replace with your service's base URL description. Arcane: 'Base URL of your Arcane service, e.g. https://api.rarcane.com/v1'.",
           "isRequired": true,
           "isSecret": false
         },
         {
-          "name": "RUSTCANE_API_KEY",
+          "name": "RARCANE_API_KEY",
           "description": "TEMPLATE: Replace with your service's API key description. Arcane: 'API key for authenticating to the Arcane service.'",
           "isRequired": true,
           "isSecret": true
         },
         {
-          "name": "RUSTCANE_MCP_TOKEN",
+          "name": "RARCANE_MCP_TOKEN",
           "description": "Bearer token for MCP endpoint authentication. All /mcp requests must include: Authorization: Bearer <token>. Generate with: openssl rand -hex 32.",
           "isRequired": false,
           "isSecret": true
@@ -71,7 +71,7 @@
   "remotes": [
     {
       "type": "streamable-http",
-      "url": "https://rustcane.yourdomain.com/mcp"
+      "url": "https://rarcane.yourdomain.com/mcp"
     }
   ]
 }

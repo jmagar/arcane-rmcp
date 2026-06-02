@@ -1,13 +1,13 @@
 {
-  "name": "rustcane",
+  "name": "rarcane",
   "description": "Rust MCP server for Arcane Docker management — manage containers, images, networks, volumes, compose projects, GitOps, and vulnerability scanning across Docker environments.",
   "author": {
     "name": "jmagar"
   },
-  "repository": "https://github.com/jmagar/rustcane",
+  "repository": "https://github.com/jmagar/rarcane",
   "license": "MIT",
   "keywords": [
-    "rustcane",
+    "rarcane",
     "arcane",
     "docker",
     "containers",
@@ -23,14 +23,14 @@
     "server_url": {
       "type": "string",
       "title": "Server URL",
-      "description": "Base URL of the MCP HTTP server this Claude Code session connects to. If running locally: keep http://localhost:40060. If connecting to a remote server: set to http://hostname:40060 or https://rustcane.yourdomain.com. Do NOT include a trailing /mcp — the plugin appends it automatically.",
+      "description": "Base URL of the MCP HTTP server this Claude Code session connects to. If running locally: keep http://localhost:40060. If connecting to a remote server: set to http://hostname:40060 or https://rarcane.yourdomain.com. Do NOT include a trailing /mcp — the plugin appends it automatically.",
       "required": true,
       "default": "http://localhost:40060"
     },
     "api_token": {
       "type": "string",
       "title": "API token",
-      "description": "Bearer token for MCP HTTP authentication. Every request to /mcp includes: Authorization: Bearer <token>. Server mode: pick any value and use the same value in RUSTCANE_MCP_TOKEN. Client mode: paste the token your server admin configured. Generate one with: openssl rand -hex 32 or just gen-token.",
+      "description": "Bearer token for MCP HTTP authentication. Every request to /mcp includes: Authorization: Bearer <token>. Server mode: pick any value and use the same value in RARCANE_MCP_TOKEN. Client mode: paste the token your server admin configured. Generate one with: openssl rand -hex 32 or just gen-token.",
       "sensitive": true,
       "required": false
     },
@@ -51,7 +51,7 @@
     "public_url": {
       "type": "string",
       "title": "Public URL",
-      "description": "Public base URL for OAuth issuer metadata, e.g. https://rustcane.yourdomain.com. Required when auth_mode=oauth. If empty, setup derives it from an https server_url by stripping /mcp suffix. Server mode only.",
+      "description": "Public base URL for OAuth issuer metadata, e.g. https://rarcane.yourdomain.com. Required when auth_mode=oauth. If empty, setup derives it from an https server_url by stripping /mcp suffix. Server mode only.",
       "default": ""
     },
     "google_client_id": {
@@ -74,17 +74,17 @@
       "description": "Bootstrap allowed Google account for OAuth mode. The server refuses to start OAuth mode without at least one allowlisted email address. Server mode only.",
       "default": ""
     },
-    "rustcane_api_url": {
+    "rarcane_api_url": {
       "type": "string",
       "title": "Arcane API URL",
-      "description": "Base URL of the upstream Arcane API this server manages Docker through, e.g. https://arcane.example.com. Maps to the RUSTCANE_API_URL env var.",
+      "description": "Base URL of the upstream Arcane API this server manages Docker through, e.g. https://arcane.example.com. Maps to the RARCANE_API_URL env var.",
       "sensitive": true,
       "default": ""
     },
-    "rustcane_api_key": {
+    "rarcane_api_key": {
       "type": "string",
       "title": "Arcane API key",
-      "description": "API key or bearer token for authenticating to the upstream Arcane API. Generate one in the Arcane admin panel. Maps to the RUSTCANE_API_KEY env var. Never stored in config.toml.",
+      "description": "API key or bearer token for authenticating to the upstream Arcane API. Generate one in the Arcane admin panel. Maps to the RARCANE_API_KEY env var. Never stored in config.toml.",
       "sensitive": true,
       "default": ""
     }

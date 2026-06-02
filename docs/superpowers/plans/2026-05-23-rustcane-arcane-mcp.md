@@ -1,10 +1,10 @@
-# Rustcane Arcane MCP Implementation Plan
+# Rarcane Arcane MCP Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build `rustcane`, a Rust rmcp MCP server and CLI for Arcane Docker management.
+**Goal:** Build `rarcane`, a Rust rmcp MCP server and CLI for Arcane Docker management.
 
-**Architecture:** Start from `rustcane`, rename the scaffold to rustcane, and keep the upstream-client shape: `src/arcane.rs` owns HTTP calls, `src/app.rs` owns action validation/confirmation/dispatch, and `src/mcp/tools.rs` plus `src/cli.rs` only parse and delegate. Use a centralized action table so MCP schema, CLI validation, scopes, help, and dispatch stay aligned.
+**Architecture:** Start from `rarcane`, rename the scaffold to rarcane, and keep the upstream-client shape: `src/arcane.rs` owns HTTP calls, `src/app.rs` owns action validation/confirmation/dispatch, and `src/mcp/tools.rs` plus `src/cli.rs` only parse and delegate. Use a centralized action table so MCP schema, CLI validation, scopes, help, and dispatch stay aligned.
 
 **Tech Stack:** Rust, rmcp, axum, reqwest, serde_json, clap, tokio, wiremock, cargo test/clippy/fmt.
 
@@ -14,29 +14,29 @@
 
 - Template rules: `AGENTS.md`, `README.md`
 - TypeScript prior art: `/home/jmagar/workspace/arcane-mcp/src/mcp/tools/arcane.ts`, `src/mcp/tools/dispatch/*.ts`, `src/services/*.ts`, `README.md`
-- Epic bead: `rustcane-r6l`
+- Epic bead: `rarcane-r6l`
 - Research findings: Arcane public API docs are instance-hosted; use TypeScript prior art for concrete endpoints. MCP 2025-06-18 requires human-in-loop tool safety and says elicitation must not request secrets.
 
 ## File Map
 
 - Modify: `Cargo.toml`, `Cargo.lock` for package/bin/dependencies.
-- Rename/replace: `src/rustcane.rs` -> `src/arcane.rs`.
+- Rename/replace: `src/rarcane.rs` -> `src/arcane.rs`.
 - Modify: `src/config.rs`, `src/app.rs`, `src/actions.rs`, `src/cli.rs`, `src/main.rs`, `src/lib.rs`.
 - Modify: `src/mcp/tools.rs`, `src/mcp/schemas.rs`, `src/mcp/rmcp_server.rs`, `src/mcp/prompts.rs`, `src/mcp.rs`.
 - Modify: `tests/cli_parse.rs`, `tests/tool_dispatch.rs`; create `tests/arcane_client.rs`.
-- Modify docs/config/plugin surfaces: `README.md`, `AGENTS.md`, `.env.rustcane`, `config.rustcane.toml`, `server.json`, `plugins/rustcane/**` renamed or rewritten to `plugins/rustcane/**`.
+- Modify docs/config/plugin surfaces: `README.md`, `AGENTS.md`, `.env.rarcane`, `config.rarcane.toml`, `server.json`, `plugins/rarcane/**` renamed or rewritten to `plugins/rarcane/**`.
 
 ## Task 1: Baseline Scaffold Rename
 
 **Files:**
 - Modify: `Cargo.toml`, `src/main.rs`, `src/lib.rs`, `src/config.rs`, `src/mcp.rs`, docs/config/plugin files.
-- Rename: `src/rustcane.rs` to `src/arcane.rs`; `plugins/rustcane/` to `plugins/rustcane/`.
+- Rename: `src/rarcane.rs` to `src/arcane.rs`; `plugins/rarcane/` to `plugins/rarcane/`.
 
 - [ ] **Step 1: Write/adjust tests for names**
 
 Run:
 ```bash
-rg -n "rustcane|Arcane|rustcane|EXAMPLE" src tests README.md AGENTS.md plugins config* server.json .env.rustcane
+rg -n "rarcane|Arcane|rarcane|EXAMPLE" src tests README.md AGENTS.md plugins config* server.json .env.rarcane
 ```
 Expected before implementation: matches exist. Expected after implementation: no template identifiers remain except intentional historical references in docs.
 
@@ -44,20 +44,20 @@ Expected before implementation: matches exist. Expected after implementation: no
 
 Use repository-aware replacement, preserving case:
 ```bash
-mv src/rustcane.rs src/arcane.rs
-mv plugins/rustcane plugins/rustcane
+mv src/rarcane.rs src/arcane.rs
+mv plugins/rarcane plugins/rarcane
 ```
 Then replace:
 ```text
-rustcane -> rustcane
+rarcane -> rarcane
 ArcaneClient -> ArcaneClient
 ArcaneService -> ArcaneService
 ArcaneConfig -> ArcaneConfig
 ArcaneRmcpServer -> ArcaneRmcpServer
-RUSTCANE_ -> RUSTCANE_
-rustcane:read -> rustcane:read
-rustcane:write -> rustcane:write
-rustcane://schema/mcp-tool -> rustcane://schema/mcp-tool
+RARCANE_ -> RARCANE_
+rarcane:read -> rarcane:read
+rarcane:write -> rarcane:write
+rarcane://schema/mcp-tool -> rarcane://schema/mcp-tool
 ```
 
 - [ ] **Step 3: Verify compile catches only expected missing Arcane implementation**
@@ -161,22 +161,22 @@ Expose one MCP tool named `arcane` with:
 ```json
 {"action":"container","subaction":"list","envId":"env-abc","id":"optional","params":{}}
 ```
-Help remains public; read operations require `rustcane:read`; mutating/destructive operations require `rustcane:write`.
+Help remains public; read operations require `rarcane:read`; mutating/destructive operations require `rarcane:write`.
 
 - [ ] **Step 3: Implement CLI**
 
 Use a compact parity CLI:
 ```bash
-rustcane call --action container --subaction list --env-id env-abc
-rustcane call --action project --subaction down --env-id env-abc --id stack --confirm
-rustcane help --domain container
+rarcane call --action container --subaction list --env-id env-abc
+rarcane call --action project --subaction down --env-id env-abc --id stack --confirm
+rarcane help --domain container
 ```
 CLI shims parse flags, add `confirm=true` only from `--confirm`, and delegate to `ArcaneService`.
 
 ## Task 5: Docs, Verification, Commit, and PR
 
 **Files:**
-- Modify: `README.md`, `AGENTS.md`, `.env.rustcane`, `config.rustcane.toml`, `server.json`, plugin docs/manifests.
+- Modify: `README.md`, `AGENTS.md`, `.env.rarcane`, `config.rarcane.toml`, `server.json`, plugin docs/manifests.
 
 - [ ] **Step 1: Document the delivered contract**
 
@@ -198,10 +198,10 @@ Run:
 ```bash
 git status --short
 git add .
-git commit -m "feat: implement rustcane Arcane MCP server"
+git commit -m "feat: implement rarcane Arcane MCP server"
 git remote -v
 ```
-If a GitHub remote exists for rustcane, push and create a PR. If no remote exists, record that PR creation is blocked by missing remote.
+If a GitHub remote exists for rarcane, push and create a PR. If no remote exists, record that PR creation is blocked by missing remote.
 
 ## Self-Review
 

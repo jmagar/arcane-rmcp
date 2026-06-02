@@ -1,18 +1,18 @@
 # =============================================================================
 # docker-compose.prod.yml — Production deployment template
 #
-# TEMPLATE: Replace all occurrences of "rustcane" with your service name.
+# TEMPLATE: Replace all occurrences of "rarcane" with your service name.
 #           Replace all occurrences of "EXAMPLE" with your service name in caps.
 #
 # Key substitutions:
-#   "rustcane-mcp"          -> your Docker service/container name
-#   "rustcane-mcp-data"     -> your Docker volume name
-#   "ghcr.io/.../rustcane"  -> your published Docker image path
+#   "rarcane-mcp"          -> your Docker service/container name
+#   "rarcane-mcp-data"     -> your Docker volume name
+#   "ghcr.io/.../rarcane"  -> your published Docker image path
 #   port 40060             -> your service's MCP port
-#   RUSTCANE_*              -> your env var prefix
+#   RARCANE_*              -> your env var prefix
 # =============================================================================
 
-name: rustcane
+name: rarcane
 
 x-common-service: &common-service
   networks:
@@ -32,21 +32,21 @@ x-common-service: &common-service
       compress: "true"
 
 services:
-  rustcane-mcp:
+  rarcane-mcp:
     <<: *common-service
     # TEMPLATE: Replace with your image path.
-    image: ghcr.io/your-org/rustcane-mcp:${RUSTCANE_MCP_VERSION:-latest}
-    container_name: rustcane-mcp
+    image: ghcr.io/your-org/rarcane-mcp:${RARCANE_MCP_VERSION:-latest}
+    container_name: rarcane-mcp
     env_file:
       - path: .env
         required: false
     environment:
-      RUSTCANE_MCP_HOST: 0.0.0.0
-      RUSTCANE_NOAUTH: "true"
+      RARCANE_MCP_HOST: 0.0.0.0
+      RARCANE_NOAUTH: "true"
     ports:
-      - "${RUSTCANE_MCP_HOST_PORT:-40060}:40060/tcp"
+      - "${RARCANE_MCP_HOST_PORT:-40060}:40060/tcp"
     volumes:
-      - ${HOME}/.rustcane:/data
+      - ${HOME}/.rarcane:/data
     cap_drop:
       - ALL
     security_opt:
@@ -68,7 +68,7 @@ services:
           cpus: '0.5'
 
 volumes:
-  rustcane-mcp-data:
+  rarcane-mcp-data:
 
 networks:
   mcp:

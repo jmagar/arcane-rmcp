@@ -90,7 +90,7 @@ impl ArcaneService {
     pub async fn status(&self) -> Result<Value> {
         Ok(json!({
             "status": "ok",
-            "server": "rustcane",
+            "server": "rarcane",
             "upstream": "arcane",
         }))
     }
@@ -127,7 +127,7 @@ impl ArcaneService {
                     })
                 } else {
                     json!({
-                        "greeting": format!("Hello, {name}! Welcome to the rustcane MCP server."),
+                        "greeting": format!("Hello, {name}! Welcome to the rarcane MCP server."),
                         "name": name,
                     })
                 }
@@ -164,7 +164,7 @@ impl ArcaneService {
         let env_prefix = input.env_prefix.trim().to_ascii_uppercase();
 
         Ok(json!({
-            "kind": "rustcane_scaffold_intent",
+            "kind": "rarcane_scaffold_intent",
             "schema_version": 1,
             "server_category": category,
             "required_surfaces": required_surfaces,
@@ -340,7 +340,7 @@ fn confirmed(params: &Value) -> bool {
 }
 
 fn allow_destructive() -> bool {
-    std::env::var("RUSTCANE_MCP_ALLOW_DESTRUCTIVE")
+    std::env::var("RARCANE_MCP_ALLOW_DESTRUCTIVE")
         .map(|value| matches!(value.to_ascii_lowercase().as_str(), "1" | "true" | "yes"))
         .unwrap_or(false)
 }

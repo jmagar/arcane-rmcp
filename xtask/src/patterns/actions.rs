@@ -179,7 +179,7 @@ pub const ACTION_SPECS: &[ActionSpec] = &[
 ];
 
 pub fn rest_help() {
-    let rustcane = "Alice";
+    let rarcane = "Alice";
 }
 "#;
 

@@ -1,4 +1,4 @@
-//! MCP prompts for the rustcane server.
+//! MCP prompts for the rarcane server.
 //!
 //! Prompts are pre-canned message templates that MCP clients can invoke.
 //! They appear in the "Prompts" section of compatible MCP UIs.
@@ -28,7 +28,7 @@ pub(super) fn get_prompt(request: GetPromptRequestParams) -> anyhow::Result<GetP
     match request.name.as_str() {
         "quick_start" => Ok(GetPromptResult::new(vec![PromptMessage::new_text(
             PromptMessageRole::User,
-            "Use the rustcane tool with action=status to check the server is running, \
+            "Use the rarcane tool with action=status to check the server is running, \
              then use action=greet with your name to get a personalised greeting. \
              Report back both results.",
         )])

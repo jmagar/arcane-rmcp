@@ -1,11 +1,11 @@
 # =============================================================================
-# Cargo.toml — Workspace root for the rustcane project
+# Cargo.toml — Workspace root for the rarcane project
 #
 # TEMPLATE: This is a cargo workspace containing two crates:
 #   - . (the main library/binary crate)
 #   - xtask/ (repo automation: dist, ci, symlink-docs, check-env)
 #
-# When creating your own server, rename "rustcane" and add your own
+# When creating your own server, rename "rarcane" and add your own
 # workspace members if needed.
 # =============================================================================
 
@@ -15,7 +15,7 @@ members = [".", "xtask"]
 resolver = "2"
 
 [package]
-name = "rustcane"
+name = "rarcane"
 version = "0.4.0"
 edition = "2021"
 rust-version = "1.90"
@@ -64,7 +64,7 @@ tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 # HTTP client (stub — replace with your real transport: GraphQL, REST, gRPC, etc.)
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
 
-# Platform dirs — for default_data_dir() (~/.rustcane detection)
+# Platform dirs — for default_data_dir() (~/.rarcane detection)
 # TEMPLATE: Used in config.rs default_data_dir(). Keep this dep.
 dirs = "6"
 
@@ -76,7 +76,7 @@ default = []
 test-support = []
 
 [dev-dependencies]
-rustcane = { path = ".", features = ["test-support"] }
+rarcane = { path = ".", features = ["test-support"] }
 tempfile = "3"
 tower = { version = "0.5", features = ["util"] }
 rmcp = { version = "1.7.0", default-features = false, features = [

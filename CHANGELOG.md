@@ -25,20 +25,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `src/cli/watch.rs` — `rustcane watch` subcommand for live file-system monitoring.
-- `plugins/rustcane/monitors/` — plugin monitor definitions for event-driven automation.
-- `plugins/rustcane/gemini-extension.json` — Gemini extension manifest for multi-platform plugin distribution.
+- `src/cli/watch.rs` — `rarcane watch` subcommand for live file-system monitoring.
+- `plugins/rarcane/monitors/` — plugin monitor definitions for event-driven automation.
+- `plugins/rarcane/gemini-extension.json` — Gemini extension manifest for multi-platform plugin distribution.
 - `.github/dependabot.yml` + `.github/workflows/dependabot-auto-merge.yml` — automated dependency updates with auto-merge for minor/patch bumps.
 - `scripts/asciicheck.py`, `scripts/check-blob-size.py`, `scripts/check-dependency-updates.sh`, `scripts/check-file-size.sh`, `scripts/check-runtime-current.sh`, `scripts/validate-plugin-layout.sh`, `scripts/blob-size-allowlist.txt` — repository validation and quality scripts.
 - `tests/plugin_contract.rs` — plugin contract integration tests.
 - `docs/PLUGINS.md` — documentation for the plugin system and distribution model.
-- `plugins/README.md`, `plugins/rustcane/README.md`, `plugins/rustcane/CLAUDE.md` — plugin-level documentation and agent guidance.
+- `plugins/README.md`, `plugins/rarcane/README.md`, `plugins/rarcane/CLAUDE.md` — plugin-level documentation and agent guidance.
 - `apps/web/README.md`, `xtask/README.md`, `tests/README.md`, `scripts/README.md` — README coverage for every major directory.
 - `.claude/` — Claude Code project settings for agent-assisted development.
 
 ### Changed
 
-- `plugins/rustcane/hooks/plugin-setup.sh` — significant simplification; reduced from ~500 to ~50 lines by extracting reusable logic and removing duplication.
+- `plugins/rarcane/hooks/plugin-setup.sh` — significant simplification; reduced from ~500 to ~50 lines by extracting reusable logic and removing duplication.
 - `Justfile` — expanded with additional recipes covering plugin validation, script checks, and workflow shortcuts.
 - `lefthook.yml` — pre-commit hook additions aligned with new script suite.
 - `AGENTS.md`, `CLAUDE.md` — updated agent and AI tooling guidance to reflect current project structure.
@@ -71,20 +71,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Layered architecture: `ArcaneClient` (transport) → `ArcaneService` (business logic) → MCP/CLI shims
-- Action-based dispatch: single `rustcane` MCP tool with `action` parameter routing
-- Both transports: Streamable HTTP (`rustcane serve`) and stdio (`rustcane mcp`)
-- Bearer token authentication via `RUSTCANE_MCP_TOKEN`
-- Google OAuth authentication via `RUSTCANE_MCP_AUTH_MODE=oauth` (issues RS256 JWTs)
+- Action-based dispatch: single `rarcane` MCP tool with `action` parameter routing
+- Both transports: Streamable HTTP (`rarcane serve`) and stdio (`rarcane mcp`)
+- Bearer token authentication via `RARCANE_MCP_TOKEN`
+- Google OAuth authentication via `RARCANE_MCP_AUTH_MODE=oauth` (issues RS256 JWTs)
 - Loopback/no-auth mode for local development
 - MCP elicitation support (`elicit_name` action, spec 2025-06-18) with graceful fallback
-- MCP resources: exposes tool schema at `rustcane://schema/mcp-tool`
+- MCP resources: exposes tool schema at `rarcane://schema/mcp-tool`
 - MCP prompts: `quick_start` prompt
 - CLI with `greet`, `echo`, and `status` subcommands
 - Test helpers: `loopback_state()` and `bearer_state()` for credential-free integration tests
 - `AuthPolicy` enum making auth choice explicit at construction time
 - CORS, Host header validation, request body size limiting built-in
 - `resolve_auth_policy_kind()` — refuses to bind `0.0.0.0` without auth (Pattern §27)
-- `default_data_dir()` — detects container vs bare-metal, returns `/data` or `~/.rustcane`
+- `default_data_dir()` — detects container vs bare-metal, returns `/data` or `~/.rarcane`
 - `entrypoint.sh` — Docker entrypoint with permission setup and privilege drop to UID 1000
 - `xtask` crate with `dist`, `ci`, `symlink-docs`, `check-env` commands
 - `.config/nextest.toml` — nextest configuration with `default` and `ci` profiles
@@ -93,8 +93,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `.github/workflows/ci.yml` — CI: fmt, clippy, nextest, taplo, audit, gitleaks
 - `.github/workflows/docker-publish.yml` — multi-platform Docker build + Trivy scan
 - `.github/workflows/release.yml` — release binaries for linux/amd64 and linux/arm64
-- `config.rustcane.toml` — fully annotated config template
-- `.env.rustcane` — documented secrets template
+- `config.rarcane.toml` — fully annotated config template
+- `.env.rarcane` — documented secrets template
 - `CHANGELOG.md` following Keep a Changelog format
 - Workspace structure: root crate + `xtask/` member
 - `symlink-docs` and `symlink-docs-inline` Justfile recipes

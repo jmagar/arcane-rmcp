@@ -1,13 +1,13 @@
 ---
 date: 2026-05-14 03:32:50 EST
-repo: git@github.com:jmagar/rustcane.git
+repo: git@github.com:jmagar/rarcane.git
 branch: refactor/server-api-module-split
 head: 37429e6
 plan: none
 agent: Claude (claude-sonnet-4-6)
 session id: e8aeb70d-b7af-4ff5-8534-1cfcaafe6850
-transcript: /home/jmagar/.claude/projects/-home-jmagar-workspace-rustcane/e8aeb70d-b7af-4ff5-8534-1cfcaafe6850.jsonl
-working directory: /home/jmagar/workspace/rustcane
+transcript: /home/jmagar/.claude/projects/-home-jmagar-workspace-rarcane/e8aeb70d-b7af-4ff5-8534-1cfcaafe6850.jsonl
+working directory: /home/jmagar/workspace/rarcane
 ---
 
 ## User Request
@@ -16,14 +16,14 @@ Continue from previous session: verify CLAUDE.md module map was up to date, add 
 
 ## Session Overview
 
-Audited Justfiles across all 9 repos in the rmcp-server family (rustcane, lab, axon_rust, syslog-mcp, rustifi, rustify, rustscale, unrust, apprise-mcp). Added 14 new recipes to rustcane's Justfile. Removed `"version"` from plugin manifests in 7 repos (lab and axon_rust were already clean). Fixed a pre-existing clippy lint in syslog-mcp as part of the same commit. Confirmed CLAUDE.md module map was already correct from the previous session.
+Audited Justfiles across all 9 repos in the rmcp-server family (rarcane, lab, axon_rust, syslog-mcp, rustifi, rustify, rustscale, unrust, apprise-mcp). Added 14 new recipes to rarcane's Justfile. Removed `"version"` from plugin manifests in 7 repos (lab and axon_rust were already clean). Fixed a pre-existing clippy lint in syslog-mcp as part of the same commit. Confirmed CLAUDE.md module map was already correct from the previous session.
 
 ## Sequence of Events
 
 1. Verified CLAUDE.md module map — `src/server.rs` already listed correctly, no update needed
-2. Read all 7 Justfiles in parallel (rustcane + lab + syslog-mcp + axon_rust + rustifi + rustify + rustscale + unrust + apprise-mcp)
-3. Identified 14 recipes missing from rustcane present in ≥3 family repos
-4. Rewrote rustcane Justfile with all additions + `build-web`, `web-watch`, `build-full`
+2. Read all 7 Justfiles in parallel (rarcane + lab + syslog-mcp + axon_rust + rustifi + rustify + rustscale + unrust + apprise-mcp)
+3. Identified 14 recipes missing from rarcane present in ≥3 family repos
+4. Rewrote rarcane Justfile with all additions + `build-web`, `web-watch`, `build-full`
 5. User pointed out plugin manifests should not carry a version number — SHA is the version
 6. Stripped `"version"` field from all 13 manifests across 7 repos (lab/axon_rust already clean)
 7. Removed plugin version-bump loop from `publish` recipe in all 7 affected Justfiles
@@ -37,10 +37,10 @@ Audited Justfiles across all 9 repos in the rmcp-server family (rustcane, lab, a
 
 - `lab` has 53 plugin manifests across `plugins/*/`, none with `"version"` — already following the convention
 - `axon_rust` had 1 manifest, also already clean
-- All 7 MCP server repos (rustcane, rustifi, rustify, rustscale, unrust, apprise-mcp, syslog-mcp) had `"version": "0.1.0"` or `"version": "0.20.0"` in their manifests
+- All 7 MCP server repos (rarcane, rustifi, rustify, rustscale, unrust, apprise-mcp, syslog-mcp) had `"version": "0.1.0"` or `"version": "0.20.0"` in their manifests
 - syslog-mcp had a pre-existing `clippy::empty_line_after_doc_comments` error in `src/logging/aurora.rs:13` blocking its pre-commit hook
-- rustcane Justfile was missing 14 recipes present in ≥3 family repos; notably `clean`, `deny`, `verify`, `fix`, `generate-cli`, `build-plugin`, `doctor`, `default`
-- The `publish` recipe in rustcane did not update plugin.json files (unlike family members); fixed to match, then immediately removed the loop since manifests no longer carry versions
+- rarcane Justfile was missing 14 recipes present in ≥3 family repos; notably `clean`, `deny`, `verify`, `fix`, `generate-cli`, `build-plugin`, `doctor`, `default`
+- The `publish` recipe in rarcane did not update plugin.json files (unlike family members); fixed to match, then immediately removed the loop since manifests no longer carry versions
 
 ## Technical Decisions
 
@@ -54,10 +54,10 @@ Audited Justfiles across all 9 repos in the rmcp-server family (rustcane, lab, a
 
 | File | Repo | Action | Purpose |
 |------|------|--------|---------|
-| `Justfile` | rustcane | Rewritten | Added 14 recipes; fixed `publish`; removed plugin version loop |
-| `plugins/rustcane/.claude-plugin/plugin.json` | rustcane | Modified | Removed `"version"` field |
-| `plugins/rustcane/.codex-plugin/plugin.json` | rustcane | Modified | Removed `"version"` field |
-| `docs/PATTERNS.md` | rustcane | Modified | §13 + §36: added no-version convention with rationale |
+| `Justfile` | rarcane | Rewritten | Added 14 recipes; fixed `publish`; removed plugin version loop |
+| `plugins/rarcane/.claude-plugin/plugin.json` | rarcane | Modified | Removed `"version"` field |
+| `plugins/rarcane/.codex-plugin/plugin.json` | rarcane | Modified | Removed `"version"` field |
+| `docs/PATTERNS.md` | rarcane | Modified | §13 + §36: added no-version convention with rationale |
 | `Justfile` | rustifi | Modified | Removed plugin version-bump loop from `publish` |
 | `plugins/unifi/.claude-plugin/plugin.json` | rustifi | Modified | Removed `"version"` |
 | `plugins/unifi/.codex-plugin/plugin.json` | rustifi | Modified | Removed `"version"` |
@@ -96,7 +96,7 @@ python3 -c "import re; re.sub(r'for f in ...done\n', '', text)"
 just --list  # 51 recipes listed cleanly
 
 # Push all 7 repos
-for repo in rustcane rustifi rustify rustscale unrust apprise-mcp syslog-mcp; do
+for repo in rarcane rustifi rustify rustscale unrust apprise-mcp syslog-mcp; do
   git -C /home/jmagar/workspace/$repo push
 done
 ```
@@ -127,7 +127,7 @@ done
 
 ## Decisions Not Taken
 
-- **Propagate new Justfile recipes to all family repos**: Only the plugin version change was propagated. The 14 new recipes added to rustcane were not backported to rustifi/rustify/etc. — those repos have their own cadence and the template is the source of truth.
+- **Propagate new Justfile recipes to all family repos**: Only the plugin version change was propagated. The 14 new recipes added to rarcane were not backported to rustifi/rustify/etc. — those repos have their own cadence and the template is the source of truth.
 - **Track pre-commit hook in `.githooks/`**: Left in `.git/hooks/` (untracked). Would require `git config core.hooksPath .githooks` documentation.
 
 ## Open Questions

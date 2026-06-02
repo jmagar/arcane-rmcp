@@ -1,13 +1,13 @@
 ---
 date: 2026-05-15 16:54:12 EST
-repo: git@github.com:jmagar/rustcane.git
+repo: git@github.com:jmagar/rarcane.git
 branch: main
 head: 68eaadd
 plan: none
 agent: Claude (claude-sonnet-4-6)
 session id: 858d9d67-35f8-4ec0-93d6-d7870a9b3359
-transcript: /home/jmagar/.claude/projects/-home-jmagar-workspace-rustcane/858d9d67-35f8-4ec0-93d6-d7870a9b3359.jsonl
-working directory: /home/jmagar/workspace/rustcane
+transcript: /home/jmagar/.claude/projects/-home-jmagar-workspace-rarcane/858d9d67-35f8-4ec0-93d6-d7870a9b3359.jsonl
+working directory: /home/jmagar/workspace/rarcane
 ---
 
 ## User Request
@@ -24,7 +24,7 @@ Investigated system memory usage on a 57 GB machine with swap full (8/8 GB) and 
 2. Surveyed running processes for MCP-related entries (`claude mcp serve`, `chrome-devtools-mcp`, etc.).
 3. Checked parent PIDs of all `claude mcp serve` instances to distinguish orphans (re-parented to systemd PID 1) from active ones (live parent).
 4. Verified 14 orphaned `claude mcp serve` processes (parent=systemd, 0 socket fds) — ~2.0 GB total.
-5. Expanded search to all systemd-parented user processes and found additional orphans: a `tsx serve.ts` (ACP basic-host rustcane), PM2 daemon with no managed processes.
+5. Expanded search to all systemd-parented user processes and found additional orphans: a `tsx serve.ts` (ACP basic-host rarcane), PM2 daemon with no managed processes.
 6. User pushed back — "there's far more." Ran a full `/proc/meminfo` + per-category breakdown.
 7. **Discovered `/tmp` is a 29 GB tmpfs with 19 GB in use** — the real culprit.
 8. Listed `/tmp` contents by size; identified 13 directories with no live process holding any open file handles.
@@ -73,7 +73,7 @@ rm -rf /tmp/lab-target-plugin-hook /tmp/axon-rust-verify-target \
   /tmp/lab-target-tool-search /tmp/axon-image-root \
   /tmp/codex-json-check.out /tmp/axon_original /tmp/axon_orig_binary \
   /tmp/beads-bulk-remote-fix-20260514-180242 /tmp/lavra-dolt-remote-inspect \
-  /tmp/rustcane-bump-test-20260514a
+  /tmp/rarcane-bump-test-20260514a
 sudo rm -rf /tmp/tmp.u6RgLT9HE8
 
 # Verify result

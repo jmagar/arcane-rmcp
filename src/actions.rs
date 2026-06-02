@@ -4,9 +4,9 @@ use std::time::Duration;
 
 use crate::app::ArcaneService;
 
-pub const READ_SCOPE: &str = "rustcane:read";
-pub const WRITE_SCOPE: &str = "rustcane:write";
-pub const DENY_SCOPE: &str = "rustcane:__deny__";
+pub const READ_SCOPE: &str = "rarcane:read";
+pub const WRITE_SCOPE: &str = "rarcane:write";
+pub const DENY_SCOPE: &str = "rarcane:__deny__";
 
 pub fn scopes_satisfy(token_scopes: &[String], required: &str) -> bool {
     token_scopes
@@ -40,7 +40,7 @@ impl std::fmt::Display for ValidationError {
             Self::MissingId { label } => write!(f, "{label} id is required"),
             Self::UnknownAction { action } => write!(
                 f,
-                "unknown rustcane action: {action}; use action=help for documentation"
+                "unknown rarcane action: {action}; use action=help for documentation"
             ),
             Self::UnknownSubaction { action, subaction } => write!(
                 f,
@@ -1096,7 +1096,7 @@ pub fn rest_help() -> Value {
     json!({
         "tool": "arcane",
         "actions": action_names(),
-        "usage": "rustcane call --action container --subaction list --env-id <env>",
+        "usage": "rarcane call --action container --subaction list --env-id <env>",
     })
 }
 

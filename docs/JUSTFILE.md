@@ -2,7 +2,7 @@
 title: "Justfile"
 doc_type: "guide"
 status: "active"
-owner: "rustcane"
+owner: "rarcane"
 audience:
   - "contributors"
   - "agents"
@@ -19,10 +19,10 @@ last_reviewed: "2026-05-15"
 
 | Recipe | Purpose |
 |---|---|
-| `just dev` | Run HTTP MCP server on loopback in no-auth dev mode (`RUSTCANE_MCP_NO_AUTH=true`). |
-| `just mcp` | Run stdio MCP transport (`rustcane mcp`). |
+| `just dev` | Run HTTP MCP server on loopback in no-auth dev mode (`RARCANE_MCP_NO_AUTH=true`). |
+| `just mcp` | Run stdio MCP transport (`rarcane mcp`). |
 | `just greet` | Quick CLI smoke test. |
-| `just doctor` | Pre-flight environment/connectivity checks (`rustcane doctor`). |
+| `just doctor` | Pre-flight environment/connectivity checks (`rarcane doctor`). |
 | `just build` / `just build-release` | Debug/release Rust builds. |
 | `just build-web` | Build static Next.js web assets (`apps/web/out`). |
 | `just build-full` | Build web assets then release binary (CI use). |
@@ -80,28 +80,28 @@ refresh-docs-dry:       bash scripts/refresh-docs.sh --dry-run
 ## Doctor output
 
 ```
-$ rustcane doctor
+$ rarcane doctor
 
-rustcane-mcp v0.1.0 — environment check
+rarcane-mcp v0.1.0 — environment check
 
   Config
   ──────────────────────────────────────────
-  ✓ Config file:       ~/.rustcane/config.toml
-  ✓ Data directory:    ~/.rustcane/ (writable)
-  ✓ Binary in PATH:    /home/user/.local/bin/rustcane
+  ✓ Config file:       ~/.rarcane/config.toml
+  ✓ Data directory:    ~/.rarcane/ (writable)
+  ✓ Binary in PATH:    /home/user/.local/bin/rarcane
 
   Service credentials
   ──────────────────────────────────────────
-  ✓ RUSTCANE_API_URL:   https://rustcane.internal/api (set)
-  ✗ RUSTCANE_API_KEY:   not set
-    → Set RUSTCANE_API_KEY in ~/.rustcane/.env
+  ✓ RARCANE_API_URL:   https://rarcane.internal/api (set)
+  ✗ RARCANE_API_KEY:   not set
+    → Set RARCANE_API_KEY in ~/.rarcane/.env
 
   Connectivity
   ──────────────────────────────────────────
-  ✓ Upstream reachable: https://rustcane.internal/api → 200 OK (42 ms)
+  ✓ Upstream reachable: https://rarcane.internal/api → 200 OK (42 ms)
 
   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  1 issue found. Fix it before running: rustcane serve
+  1 issue found. Fix it before running: rarcane serve
 ```
 
 Exit code 0 = ready. Exit code 1 = issues found.

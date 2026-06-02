@@ -18,12 +18,12 @@ fn json(path: &str) -> Value {
 #[test]
 fn plugin_manifests_exist_for_all_supported_hosts() {
     for path in [
-        "plugins/rustcane/.claude-plugin/plugin.json",
-        "plugins/rustcane/.codex-plugin/plugin.json",
-        "plugins/rustcane/gemini-extension.json",
-        "plugins/rustcane/.mcp.json",
-        "plugins/rustcane/hooks/hooks.json",
-        "plugins/rustcane/skills/rustcane/SKILL.md",
+        "plugins/rarcane/.claude-plugin/plugin.json",
+        "plugins/rarcane/.codex-plugin/plugin.json",
+        "plugins/rarcane/gemini-extension.json",
+        "plugins/rarcane/.mcp.json",
+        "plugins/rarcane/hooks/hooks.json",
+        "plugins/rarcane/skills/rarcane/SKILL.md",
     ] {
         assert!(std::path::Path::new(path).exists(), "{path} should exist");
     }
@@ -31,34 +31,34 @@ fn plugin_manifests_exist_for_all_supported_hosts() {
 
 #[test]
 fn plugin_manifests_share_identity_and_connection_settings() {
-    let claude = json("plugins/rustcane/.claude-plugin/plugin.json");
-    let codex = json("plugins/rustcane/.codex-plugin/plugin.json");
-    let gemini = json("plugins/rustcane/gemini-extension.json");
-    let mcp = json("plugins/rustcane/.mcp.json");
+    let claude = json("plugins/rarcane/.claude-plugin/plugin.json");
+    let codex = json("plugins/rarcane/.codex-plugin/plugin.json");
+    let gemini = json("plugins/rarcane/gemini-extension.json");
+    let mcp = json("plugins/rarcane/.mcp.json");
 
-    assert_eq!(claude["name"], "rustcane");
-    assert_eq!(codex["name"], "rustcane-mcp");
-    assert_eq!(gemini["name"], "rustcane-mcp");
+    assert_eq!(claude["name"], "rarcane");
+    assert_eq!(codex["name"], "rarcane-mcp");
+    assert_eq!(gemini["name"], "rarcane-mcp");
 
     assert!(claude["repository"]
         .as_str()
         .unwrap()
-        .ends_with("/rustcane"));
+        .ends_with("/rarcane"));
     assert!(codex["repository"]
         .as_str()
         .unwrap()
-        .ends_with("/rustcane"));
+        .ends_with("/rarcane"));
     assert!(gemini["repository"]
         .as_str()
         .unwrap()
-        .ends_with("/rustcane"));
+        .ends_with("/rarcane"));
 
     let user_config = claude["userConfig"].as_object().unwrap();
     for key in [
         "server_url",
         "api_token",
-        "rustcane_api_url",
-        "rustcane_api_key",
+        "rarcane_api_url",
+        "rarcane_api_key",
     ] {
         assert!(
             user_config.contains_key(key),
@@ -75,8 +75,8 @@ fn plugin_manifests_share_identity_and_connection_settings() {
     for key in [
         "server_url",
         "api_token",
-        "rustcane_api_url",
-        "rustcane_api_key",
+        "rarcane_api_url",
+        "rarcane_api_key",
     ] {
         assert!(
             gemini_settings.contains(&key),
@@ -85,26 +85,26 @@ fn plugin_manifests_share_identity_and_connection_settings() {
     }
 
     assert_eq!(
-        mcp["mcpServers"]["rustcane"]["url"],
+        mcp["mcpServers"]["rarcane"]["url"],
         "${user_config.server_url}/mcp"
     );
     assert_eq!(
-        mcp["mcpServers"]["rustcane"]["headers"]["Authorization"],
+        mcp["mcpServers"]["rarcane"]["headers"]["Authorization"],
         "Bearer ${user_config.api_token}"
     );
     assert_eq!(
-        gemini["mcpServers"]["rustcane"]["url"],
+        gemini["mcpServers"]["rarcane"]["url"],
         "${settings.server_url}/mcp"
     );
     assert_eq!(
-        gemini["mcpServers"]["rustcane"]["headers"]["Authorization"],
+        gemini["mcpServers"]["rarcane"]["headers"]["Authorization"],
         "Bearer ${settings.api_token}"
     );
 }
 
 #[test]
 fn claude_hooks_call_binary_setup_plugin_hook_directly() {
-    let hooks = json("plugins/rustcane/hooks/hooks.json");
+    let hooks = json("plugins/rarcane/hooks/hooks.json");
     for hook_name in ["SessionStart", "ConfigChange"] {
         let command = hooks["hooks"][hook_name][0]["hooks"][0]["command"]
             .as_str()
@@ -137,17 +137,17 @@ fn setup_command(data_dir: &std::path::Path) -> Command {
         .env("HOME", data_dir)
         .env("PATH", std::env::var("PATH").unwrap_or_default())
         .env("CLAUDE_PLUGIN_DATA", data_dir)
-        .env("RUSTCANE_API_URL", "https://api.rustcane.test")
-        .env("RUSTCANE_API_KEY", "rustcane-secret")
-        .env("RUSTCANE_MCP_PORT", "0")
-        .env("RUSTCANE_MCP_TOKEN", "mcp-secret");
+        .env("RARCANE_API_URL", "https://api.rarcane.test")
+        .env("RARCANE_API_KEY", "rarcane-secret")
+        .env("RARCANE_MCP_PORT", "0")
+        .env("RARCANE_MCP_TOKEN", "mcp-secret");
     cmd
 }
 
 /// The hook calls the binary directly now, so `apply_plugin_options()` (run
 /// before `Config::load()`) must map `CLAUDE_PLUGIN_OPTION_*` into the binary's
-/// `RUSTCANE_*` env vars. Supplying the credentials only via plugin options
-/// makes the `missing_example_api_url` / `missing_example_api_key` blocking
+/// `RARCANE_*` env vars. Supplying the credentials only via plugin options
+/// makes the `missing_rarcane_api_url` / `missing_rarcane_api_key` blocking
 /// failures disappear — proving the mapping reaches the loaded config.
 #[test]
 fn plugin_hook_maps_plugin_options_into_env() {
@@ -157,13 +157,13 @@ fn plugin_hook_maps_plugin_options_into_env() {
         .env("HOME", dir.path())
         .env("PATH", std::env::var("PATH").unwrap_or_default())
         .env("CLAUDE_PLUGIN_DATA", dir.path())
-        .env("RUSTCANE_MCP_PORT", "0")
-        // Supply credentials only via plugin options, not RUSTCANE_* directly.
+        .env("RARCANE_MCP_PORT", "0")
+        // Supply credentials only via plugin options, not RARCANE_* directly.
         .env(
-            "CLAUDE_PLUGIN_OPTION_RUSTCANE_API_URL",
-            "https://api.rustcane.test",
+            "CLAUDE_PLUGIN_OPTION_RARCANE_API_URL",
+            "https://api.rarcane.test",
         )
-        .env("CLAUDE_PLUGIN_OPTION_RUSTCANE_API_KEY", "rustcane-secret")
+        .env("CLAUDE_PLUGIN_OPTION_RARCANE_API_KEY", "rarcane-secret")
         .env("CLAUDE_PLUGIN_OPTION_API_TOKEN", "mcp-secret");
     let output = cmd
         .args(["setup", "plugin-hook", "--no-repair"])
@@ -178,12 +178,12 @@ fn plugin_hook_maps_plugin_options_into_env() {
         .map(|f| f["code"].as_str().unwrap_or_default().to_string())
         .collect();
     assert!(
-        !blocking.contains(&"missing_example_api_url".to_string()),
-        "API URL option should map into RUSTCANE_API_URL; blocking: {blocking:?}"
+        !blocking.contains(&"missing_rarcane_api_url".to_string()),
+        "API URL option should map into RARCANE_API_URL; blocking: {blocking:?}"
     );
     assert!(
-        !blocking.contains(&"missing_example_api_key".to_string()),
-        "API key option should map into RUSTCANE_API_KEY; blocking: {blocking:?}"
+        !blocking.contains(&"missing_rarcane_api_key".to_string()),
+        "API key option should map into RARCANE_API_KEY; blocking: {blocking:?}"
     );
 }
 
@@ -232,9 +232,9 @@ fn setup_repair_creates_env_file_without_upstream_contact() {
     assert_eq!(json["no_repair"], false);
 
     let env_file = std::fs::read_to_string(missing.join(".env")).unwrap();
-    assert!(env_file.contains("RUSTCANE_API_URL=https://api.rustcane.test"));
-    assert!(env_file.contains("RUSTCANE_API_KEY=rustcane-secret"));
-    assert!(env_file.contains("RUSTCANE_MCP_TOKEN=mcp-secret"));
+    assert!(env_file.contains("RARCANE_API_URL=https://api.rarcane.test"));
+    assert!(env_file.contains("RARCANE_API_KEY=rarcane-secret"));
+    assert!(env_file.contains("RARCANE_MCP_TOKEN=mcp-secret"));
     assert_env_file_mode(missing.join(".env").as_path());
 }
 
@@ -257,7 +257,7 @@ fn setup_repair_replaces_existing_env_file_with_private_mode() {
 
     let env_file = fs::read_to_string(&env_path).unwrap();
     assert!(!env_file.contains("OLD_VALUE"));
-    assert!(env_file.contains("RUSTCANE_API_URL=https://api.rustcane.test"));
+    assert!(env_file.contains("RARCANE_API_URL=https://api.rarcane.test"));
     assert_env_file_mode(&env_path);
 }
 
@@ -277,9 +277,9 @@ fn assert_env_file_mode(path: &std::path::Path) {
 // --no-repair`.
 //
 // Notes:
-//   - `setup_command` sets RUSTCANE_MCP_TOKEN, which normally selects bearer
-//     mode.  We override that by adding RUSTCANE_MCP_AUTH_MODE=oauth.
-//   - We omit RUSTCANE_MCP_TOKEN here so the setup logic enters the OAuth
+//   - `setup_command` sets RARCANE_MCP_TOKEN, which normally selects bearer
+//     mode.  We override that by adding RARCANE_MCP_AUTH_MODE=oauth.
+//   - We omit RARCANE_MCP_TOKEN here so the setup logic enters the OAuth
 //     credential-check branch (token takes precedence in bearer mode).
 //   - Port is kept at 0 (from setup_command) to avoid mcp_port_in_use noise.
 
@@ -289,14 +289,14 @@ fn oauth_setup_command(data_dir: &std::path::Path) -> Command {
         .env("HOME", data_dir)
         .env("PATH", std::env::var("PATH").unwrap_or_default())
         .env("CLAUDE_PLUGIN_DATA", data_dir)
-        .env("RUSTCANE_API_URL", "https://api.rustcane.test")
-        .env("RUSTCANE_API_KEY", "rustcane-secret")
-        .env("RUSTCANE_MCP_PORT", "0")
-        .env("RUSTCANE_MCP_AUTH_MODE", "oauth")
-        .env("RUSTCANE_MCP_PUBLIC_URL", "https://mcp.rustcane.test")
-        .env("RUSTCANE_MCP_GOOGLE_CLIENT_ID", "test-client-id")
-        .env("RUSTCANE_MCP_GOOGLE_CLIENT_SECRET", "test-client-secret")
-        .env("RUSTCANE_MCP_AUTH_ADMIN_EMAIL", "admin@rustcane.test");
+        .env("RARCANE_API_URL", "https://api.rarcane.test")
+        .env("RARCANE_API_KEY", "rarcane-secret")
+        .env("RARCANE_MCP_PORT", "0")
+        .env("RARCANE_MCP_AUTH_MODE", "oauth")
+        .env("RARCANE_MCP_PUBLIC_URL", "https://mcp.rarcane.test")
+        .env("RARCANE_MCP_GOOGLE_CLIENT_ID", "test-client-id")
+        .env("RARCANE_MCP_GOOGLE_CLIENT_SECRET", "test-client-secret")
+        .env("RARCANE_MCP_AUTH_ADMIN_EMAIL", "admin@rarcane.test");
     cmd
 }
 
@@ -320,7 +320,7 @@ fn oauth_missing_public_url_produces_blocking_failure() {
     let dir = tempdir().unwrap();
     let mut cmd = oauth_setup_command(dir.path());
     // Remove the public URL so the check fires.
-    cmd.env_remove("RUSTCANE_MCP_PUBLIC_URL");
+    cmd.env_remove("RARCANE_MCP_PUBLIC_URL");
     let output = cmd
         .args(["setup", "plugin-hook", "--no-repair"])
         .output()
@@ -343,7 +343,7 @@ fn oauth_missing_public_url_produces_blocking_failure() {
 fn oauth_missing_client_id_produces_blocking_failure() {
     let dir = tempdir().unwrap();
     let mut cmd = oauth_setup_command(dir.path());
-    cmd.env_remove("RUSTCANE_MCP_GOOGLE_CLIENT_ID");
+    cmd.env_remove("RARCANE_MCP_GOOGLE_CLIENT_ID");
     let output = cmd
         .args(["setup", "plugin-hook", "--no-repair"])
         .output()
@@ -365,7 +365,7 @@ fn oauth_missing_client_id_produces_blocking_failure() {
 fn oauth_missing_client_secret_produces_blocking_failure() {
     let dir = tempdir().unwrap();
     let mut cmd = oauth_setup_command(dir.path());
-    cmd.env_remove("RUSTCANE_MCP_GOOGLE_CLIENT_SECRET");
+    cmd.env_remove("RARCANE_MCP_GOOGLE_CLIENT_SECRET");
     let output = cmd
         .args(["setup", "plugin-hook", "--no-repair"])
         .output()
@@ -387,7 +387,7 @@ fn oauth_missing_client_secret_produces_blocking_failure() {
 fn oauth_missing_admin_email_produces_blocking_failure() {
     let dir = tempdir().unwrap();
     let mut cmd = oauth_setup_command(dir.path());
-    cmd.env_remove("RUSTCANE_MCP_AUTH_ADMIN_EMAIL");
+    cmd.env_remove("RARCANE_MCP_AUTH_ADMIN_EMAIL");
     let output = cmd
         .args(["setup", "plugin-hook", "--no-repair"])
         .output()
@@ -408,7 +408,7 @@ fn oauth_missing_admin_email_produces_blocking_failure() {
 // ── write_env OAuth branch (L28) ──────────────────────────────────────────────
 //
 // When `auth_mode = OAuth` with all OAuth fields set, `setup repair` must
-// write a .env that includes RUSTCANE_MCP_AUTH_MODE=oauth and all four OAuth
+// write a .env that includes RARCANE_MCP_AUTH_MODE=oauth and all four OAuth
 // credential lines.
 
 #[test]
@@ -429,24 +429,24 @@ fn setup_repair_oauth_writes_oauth_env_lines() {
 
     let env_file = fs::read_to_string(data_dir.join(".env")).unwrap();
     assert!(
-        env_file.contains("RUSTCANE_MCP_AUTH_MODE=oauth"),
-        ".env should contain RUSTCANE_MCP_AUTH_MODE=oauth"
+        env_file.contains("RARCANE_MCP_AUTH_MODE=oauth"),
+        ".env should contain RARCANE_MCP_AUTH_MODE=oauth"
     );
     assert!(
-        env_file.contains("RUSTCANE_MCP_PUBLIC_URL=https://mcp.rustcane.test"),
-        ".env should contain RUSTCANE_MCP_PUBLIC_URL"
+        env_file.contains("RARCANE_MCP_PUBLIC_URL=https://mcp.rarcane.test"),
+        ".env should contain RARCANE_MCP_PUBLIC_URL"
     );
     assert!(
-        env_file.contains("RUSTCANE_MCP_GOOGLE_CLIENT_ID=test-client-id"),
-        ".env should contain RUSTCANE_MCP_GOOGLE_CLIENT_ID"
+        env_file.contains("RARCANE_MCP_GOOGLE_CLIENT_ID=test-client-id"),
+        ".env should contain RARCANE_MCP_GOOGLE_CLIENT_ID"
     );
     assert!(
-        env_file.contains("RUSTCANE_MCP_GOOGLE_CLIENT_SECRET=test-client-secret"),
-        ".env should contain RUSTCANE_MCP_GOOGLE_CLIENT_SECRET"
+        env_file.contains("RARCANE_MCP_GOOGLE_CLIENT_SECRET=test-client-secret"),
+        ".env should contain RARCANE_MCP_GOOGLE_CLIENT_SECRET"
     );
     assert!(
-        env_file.contains("RUSTCANE_MCP_AUTH_ADMIN_EMAIL=admin@rustcane.test"),
-        ".env should contain RUSTCANE_MCP_AUTH_ADMIN_EMAIL"
+        env_file.contains("RARCANE_MCP_AUTH_ADMIN_EMAIL=admin@rarcane.test"),
+        ".env should contain RARCANE_MCP_AUTH_ADMIN_EMAIL"
     );
     assert_env_file_mode(&data_dir.join(".env"));
 }

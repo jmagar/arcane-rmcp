@@ -81,13 +81,13 @@ fn scaffold_intent_transformation_lives_in_service() {
             deployment: "containers".into(),
             plugins: "claude, gemini, none".into(),
             publish_mcp: true,
-            crawl_urls: "https://docs.rustcane.test".into(),
+            crawl_urls: "https://docs.rarcane.test".into(),
             crawl_repos: "".into(),
             crawl_search_topics: "Lab API".into(),
         })
         .expect("valid scaffold intent should build");
 
-    assert_eq!(result["kind"], "rustcane_scaffold_intent");
+    assert_eq!(result["kind"], "rarcane_scaffold_intent");
     assert_eq!(result["server_category"], "application-platform");
     assert_eq!(result["project"]["env_prefix"], "LAB");
     assert_eq!(

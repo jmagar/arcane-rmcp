@@ -1,5 +1,5 @@
 # =============================================================================
-# .cargo/config.toml — Cargo workspace configuration for rustcane
+# .cargo/config.toml — Cargo workspace configuration for rarcane
 #
 # The [alias] section wires `cargo xtask` so it runs the xtask crate.
 #

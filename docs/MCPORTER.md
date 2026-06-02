@@ -2,7 +2,7 @@
 title: "mcporter Integration Testing"
 doc_type: "guide"
 status: "active"
-owner: "rustcane"
+owner: "rarcane"
 audience:
   - "contributors"
   - "agents"
@@ -37,7 +37,7 @@ just test-mcporter
 ```json
 {
   "mcpServers": {
-    "rustcane": {
+    "rarcane": {
       "url": "http://localhost:40060/mcp",
       "transport": "http"
     }
@@ -45,13 +45,13 @@ just test-mcporter
 }
 ```
 
-The script targets `http://<RUSTCANE_MCP_HOST>:<RUSTCANE_MCP_PORT>/mcp`, defaulting to `http://localhost:40060/mcp` to match `just dev`. It remaps `0.0.0.0` to `localhost`. If `RUSTCANE_MCP_TOKEN` is set, it sends `Authorization: Bearer <token>`.
+The script targets `http://<RARCANE_MCP_HOST>:<RARCANE_MCP_PORT>/mcp`, defaulting to `http://localhost:40060/mcp` to match `just dev`. It remaps `0.0.0.0` to `localhost`. If `RARCANE_MCP_TOKEN` is set, it sends `Authorization: Bearer <token>`.
 
 ## What the test suite validates
 
-- auth rejection when `RUSTCANE_MCP_TOKEN` is set
+- auth rejection when `RARCANE_MCP_TOKEN` is set
 - semantic behavior of the `arcane` tool's read-only `status` and `help` actions
-- MCP resource behavior for `rustcane://schema/mcp-tool` (the schema names the tool `arcane`)
+- MCP resource behavior for `rarcane://schema/mcp-tool` (the schema names the tool `arcane`)
 
 Only read-only, environment-independent actions are smoke-tested. Destructive
 actions (container/image/network/volume/system/project/gitops mutations) are

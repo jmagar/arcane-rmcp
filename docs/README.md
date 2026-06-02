@@ -1,6 +1,6 @@
 # Documentation index
 
-This directory contains focused guides for operating, adapting, testing, and releasing an `rustcane`-derived MCP server.
+This directory contains focused guides for operating, adapting, testing, and releasing an `rarcane`-derived MCP server.
 
 ## Start here
 
@@ -52,7 +52,7 @@ This directory contains focused guides for operating, adapting, testing, and rel
 | Directory | Contents |
 |---|---|
 | `generated/` | Machine-produced artefacts committed for CI/API compatibility (e.g. `openapi.json`). |
-| `contracts/` | Durable JSON Schema and rustcane compatibility contracts. |
+| `contracts/` | Durable JSON Schema and rarcane compatibility contracts. |
 | `specs/` | Design specs and handoff documents for MCP-only wizard flows. |
 | `sessions/` | Saved session notes and agent handoff records. |
 | `references/` | Snapshots of external specifications and tooling docs (MCP spec, registry, etc.). |

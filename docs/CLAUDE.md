@@ -2,7 +2,7 @@
 title: "Documentation Instructions"
 doc_type: "guide"
 status: "active"
-owner: "rustcane"
+owner: "rarcane"
 audience:
   - "contributors"
   - "agents"
@@ -15,7 +15,7 @@ last_reviewed: "2026-05-14"
 
 # Documentation Instructions
 
-This directory contains guides, reference material, and working records for the rustcane project and the Rust MCP server family it governs.
+This directory contains guides, reference material, and working records for the rarcane project and the Rust MCP server family it governs.
 
 Both humans and LLM agents operate this codebase. Write docs, contracts, specs, examples, and commands assuming both audiences. Prefer structured, runnable, and self-contained content. Avoid prose that only makes sense in context of a prior conversation.
 
@@ -58,7 +58,7 @@ Do not treat seed transcripts or conversation context as sufficient evidence for
 
 ## Naming
 
-- The binary and template identifiers use `rustcane` / `Arcane` / `RUSTCANE_` as placeholders. These are renamed when the template is adapted.
+- The binary and template identifiers use `rarcane` / `Arcane` / `RARCANE_` as placeholders. These are renamed when the template is adapted.
 - The pattern family is `rmcp-server`. Member servers include `lab`, `axon_rust`, `syslog-mcp`, `rustify`, `rustifi`, `apprise-mcp`, `rustscale`, `unrust`, and this template.
 - Do not rewrite captured reference snapshots or upstream repopacks to match current naming. Those files preserve provenance.
 

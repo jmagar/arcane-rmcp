@@ -2,7 +2,7 @@
 title: "Observability"
 doc_type: "guide"
 status: "active"
-owner: "rustcane"
+owner: "rarcane"
 audience:
   - "contributors"
   - "agents"
@@ -47,7 +47,7 @@ The template exposes fast, redacted status surfaces for humans, agents, and depl
 ```json
 {
   "status": "ok",
-  "server": "rustcane-mcp",
+  "server": "rarcane-mcp",
   "version": "0.1.0",
   "transport": "http"
 }
@@ -66,12 +66,12 @@ Two destinations simultaneously — console and file:
 | Destination | Format | Writer |
 |---|---|---|
 | Console (stderr) | Human-readable, Aurora colors | `tracing_subscriber::fmt` with `AuroraFormatter` |
-| File (`~/.rustcane/logs/rustcane.log`) | Structured JSON | `tracing_subscriber::fmt::json()` |
+| File (`~/.rarcane/logs/rarcane.log`) | Structured JSON | `tracing_subscriber::fmt::json()` |
 
 Use `RUST_LOG` to control log level:
 
 ```bash
-RUST_LOG=info,rmcp=warn rustcane serve
+RUST_LOG=info,rmcp=warn rarcane serve
 ```
 
 Log file: one file, 10 MB cap. On overflow, truncate and restart. Never multiple files.
@@ -81,14 +81,14 @@ Aurora console color palette (ANSI 256): `SERVICE_NAME=211` (pink), `ACCENT_PRIM
 Console log format:
 
 ```
-2026-05-13T14:32:05Z  INFO  MCP tool call  tool=rustcane  action=greet  elapsed_ms=12
+2026-05-13T14:32:05Z  INFO  MCP tool call  tool=rarcane  action=greet  elapsed_ms=12
 2026-05-13T14:32:15Z ERROR  upstream failed  action=echo  error="connection refused"
 ```
 
 File log format:
 
 ```json
-{"timestamp":"2026-05-13T14:32:05Z","level":"INFO","message":"MCP tool call","tool":"rustcane","action":"greet","elapsed_ms":12}
+{"timestamp":"2026-05-13T14:32:05Z","level":"INFO","message":"MCP tool call","tool":"rarcane","action":"greet","elapsed_ms":12}
 ```
 
 ## Tracing spans

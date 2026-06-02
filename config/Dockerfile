@@ -2,16 +2,16 @@
 # =============================================================================
 # Dockerfile — Template for building an rmcp-based MCP server
 #
-# TEMPLATE: Replace all occurrences of "rustcane" with your binary name.
-#           The binary name must match Cargo.toml [[bin]] name = "rustcane".
+# TEMPLATE: Replace all occurrences of "rarcane" with your binary name.
+#           The binary name must match Cargo.toml [[bin]] name = "rarcane".
 #
 # Key substitutions:
-#   "rustcane"              → your binary name (e.g. "myservice")
-#   "rustcane-cargo-*"      → your cache mount IDs (e.g. "myservice-cargo-*")
-#   "rustcane-mcp"          → your systemd/Docker service name
+#   "rarcane"              → your binary name (e.g. "myservice")
+#   "rarcane-cargo-*"      → your cache mount IDs (e.g. "myservice-cargo-*")
+#   "rarcane-mcp"          → your systemd/Docker service name
 #   EXPOSE 40060            → your port (must match config.toml [mcp] port)
 #   HEALTHCHECK port 40060  → same as EXPOSE
-#   CMD ["rustcane", ...]   → your binary name
+#   CMD ["rarcane", ...]   → your binary name
 #
 # Build stages:
 #   builder  — Rust compilation with BuildKit cache mounts (fast incremental builds)
@@ -53,12 +53,12 @@ COPY Cargo.toml Cargo.lock ./
 # Strip xtask workspace member — not needed in Docker build context
 RUN sed -i 's/, \"xtask\"//g; s/\"xtask\", //g; s/\"xtask\"//g' Cargo.toml
 
-# TEMPLATE: Replace "rustcane" cache IDs with your service name to avoid
+# TEMPLATE: Replace "rarcane" cache IDs with your service name to avoid
 #           sharing cache with other projects on the same build host.
-RUN --mount=type=cache,id=rustcane-cargo-registry,target=/usr/local/cargo/registry,sharing=locked \
-    --mount=type=cache,id=rustcane-cargo-git,target=/usr/local/cargo/git,sharing=locked \
-    --mount=type=cache,id=rustcane-cargo-target,target=/app/target,sharing=locked \
-    mkdir src && echo "fn main() {}" > src/main.rs && cargo build --release --locked -p rustcane && rm -rf src
+RUN --mount=type=cache,id=rarcane-cargo-registry,target=/usr/local/cargo/registry,sharing=locked \
+    --mount=type=cache,id=rarcane-cargo-git,target=/usr/local/cargo/git,sharing=locked \
+    --mount=type=cache,id=rarcane-cargo-target,target=/app/target,sharing=locked \
+    mkdir src && echo "fn main() {}" > src/main.rs && cargo build --release --locked -p rarcane && rm -rf src
 
 # ── Application build ─────────────────────────────────────────────────────────
 # Now copy the real source and build the actual binary.
@@ -68,10 +68,10 @@ COPY src/ src/
 COPY docs/generated/openapi.json docs/generated/openapi.json
 # Embed the Next.js static export built in the web stage.
 COPY --from=web /app/apps/web/out/ apps/web/out/
-RUN --mount=type=cache,id=rustcane-cargo-registry,target=/usr/local/cargo/registry,sharing=locked \
-    --mount=type=cache,id=rustcane-cargo-git,target=/usr/local/cargo/git,sharing=locked \
-    --mount=type=cache,id=rustcane-cargo-target,target=/app/target,sharing=locked \
-    touch src/main.rs && cargo build --release --locked -p rustcane && \
+RUN --mount=type=cache,id=rarcane-cargo-registry,target=/usr/local/cargo/registry,sharing=locked \
+    --mount=type=cache,id=rarcane-cargo-git,target=/usr/local/cargo/git,sharing=locked \
+    --mount=type=cache,id=rarcane-cargo-target,target=/app/target,sharing=locked \
+    touch src/main.rs && cargo build --release --locked -p rarcane && \
     cp target/release/rarcane /usr/local/bin/rarcane
 
 # ── Stage 3: Runtime ──────────────────────────────────────────────────────────
@@ -94,7 +94,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends ca-certificates curl gosu && \
     rm -rf /var/lib/apt/lists/*
 
-# TEMPLATE: Replace "rustcane" with your binary name in both COPY and target path.
+# TEMPLATE: Replace "rarcane" with your binary name in both COPY and target path.
 COPY --from=builder /usr/local/bin/rarcane /usr/local/bin/rarcane
 
 # Wire in the entrypoint.
@@ -105,18 +105,18 @@ RUN chmod +x /entrypoint.sh
 
 # Create a non-root user and group for the service.
 # UID/GID 1000 matches the host user convention in docker-compose.yml.
-# TEMPLATE: Replace "rustcane" with your service name for the user/group.
-RUN groupadd --gid 1000 rustcane && \
-    useradd --uid 1000 --gid rustcane --no-create-home --shell /sbin/nologin rustcane && \
+# TEMPLATE: Replace "rarcane" with your service name for the user/group.
+RUN groupadd --gid 1000 rarcane && \
+    useradd --uid 1000 --gid rarcane --no-create-home --shell /sbin/nologin rarcane && \
     mkdir -p /data && \
-    chown rustcane:rustcane /data
+    chown rarcane:rarcane /data
 
 # Default log level. Override with RUST_LOG env var in docker-compose or at runtime.
 ENV RUST_LOG=info
 
 # TEMPLATE: Add other default env vars your binary needs.
-# ENV RUSTCANE_MCP_HOST=0.0.0.0
-# ENV RUSTCANE_MCP_PORT=3000
+# ENV RARCANE_MCP_HOST=0.0.0.0
+# ENV RARCANE_MCP_PORT=3000
 
 # NOTE: No USER directive here — entrypoint.sh drops to UID 1000:1000 via gosu.
 # This allows entrypoint.sh to run as root (for chown /data) before execing the binary.
@@ -125,17 +125,17 @@ ENV RUST_LOG=info
 # TEMPLATE: Change to match your config.toml [mcp] port = 3000
 EXPOSE 40060/tcp
 
-# Health check hits /health (always unauthenticated in the rustcane design).
+# Health check hits /health (always unauthenticated in the rarcane design).
 # TEMPLATE: Change port to match EXPOSE above.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD curl -sf http://localhost:40060/health || exit 1
 
 # MCP registry label — used by Claude Code plugin discovery.
 # TEMPLATE: Replace with your registry path: "tv.tootie/yourservice-mcp"
-LABEL io.modelcontextprotocol.server.name="tv.tootie/rustcane-mcp"
+LABEL io.modelcontextprotocol.server.name="tv.tootie/rarcane-mcp"
 
 # Entrypoint handles permission setup and privilege drop.
 # CMD is the default argument passed to entrypoint.sh.
-# TEMPLATE: Replace "rustcane" with your binary name.
+# TEMPLATE: Replace "rarcane" with your binary name.
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["serve", "mcp"]

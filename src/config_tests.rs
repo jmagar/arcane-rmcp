@@ -55,10 +55,10 @@ fn is_loopback_uppercase_localhost_is_false() {
 
 #[test]
 fn is_loopback_subdomain_is_false() {
-    // "localhost.rustcane.com" must not be treated as loopback
+    // "localhost.rarcane.com" must not be treated as loopback
     assert!(
-        !mcp_with_host("localhost.rustcane.com").is_loopback(),
-        "localhost.rustcane.com should not be loopback"
+        !mcp_with_host("localhost.rarcane.com").is_loopback(),
+        "localhost.rarcane.com should not be loopback"
     );
 }
 

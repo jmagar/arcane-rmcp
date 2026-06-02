@@ -1,6 +1,6 @@
-# rustcane API
+# rarcane API
 
-`rustcane` exposes one MCP tool named `arcane` and equivalent CLI commands.
+`rarcane` exposes one MCP tool named `arcane` and equivalent CLI commands.
 
 ## MCP Tool
 
@@ -28,18 +28,18 @@ Examples:
 ## CLI Parity
 
 ```bash
-rustcane status
-rustcane help container
-rustcane call --action container --subaction list --env-id default
-rustcane call --action container --subaction stop --env-id default --id nginx --confirm
-rustcane call --action image --subaction pull --env-id default --params '{"image":"alpine:latest"}'
+rarcane status
+rarcane help container
+rarcane call --action container --subaction list --env-id default
+rarcane call --action container --subaction stop --env-id default --id nginx --confirm
+rarcane call --action image --subaction pull --env-id default --params '{"image":"alpine:latest"}'
 ```
 
 ## Safety and Auth
 
 - `help` is public.
-- Read operations require `rustcane:read`.
-- Mutating operations require `rustcane:write`.
+- Read operations require `rarcane:read`.
+- Mutating operations require `rarcane:write`.
 - Destructive operations require explicit confirmation.
 - Credentials are never accepted as tool parameters.
 - Arcane API error strings are redacted before being returned.

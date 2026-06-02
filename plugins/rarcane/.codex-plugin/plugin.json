@@ -1,11 +1,11 @@
 {
-  "name": "rustcane-mcp",
+  "name": "rarcane-mcp",
   "description": "Rust MCP server for Arcane Docker management — manage containers, images, networks, volumes, compose projects, and more.",
-  "homepage": "https://github.com/jmagar/rustcane",
-  "repository": "https://github.com/jmagar/rustcane",
+  "homepage": "https://github.com/jmagar/rarcane",
+  "repository": "https://github.com/jmagar/rarcane",
   "license": "MIT",
   "keywords": [
-    "rustcane",
+    "rarcane",
     "arcane",
     "docker",
     "containers",
@@ -15,7 +15,7 @@
   "skills": "./skills/",
   "mcpServers": "./.mcp.json",
   "interface": {
-    "displayName": "Rustcane MCP",
+    "displayName": "Rarcane MCP",
     "shortDescription": "Manage Docker via the Arcane API",
     "longDescription": "MCP server that bridges Codex to the Arcane Docker management API. Exposes a single action-dispatched 'arcane' tool covering environments, compose projects, containers, images, networks, volumes, registries, GitOps repos, image-update checks, vulnerability scanning, and system operations. Supports both read and write operations across Docker environments; destructive subactions (delete, prune, stop, destroy) require explicit confirmation.",
     "developerName": "Jacob Magar",
@@ -24,10 +24,10 @@
       "Read",
       "Write"
     ],
-    "websiteURL": "https://github.com/jmagar/rustcane",
+    "websiteURL": "https://github.com/jmagar/rarcane",
     "defaultPrompt": [
       "List all running Docker containers.",
-      "Show me the Arcane and rustcane configuration status.",
+      "Show me the Arcane and rarcane configuration status.",
       "Check for available image updates across my Docker environment."
     ],
     "brandColor": "#6366F1"

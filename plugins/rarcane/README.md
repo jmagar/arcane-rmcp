@@ -1,11 +1,11 @@
-# rustcane plugin
+# rarcane plugin
 
 Multi-platform plugin package that connects Claude Code, Codex, and Gemini CLI to the Arcane MCP server.
 
 ## Structure
 
 ```
-plugins/rustcane/
+plugins/rarcane/
 ├── .claude-plugin/
 │   └── plugin.json         # Claude Code manifest
 ├── .codex-plugin/
@@ -14,14 +14,14 @@ plugins/rustcane/
 ├── gemini-extension.json   # Gemini CLI extension manifest
 ├── .mcp.json               # Shared MCP server connection config (all three platforms)
 ├── bin/
-│   └── rustcane             # Release binary (populate with: just install)
+│   └── rarcane             # Release binary (populate with: just install)
 ├── hooks/
 │   ├── hooks.json          # SessionStart + ConfigChange hook definitions
 │   └── plugin-setup.sh     # Deployment and validation script
 ├── monitors/
 │   └── monitors.json       # Background health monitor (requires Claude Code v2.1.105+)
 └── skills/
-    └── rustcane/
+    └── rarcane/
         └── SKILL.md        # Tool documentation (shared by Claude and Codex)
 ```
 
@@ -44,7 +44,7 @@ Claude Code and Codex read their MCP connection config from the shared `.mcp.jso
 ```json
 {
   "mcpServers": {
-    "rustcane": {
+    "rarcane": {
       "type": "http",
       "url": "${user_config.server_url}/mcp",
       "headers": { "Authorization": "Bearer ${user_config.api_token}" }
@@ -59,13 +59,13 @@ The `${user_config.*}` / `${settings.*}` variables are populated from each platf
 
 `hooks/hooks.json` fires `plugin-setup.sh` on `SessionStart` and `ConfigChange`.
 
-The setup script is a thin adapter. It maps plugin settings to environment variables, prepares appdata, ensures the bundled binary is available on `PATH`, and delegates setup checks or repair to `rustcane setup plugin-hook "$@"`.
+The setup script is a thin adapter. It maps plugin settings to environment variables, prepares appdata, ensures the bundled binary is available on `PATH`, and delegates setup checks or repair to `rarcane setup plugin-hook "$@"`.
 
 ## Monitors
 
 **Requires Claude Code v2.1.105+.**
 
-`monitors/monitors.json` declares a background `server-health` monitor that starts automatically at session start. It runs `rustcane watch` (the binary in `bin/`) and delivers each stdout line to Claude as a notification whenever the MCP server changes state.
+`monitors/monitors.json` declares a background `server-health` monitor that starts automatically at session start. It runs `rarcane watch` (the binary in `bin/`) and delivers each stdout line to Claude as a notification whenever the MCP server changes state.
 
 The monitor emits only on state transitions — Claude is not notified while the server is stable. Three states:
 
@@ -73,22 +73,22 @@ The monitor emits only on state transitions — Claude is not notified while the
 - `DOWN` — connection refused / timeout
 - `DEGRADED(HTTP N)` — non-2xx HTTP response
 
-The command references `${CLAUDE_PLUGIN_ROOT}/bin/rustcane` — populate `bin/` before installing the plugin:
+The command references `${CLAUDE_PLUGIN_ROOT}/bin/rarcane` — populate `bin/` before installing the plugin:
 
 ```bash
-just install   # builds release binary and copies to plugins/rustcane/bin/rustcane
+just install   # builds release binary and copies to plugins/rarcane/bin/rarcane
 ```
 
 Disabling the plugin mid-session does not stop an already-running monitor; it stops when the session ends.
 
 ## Skills
 
-`skills/rustcane/SKILL.md` is the three-tier structured documentation for the `rustcane` MCP tool. The AI reads Tier 1 for quick lookups, Tier 2 for parameter details, Tier 3 for multi-step workflows.
+`skills/rarcane/SKILL.md` is the three-tier structured documentation for the `rarcane` MCP tool. The AI reads Tier 1 for quick lookups, Tier 2 for parameter details, Tier 3 for multi-step workflows.
 
 ## Packaging checklist
 
 1. Build the release binary with `just install`.
-2. Confirm `plugins/rustcane/bin/rustcane` exists and is executable.
+2. Confirm `plugins/rarcane/bin/rarcane` exists and is executable.
 3. Run `cargo test --test plugin_contract`.
 4. Verify all manifests still omit explicit `version` fields.
 5. Install through the target marketplace or local plugin path.

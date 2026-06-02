@@ -6,7 +6,7 @@ Draft / implemented in template skeleton.
 
 ## Purpose
 
-`rustcane` provides an MCP elicitation setup wizard that helps a user describe the server they want to scaffold without granting the tool permission to mutate files directly.
+`rarcane` provides an MCP elicitation setup wizard that helps a user describe the server they want to scaffold without granting the tool permission to mutate files directly.
 
 The wizard returns structured JSON. A plugin skill then reads that JSON and creates an approval-first implementation plan. The user remains in control because normal editor/plugin permissions govern any later file edits.
 
@@ -49,7 +49,7 @@ sequenceDiagram
     participant A as Coding Agent
 
     U->>C: Request help scaffolding project
-    C->>S: rustcane(action="scaffold_intent")
+    C->>S: rarcane(action="scaffold_intent")
     S->>C: elicitation/create with scaffold fields
     C->>U: Render setup wizard form
     U->>C: Submit project details
@@ -74,7 +74,7 @@ MCP-only.
 
 ### Scope
 
-`rustcane:read` in the template. Scaffolded projects should rename this to the service read scope, for rustcane `unraid:read`.
+`rarcane:read` in the template. Scaffolded projects should rename this to the service read scope, for rarcane `unraid:read`.
 
 ### Rationale for MCP-only
 
@@ -110,7 +110,7 @@ The intent should stay lightweight. The wizard asks enough to choose the scaffol
 
 ## Returned JSON contract
 
-The action returns a JSON object with `kind = "rustcane_scaffold_intent"` and `schema_version = 1`.
+The action returns a JSON object with `kind = "rarcane_scaffold_intent"` and `schema_version = 1`.
 
 Machine-readable contract: [`docs/contracts/scaffold-intent.schema.json`](../contracts/scaffold-intent.schema.json).
 
@@ -139,7 +139,7 @@ These fields are part of the core scaffold decision:
 
 ```json
 {
-  "kind": "rustcane_scaffold_intent",
+  "kind": "rarcane_scaffold_intent",
   "schema_version": 1,
   "server_category": "upstream-client",
   "required_surfaces": ["mcp", "cli"],
@@ -184,7 +184,7 @@ These fields are part of the core scaffold decision:
 
 ```json
 {
-  "kind": "rustcane_scaffold_intent",
+  "kind": "rarcane_scaffold_intent",
   "schema_version": 1,
   "server_category": "application-platform",
   "required_surfaces": ["api", "cli", "mcp", "web"],
@@ -210,7 +210,7 @@ These fields are part of the core scaffold decision:
   "publish_mcp": true,
   "crawl_docs": {
     "urls": [],
-    "repos": ["https://github.com/rustcane/lab-sdk"],
+    "repos": ["https://github.com/rarcane/lab-sdk"],
     "search_topics": ["Lab Gateway API runs artifacts"]
   },
   "handoff": {
@@ -245,7 +245,7 @@ The `scaffold-project` skill is responsible for turning scaffold intent JSON int
 Location:
 
 ```text
-plugins/rustcane/skills/scaffold-project/SKILL.md
+plugins/rarcane/skills/scaffold-project/SKILL.md
 ```
 
 The skill must:
@@ -310,8 +310,8 @@ The coding agent may mutate files only after the user approves the plan produced
 | MCP schema/action enum | `src/mcp/schemas.rs` via `action_names()` |
 | Generated schema docs | `docs/MCP_SCHEMA.md` |
 | Schema docs generator descriptions | `scripts/check-schema-docs.py` |
-| Tool skill reference | `plugins/rustcane/skills/rustcane/SKILL.md` |
-| Handoff skill | `plugins/rustcane/skills/scaffold-project/SKILL.md` |
+| Tool skill reference | `plugins/rarcane/skills/rarcane/SKILL.md` |
+| Handoff skill | `plugins/rarcane/skills/scaffold-project/SKILL.md` |
 | Web API explorer metadata | `apps/web/lib/template.ts` |
 
 ## Validation requirements
@@ -319,7 +319,7 @@ The coding agent may mutate files only after the user approves the plan produced
 After changing this flow, run:
 
 ```bash
-cargo fmt --package rustcane
+cargo fmt --package rarcane
 cargo test --lib
 just schema-docs-check
 just scaffold-contract-check
@@ -344,4 +344,4 @@ Possible additions that preserve the safety boundary:
 
 - Add a CLI command that reads scaffold intent JSON and prints the same approval-first plan.
 - Add a dry-run planner command that validates intent JSON against `docs/contracts/scaffold-intent.schema.json` without editing files.
-- Add optional artifact export, for rustcane writing intent JSON only after explicit user approval.
+- Add optional artifact export, for rarcane writing intent JSON only after explicit user approval.

@@ -1,20 +1,20 @@
 ---
 date: 2026-05-14 12:44:22 EST
-repo: git@github.com:jmagar/rustcane.git
+repo: git@github.com:jmagar/rarcane.git
 branch: refactor/server-api-module-split
 head: e77df0d
 agent: Claude (claude-sonnet-4-6)
 session id: 8ee9e706-62e9-4afc-b325-4fabf0f29ad4
-transcript: /home/jmagar/.claude/projects/-home-jmagar-workspace-rustcane/8ee9e706-62e9-4afc-b325-4fabf0f29ad4.jsonl
-working directory: /home/jmagar/workspace/rustcane
-pr: "#1 — feat: watch command, monitors, Gemini extension, scripts, and tooling (0.2.0 → 0.3.0) — https://github.com/jmagar/rustcane/pull/1"
+transcript: /home/jmagar/.claude/projects/-home-jmagar-workspace-rarcane/8ee9e706-62e9-4afc-b325-4fabf0f29ad4.jsonl
+working directory: /home/jmagar/workspace/rarcane
+pr: "#1 — feat: watch command, monitors, Gemini extension, scripts, and tooling (0.2.0 → 0.3.0) — https://github.com/jmagar/rarcane/pull/1"
 ---
 
 # Session: Docs, Hardening, Monitor, Auth Fixes
 
 ## User Request
 
-Comprehensive documentation pass across all subdirectories of rustcane, followed by security/correctness hardening of the auth layer, CORS, loopback detection, and plugin monitor implementation.
+Comprehensive documentation pass across all subdirectories of rarcane, followed by security/correctness hardening of the auth layer, CORS, loopback detection, and plugin monitor implementation.
 
 ## Session Overview
 
@@ -24,44 +24,44 @@ Long-form session covering: renaming and creating docs across every major subdir
 
 1. Renamed `docs/server-json-guide.md` → `docs/MCP-REGISTRY-PUBLISH-GUIDE.md` → `docs/MCP-REGISTRY-PUBLISH-GUIDE.md` (uppercase)
 2. Created `docs/AUTH.md` — bearer token + OAuth dual-auth explanation, startup guard, gateway case
-3. Fixed bug in the startup auth policy resolver: `just dev` (sets `RUSTCANE_MCP_NO_AUTH=true`) would always fail the bind guard — added `!no_auth_explicit` to bypass condition
+3. Fixed bug in the startup auth policy resolver: `just dev` (sets `RARCANE_MCP_NO_AUTH=true`) would always fail the bind guard — added `!no_auth_explicit` to bypass condition
 4. Updated `CLAUDE.md` and `AGENTS.md` module maps for the `server.rs`/`mcp.rs` split (added `server.rs`, `server/routes.rs`, `api.rs`; corrected `mcp.rs` description)
 5. Created `docs/CLAUDE.md` using patterns from `agentcast/docs/AGENTS.md`
 6. Created READMEs: `xtask/README.md`, `tests/README.md`, `scripts/README.md`, `plugins/README.md`, `apps/web/README.md`
-7. Created `plugins/rustcane/README.md` and `plugins/rustcane/CLAUDE.md`
+7. Created `plugins/rarcane/README.md` and `plugins/rarcane/CLAUDE.md`
 8. Added plugin versioning rule to `CLAUDE.md` and `AGENTS.md`: no `version` field in manifests, SHA is the version
-9. Created `plugins/rustcane/gemini-extension.json` — Gemini CLI extension manifest (no version field, `settings` array, `${settings.*}` syntax)
-10. Implemented `rustcane watch` CLI command (`src/cli/watch.rs`) — polls `/health`, emits state-change lines to stdout only
-11. Created `plugins/rustcane/monitors/monitors.json` — wires `${CLAUDE_PLUGIN_ROOT}/bin/rustcane watch` as a background monitor
+9. Created `plugins/rarcane/gemini-extension.json` — Gemini CLI extension manifest (no version field, `settings` array, `${settings.*}` syntax)
+10. Implemented `rarcane watch` CLI command (`src/cli/watch.rs`) — polls `/health`, emits state-change lines to stdout only
+11. Created `plugins/rarcane/monitors/monitors.json` — wires `${CLAUDE_PLUGIN_ROOT}/bin/rarcane watch` as a background monitor
 12. Updated `.claude-plugin/plugin.json` with `experimental.monitors` reference
-13. Updated `build-plugin` in Justfile to also copy binary to `plugins/rustcane/bin/`
-14. Created `plugins/rustcane/bin/.gitkeep` so directory is tracked in git
+13. Updated `build-plugin` in Justfile to also copy binary to `plugins/rarcane/bin/`
+14. Created `plugins/rarcane/bin/.gitkeep` so directory is tracked in git
 15. Ran code audit → found 15 issues; fixed 8 highest-impact ones (see Key Findings)
 16. Ran `cargo xtask symlink-docs` — created 6 new `AGENTS.md`/`GEMINI.md` symlinks
 17. Fixed port inconsistency: all docs updated from `3100`/`3000` → `40060` to match `config.rs`
 18. Added `watch`/`serve`/`doctor` as CLI-infrastructure note to CLAUDE.md common gotchas
-19. Fixed `plugins/rustcane/bin/` missing from git with `.gitkeep`
+19. Fixed `plugins/rarcane/bin/` missing from git with `.gitkeep`
 20. Fixed auth table doc stale reference (`127.*` → `McpConfig::is_loopback()`)
 
 ## Key Findings
 
-- **Startup auth policy bug** (`src/main.rs`): `just dev` sets `RUSTCANE_MCP_NO_AUTH=true` but the guard treated this as insecure and would bail. Fixed by adding `!no_auth_explicit` to the bypass conditions.
+- **Startup auth policy bug** (`src/main.rs`): `just dev` sets `RARCANE_MCP_NO_AUTH=true` but the guard treated this as insecure and would bail. Fixed by adding `!no_auth_explicit` to the bypass conditions.
 - **Two copies of fragile loopback check**: `starts_with("127.")` used in both auth policy resolution and `build_auth_policy`, plus `check_auth_config` in doctor.rs. Consolidated into `McpConfig::is_loopback()` in `config.rs` using `IpAddr::is_loopback()`.
 - **`format_event` hardcoded `0`** (`src/cli/watch.rs`): `DOWN` message said "retrying every 0s". Fixed by threading `interval_secs` through to `format_event`.
 - **`prev.unwrap()` in recovery branch**: Replaced with `prev_state @` binding in match arm.
-- **Monitor binary path race** (`monitors/monitors.json`): bare `rustcane` in PATH races with `plugin-setup.sh` hook on first session. Changed to `${CLAUDE_PLUGIN_ROOT}/bin/rustcane`.
+- **Monitor binary path race** (`monitors/monitors.json`): bare `rarcane` in PATH races with `plugin-setup.sh` hook on first session. Changed to `${CLAUDE_PLUGIN_ROOT}/bin/rarcane`.
 - **CORS `allow_headers(Any)`** (`server/routes.rs`): Replaced with explicit whitelist (`Authorization`, `Content-Type`, `Accept`).
-- **CORS silent origin drop**: Invalid origins in `RUSTCANE_MCP_ALLOWED_ORIGINS` were silently dropped. Added `tracing::warn!`.
+- **CORS silent origin drop**: Invalid origins in `RARCANE_MCP_ALLOWED_ORIGINS` were silently dropped. Added `tracing::warn!`.
 - **`default_data_dir()` fallback to `"."`** (`config.rs`): Silent fallback to CWD if `HOME` unset. Changed return type to `Result<PathBuf>`, propagated through all three callers.
-- **`danger_accept_invalid_certs(true)` unconditional in doctor** (`cli/doctor.rs`): Changed to gate behind `RUSTCANE_DOCTOR_ACCEPT_INVALID_CERTS=true`.
-- **`plugin-setup.sh` symlink without binary verification**: Added explicit check that `${CLAUDE_PLUGIN_ROOT}/bin/rustcane` is executable before symlinking; fail immediately with clear message if not.
+- **`danger_accept_invalid_certs(true)` unconditional in doctor** (`cli/doctor.rs`): Changed to gate behind `RARCANE_DOCTOR_ACCEPT_INVALID_CERTS=true`.
+- **`plugin-setup.sh` symlink without binary verification**: Added explicit check that `${CLAUDE_PLUGIN_ROOT}/bin/rarcane` is executable before symlinking; fail immediately with clear message if not.
 - **Port inconsistency**: `config.rs` default is `40060`; docs referenced `3100` and `3000`. All docs corrected to `40060`.
 
 ## Technical Decisions
 
 - **`McpConfig::is_loopback()` on the struct** rather than a module-level function: allows both `main.rs` and `cli/doctor.rs` to call it via `config.mcp.is_loopback()` without additional imports.
 - **`default_data_dir()` returns `Result<PathBuf>`** rather than `Option`: fails loudly — silent fallback to CWD is worse than a clear error message.
-- **Monitor uses `${CLAUDE_PLUGIN_ROOT}/bin/rustcane`** rather than bare `rustcane`: eliminates race with `SessionStart` hook; `build-plugin` Justfile recipe now copies binary there.
+- **Monitor uses `${CLAUDE_PLUGIN_ROOT}/bin/rarcane`** rather than bare `rarcane`: eliminates race with `SessionStart` hook; `build-plugin` Justfile recipe now copies binary there.
 - **`watch` command stdout is the event stream, stderr is debug**: matches Claude Code monitor contract — each stdout line becomes a notification; debug chatter on stderr doesn't corrupt the event stream.
 - **No `"when": "always"` in `monitors.json`**: it's the default per spec; omitting it is cleaner.
 - **Plugin manifests have no `version` field**: marketplace uses git SHA per push; explicit version causes duplicate entries on every commit.
@@ -80,14 +80,14 @@ Long-form session covering: renaming and creating docs across every major subdir
 | `scripts/README.md` | Created — covers all scripts |
 | `plugins/README.md` | Created — top-level plugin directory guide |
 | `apps/web/README.md` | Created — Next.js web UI guide |
-| `plugins/rustcane/README.md` | Created — plugin package guide |
-| `plugins/rustcane/CLAUDE.md` | Created — agent instructions for plugin directory |
-| `plugins/rustcane/AGENTS.md`, `plugins/rustcane/GEMINI.md` | Created as symlinks |
+| `plugins/rarcane/README.md` | Created — plugin package guide |
+| `plugins/rarcane/CLAUDE.md` | Created — agent instructions for plugin directory |
+| `plugins/rarcane/AGENTS.md`, `plugins/rarcane/GEMINI.md` | Created as symlinks |
 | `apps/web/AGENTS.md`, `apps/web/GEMINI.md` | Created as symlinks |
-| `plugins/rustcane/gemini-extension.json` | Created — Gemini CLI extension manifest |
-| `plugins/rustcane/monitors/monitors.json` | Created — background health monitor config |
-| `plugins/rustcane/bin/.gitkeep` | Created — tracks `bin/` directory in git |
-| `plugins/rustcane/.claude-plugin/plugin.json` | Added `experimental.monitors`, updated port to 40060 |
+| `plugins/rarcane/gemini-extension.json` | Created — Gemini CLI extension manifest |
+| `plugins/rarcane/monitors/monitors.json` | Created — background health monitor config |
+| `plugins/rarcane/bin/.gitkeep` | Created — tracks `bin/` directory in git |
+| `plugins/rarcane/.claude-plugin/plugin.json` | Added `experimental.monitors`, updated port to 40060 |
 | `src/cli/watch.rs` | Created — health poll monitor with state-change stdout emission |
 | `src/cli.rs` | Added `Watch` and `Setup` command variants |
 | `src/cli/doctor.rs` | Fixed loopback check, `default_data_dir()?`, TLS flag |
@@ -95,13 +95,13 @@ Long-form session covering: renaming and creating docs across every major subdir
 | `src/main.rs` | Fixed startup auth policy `just dev` bug; use `is_loopback()`; added `Watch` dispatch |
 | `src/server.rs` | Added warning when `Mounted` with no auth mechanism |
 | `src/server/routes.rs` | CORS headers whitelist; warn on invalid origin |
-| `plugins/rustcane/hooks/plugin-setup.sh` | Verify bundled binary before symlinking |
+| `plugins/rarcane/hooks/plugin-setup.sh` | Verify bundled binary before symlinking |
 | `CLAUDE.md` | Module map updated; plugin versioning rule; auth table fixed; `watch` noted as CLI-infra; port 40060 |
 | `AGENTS.md` | Plugin versioning rule; port 40060; loopback note |
-| `Justfile` | `build-plugin` copies to `plugins/rustcane/bin/`; port 40060 throughout |
+| `Justfile` | `build-plugin` copies to `plugins/rarcane/bin/`; port 40060 throughout |
 | `docs/QUICKSTART.md` | Port 40060 |
 | `README.md` | Port 40060 |
-| `docs/PATTERNS.md` | rustcane row port 40060 |
+| `docs/PATTERNS.md` | rarcane row port 40060 |
 
 ## Commands Executed
 
@@ -123,16 +123,16 @@ sed -i 's/localhost:3100/localhost:40060/g'   # mass port correction
 
 | Area | Before | After |
 |---|---|---|
-| `just dev` | Would fail bind security guard (`RUSTCANE_MCP_NO_AUTH=true` not a bypass) | Starts correctly |
+| `just dev` | Would fail bind security guard (`RARCANE_MCP_NO_AUTH=true` not a bypass) | Starts correctly |
 | Loopback detection | `starts_with("127.")` — misses `localhost`, fragile | `IpAddr::is_loopback()` — handles all loopback addresses |
 | CORS headers | `allow_headers(Any)` | Whitelist: `Authorization`, `Content-Type`, `Accept` |
 | CORS invalid origin | Silently dropped | `tracing::warn!` emitted |
 | `default_data_dir` HOME unset | Silent fallback to `.` (CWD) | Fails with clear error message |
 | `doctor` TLS check | Always `danger_accept_invalid_certs(true)` | Strict TLS by default; opt out via env var |
-| Plugin monitor binary path | Bare `rustcane` — races with setup hook | `${CLAUDE_PLUGIN_ROOT}/bin/rustcane` — no race |
+| Plugin monitor binary path | Bare `rarcane` — races with setup hook | `${CLAUDE_PLUGIN_ROOT}/bin/rarcane` — no race |
 | Port in all docs | Mixed `3100` / `3000` | Consistent `40060` matching `config.rs` |
 | `watch` DOWN message | "retrying every 0s" | "retrying every 15s" (actual interval) |
-| `plugins/rustcane/bin/` | Not in git | Tracked via `.gitkeep`; populated by `just install` |
+| `plugins/rarcane/bin/` | Not in git | Tracked via `.gitkeep`; populated by `just install` |
 
 ## Risks and Rollback
 
@@ -141,9 +141,9 @@ sed -i 's/localhost:3100/localhost:40060/g'   # mass port correction
 
 ## Decisions Not Taken
 
-- **`RUSTCANE_NOAUTH` via `env_bool()` helper**: inconsistent with other env var parsing but works correctly. Left as-is to avoid refactor scope creep.
+- **`RARCANE_NOAUTH` via `env_bool()` helper**: inconsistent with other env var parsing but works correctly. Left as-is to avoid refactor scope creep.
 - **Monitor command injection note**: `user_config.server_url` is set by the operator on their own machine; not a real attack surface. Documented rather than mitigated.
-- **Updating PATTERNS.md `3000` examples throughout**: generic pattern docs use `3000` as a placeholder; only the rustcane-specific row was corrected.
+- **Updating PATTERNS.md `3000` examples throughout**: generic pattern docs use `3000` as a placeholder; only the rarcane-specific row was corrected.
 
 ## Open Questions
 

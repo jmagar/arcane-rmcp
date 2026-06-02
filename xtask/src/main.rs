@@ -1,4 +1,4 @@
-//! xtask — Repo automation for rustcane.
+//! xtask — Repo automation for rarcane.
 //!
 //! Invoked via: `cargo xtask <command>`
 //!
@@ -63,15 +63,15 @@ fn main() -> Result<()> {
 /// plugin users install the binary without needing a Rust toolchain — `install.sh`
 /// downloads the LFS object directly.
 ///
-/// TEMPLATE: Replace "rustcane" with your binary name throughout this function.
+/// TEMPLATE: Replace "rarcane" with your binary name throughout this function.
 ///           The binary name must match Cargo.toml `[[bin]] name = "..."`.
 ///
 /// After running `cargo xtask dist`:
-///   1. Commit bin/rustcane
+///   1. Commit bin/rarcane
 ///   2. Push — Git LFS uploads the binary automatically
 fn dist() -> Result<()> {
-    // TEMPLATE: Replace "rustcane" with your binary name.
-    const BINARY_NAME: &str = "rustcane";
+    // TEMPLATE: Replace "rarcane" with your binary name.
+    const BINARY_NAME: &str = "rarcane";
 
     println!("==> Building release binary: {BINARY_NAME}");
     run_cargo(&["build", "--release", "--locked"])?;
@@ -373,21 +373,21 @@ fn check_env() -> Result<()> {
     // REQUIRED_VARS accordingly.
     const REQUIRED_VARS: &[(&str, &str)] = &[
         // TEMPLATE: Uncomment and adapt once you have a real upstream service:
-        // ("RUSTCANE_API_URL", "Full base URL of the upstream service (e.g. https://api.rustcane.com/v1)"),
-        // ("RUSTCANE_API_KEY", "API key or bearer token for the upstream service"),
+        // ("RARCANE_API_URL", "Full base URL of the upstream service (e.g. https://api.rarcane.com/v1)"),
+        // ("RARCANE_API_KEY", "API key or bearer token for the upstream service"),
     ];
 
     // TEMPLATE: Optional variables — server boots without them but warns.
     const OPTIONAL_VARS: &[(&str, &str)] = &[
         (
-            "RUSTCANE_MCP_TOKEN",
+            "RARCANE_MCP_TOKEN",
             "Static bearer token for /mcp (required in production; omit only in loopback dev mode)",
         ),
         (
-            "RUSTCANE_MCP_HOST",
+            "RARCANE_MCP_HOST",
             "Bind host (default 0.0.0.0 — set to 127.0.0.1 for local-only)",
         ),
-        ("RUSTCANE_MCP_PORT", "Bind port (default 3000)"),
+        ("RARCANE_MCP_PORT", "Bind port (default 3000)"),
         (
             "RUST_LOG",
             "Log filter (e.g. info,rmcp=warn — default: info in server mode, warn in stdio/cli)",
@@ -419,7 +419,7 @@ fn check_env() -> Result<()> {
     if !missing.is_empty() {
         bail!(
             "\nMissing required environment variables: {}\n\
-             Copy .env.rustcane to .env and fill in the values.",
+             Copy .env.rarcane to .env and fill in the values.",
             missing.join(", ")
         );
     }
@@ -484,7 +484,7 @@ fn command_exists(name: &str) -> bool {
 fn print_help() {
     // TEMPLATE: Update binary name and command descriptions as you add commands.
     eprintln!(
-        "cargo xtask — repo automation for rustcane
+        "cargo xtask — repo automation for rarcane
 
 USAGE:
   cargo xtask <command>

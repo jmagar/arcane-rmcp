@@ -1,4 +1,4 @@
-//! `rustcane watch` — health monitor for the MCP HTTP server.
+//! `rarcane watch` — health monitor for the MCP HTTP server.
 //!
 //! Polls `{url}/health` on a fixed interval and emits a single stdout line
 //! whenever the server state changes. Stdout is the event stream; the plugin
@@ -51,7 +51,7 @@ pub async fn run_watch(base_url: &str, interval_secs: u64) -> Result<()> {
         .build()?;
 
     eprintln!(
-        "[rustcane watch] polling {} every {}s — emitting stdout on state change",
+        "[rarcane watch] polling {} every {}s — emitting stdout on state change",
         health_url, interval_secs
     );
 
@@ -89,7 +89,7 @@ async fn probe(client: &reqwest::Client, url: &str) -> ServerState {
             // Anything else (TLS error, DNS failure, etc.) likely indicates a
             // configuration problem — log it to stderr so the operator can diagnose.
             if !e.is_timeout() && !e.is_connect() {
-                eprintln!("[rustcane watch] probe error (may indicate config issue): {e}");
+                eprintln!("[rarcane watch] probe error (may indicate config issue): {e}");
             }
             ServerState::Down
         }
@@ -112,22 +112,22 @@ fn format_event(
         // Recovery — bind prev_state so we avoid unwrap and display it cleanly.
         (ServerState::Up, Some(prev_state @ (ServerState::Down | ServerState::Degraded(_)))) => {
             format!(
-                "[rustcane] UP — {} recovered after {}s (was {})",
+                "[rarcane] UP — {} recovered after {}s (was {})",
                 base_url,
                 prev_duration.as_secs(),
                 prev_state,
             )
         }
         // Initial healthy state
-        (ServerState::Up, _) => format!("[rustcane] UP — {} is healthy", base_url),
+        (ServerState::Up, _) => format!("[rarcane] UP — {} is healthy", base_url),
         // Went down
         (ServerState::Down, _) => format!(
-            "[rustcane] DOWN — {} is unreachable (retrying every {}s)",
+            "[rarcane] DOWN — {} is unreachable (retrying every {}s)",
             base_url, interval_secs
         ),
         // Degraded (non-2xx)
         (ServerState::Degraded(code), _) => {
-            format!("[rustcane] DEGRADED — {} returned HTTP {code}", base_url)
+            format!("[rarcane] DEGRADED — {} returned HTTP {code}", base_url)
         }
     }
 }

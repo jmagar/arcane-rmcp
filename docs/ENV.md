@@ -2,7 +2,7 @@
 title: "Environment Variables"
 doc_type: "guide"
 status: "active"
-owner: "rustcane"
+owner: "rarcane"
 audience:
   - "contributors"
   - "agents"
@@ -15,38 +15,38 @@ last_reviewed: "2026-05-15"
 
 # Environment variables
 
-The template uses `RUSTCANE_*` variables. Rename the prefix when adapting the template.
+The template uses `RARCANE_*` variables. Rename the prefix when adapting the template.
 
 ## Upstream service
 
 | Variable | Purpose |
 |---|---|
-| `RUSTCANE_API_URL` | Upstream API base URL used by `ArcaneClient`. Required. |
-| `RUSTCANE_API_KEY` | Upstream API key or token. Keep secret. Required. |
+| `RARCANE_API_URL` | Upstream API base URL used by `ArcaneClient`. Required. |
+| `RARCANE_API_KEY` | Upstream API key or token. Keep secret. Required. |
 
 ## MCP HTTP server
 
 | Variable | Default | Purpose |
 |---|---:|---|
-| `RUSTCANE_MCP_HOST` | `127.0.0.1` | Bind host for HTTP transport. Set `0.0.0.0` only with bearer, OAuth, or trusted-gateway auth configured. |
-| `RUSTCANE_MCP_PORT` | `40060` | Bind port for HTTP transport. |
-| `RUSTCANE_MCP_NO_AUTH` | `false` | Disable local auth for loopback development only. |
-| `RUSTCANE_NOAUTH` | `false` | Trusted-gateway no-auth mode for non-loopback deployments. |
-| `RUSTCANE_MCP_TOKEN` | unset | Static bearer token. Required for bearer-only mounted HTTP. |
-| `RUSTCANE_MCP_ALLOWED_HOSTS` | unset | Extra accepted Host header values (comma-separated). |
-| `RUSTCANE_MCP_ALLOWED_ORIGINS` | unset | Extra CORS origins (comma-separated). |
-| `RUSTCANE_MCP_PUBLIC_URL` | unset | Public URL used for OAuth metadata endpoints. |
-| `RUSTCANE_MCP_AUTH_MODE` | `bearer` | `bearer` or `oauth`. |
+| `RARCANE_MCP_HOST` | `127.0.0.1` | Bind host for HTTP transport. Set `0.0.0.0` only with bearer, OAuth, or trusted-gateway auth configured. |
+| `RARCANE_MCP_PORT` | `40060` | Bind port for HTTP transport. |
+| `RARCANE_MCP_NO_AUTH` | `false` | Disable local auth for loopback development only. |
+| `RARCANE_NOAUTH` | `false` | Trusted-gateway no-auth mode for non-loopback deployments. |
+| `RARCANE_MCP_TOKEN` | unset | Static bearer token. Required for bearer-only mounted HTTP. |
+| `RARCANE_MCP_ALLOWED_HOSTS` | unset | Extra accepted Host header values (comma-separated). |
+| `RARCANE_MCP_ALLOWED_ORIGINS` | unset | Extra CORS origins (comma-separated). |
+| `RARCANE_MCP_PUBLIC_URL` | unset | Public URL used for OAuth metadata endpoints. |
+| `RARCANE_MCP_AUTH_MODE` | `bearer` | `bearer` or `oauth`. |
 
 ## OAuth mode
 
-Only required when `RUSTCANE_MCP_AUTH_MODE=oauth`:
+Only required when `RARCANE_MCP_AUTH_MODE=oauth`:
 
 | Variable | Purpose |
 |---|---|
-| `RUSTCANE_MCP_GOOGLE_CLIENT_ID` | Google OAuth client ID. |
-| `RUSTCANE_MCP_GOOGLE_CLIENT_SECRET` | Google OAuth client secret. |
-| `RUSTCANE_MCP_AUTH_ADMIN_EMAIL` | Initial/admin email allowed by the OAuth flow. |
+| `RARCANE_MCP_GOOGLE_CLIENT_ID` | Google OAuth client ID. |
+| `RARCANE_MCP_GOOGLE_CLIENT_SECRET` | Google OAuth client secret. |
+| `RARCANE_MCP_AUTH_ADMIN_EMAIL` | Initial/admin email allowed by the OAuth flow. |
 
 ## Docker runtime
 
@@ -69,15 +69,15 @@ Only required when `RUSTCANE_MCP_AUTH_MODE=oauth`:
 
 ```bash
 # .env — secrets and URLs ONLY
-RUSTCANE_API_URL=https://rustcane.internal/api
-RUSTCANE_API_KEY=your_api_key_here
+RARCANE_API_URL=https://rarcane.internal/api
+RARCANE_API_KEY=your_api_key_here
 
 # MCP auth
-RUSTCANE_MCP_TOKEN=your_bearer_token_here
+RARCANE_MCP_TOKEN=your_bearer_token_here
 
 # OAuth (only when auth_mode=oauth in config.toml)
-# RUSTCANE_MCP_GOOGLE_CLIENT_ID=...
-# RUSTCANE_MCP_GOOGLE_CLIENT_SECRET=...
+# RARCANE_MCP_GOOGLE_CLIENT_ID=...
+# RARCANE_MCP_GOOGLE_CLIENT_SECRET=...
 
 # Docker runtime
 PUID=1000
@@ -88,7 +88,7 @@ RUST_LOG=info
 
 ## Safety
 
-`.env` and `.env.*` are ignored by `.gitignore` and blocked by `scripts/block-env-commits.sh`. Only `.env.rustcane` belongs in git.
+`.env` and `.env.*` are ignored by `.gitignore` and blocked by `scripts/block-env-commits.sh`. Only `.env.rarcane` belongs in git.
 
 Non-secret settings (host, port, auth mode, TTLs) go in `config.toml`, not `.env`. See `docs/CONFIG.md` for the full split.
 

@@ -18,10 +18,10 @@
 //! Replace the existing `tracing_subscriber` setup in `main.rs` with:
 //!
 //! ```rust,ignore
-//! use rustcane::logging;
+//! use rarcane::logging;
 //!
-//! let data_dir = config.data_dir(); // e.g. ~/.rustcane
-//! logging::init(&data_dir, "rustcane")?;
+//! let data_dir = config.data_dir(); // e.g. ~/.rarcane
+//! logging::init(&data_dir, "rarcane")?;
 //! ```
 //!
 //! In stdio mode, suppress all logs to avoid polluting the MCP JSON stream:
@@ -34,14 +34,14 @@
 //!         .with_writer(std::io::stderr)
 //!         .init();
 //! } else {
-//!     logging::init(&data_dir, "rustcane")?;
+//!     logging::init(&data_dir, "rarcane")?;
 //! }
 //! ```
 //!
 //! # TEMPLATE: Log file location
 //!
 //! Logs are written to `{data_dir}/logs/{service}.log`.
-//! For the rustcane service this resolves to `~/.rustcane/logs/rustcane.log`.
+//! For the rarcane service this resolves to `~/.rarcane/logs/rarcane.log`.
 //!
 //! The file is truncated (not rotated) when it exceeds 10MB. This keeps
 //! disk usage predictable and eliminates the complexity of log rotation.
@@ -63,9 +63,9 @@ use formatter::AuroraFormatter;
 ///
 /// # Arguments
 ///
-/// - `data_dir` — service data directory (e.g. `~/.rustcane`). Logs go into
+/// - `data_dir` — service data directory (e.g. `~/.rarcane`). Logs go into
 ///   `{data_dir}/logs/{service_name}.log`.
-/// - `service_name` — used as the log file name (e.g. `"rustcane"`).
+/// - `service_name` — used as the log file name (e.g. `"rarcane"`).
 ///
 /// # Errors
 ///
@@ -78,7 +78,7 @@ use formatter::AuroraFormatter;
 /// Examples:
 /// - `RUST_LOG=debug` — show all debug logs
 /// - `RUST_LOG=info,rmcp=warn` — info level, suppress rmcp crate noise
-/// - `RUST_LOG=rustcane=trace` — trace this crate only
+/// - `RUST_LOG=rarcane=trace` — trace this crate only
 ///
 /// Both the console and file writers share the same `EnvFilter`, so they
 /// always emit the same set of events.
@@ -137,7 +137,7 @@ pub fn init(data_dir: &Path, service_name: &str) -> Result<()> {
             // - `.with_ansi(false)` — never emit ANSI codes to the file
             // - `.with_writer(log_file)` — write to the log file we opened above
             //
-            // JSON format rustcane:
+            // JSON format rarcane:
             // {"timestamp":"2026-05-13T14:32:01.123Z","level":"INFO","fields":{"message":"starting","bind":"0.0.0.0:3000"}}
             tracing_subscriber::fmt::layer()
                 .json()

@@ -2,7 +2,7 @@
 title: "Agents-First Design"
 doc_type: "guide"
 status: "active"
-owner: "rustcane"
+owner: "rarcane"
 audience:
   - "contributors"
   - "agents"
@@ -79,8 +79,8 @@ Never return opaque `"internal error"` messages. Never leak secrets in error tex
 Agents may use:
 
 1. **MCP tool calls** through `/mcp` or stdio (preferred — full tool schema, scope enforcement)
-2. **CLI commands** for local shell workflows (`rustcane greet --name Alice`)
-3. **REST `/v1/rustcane`** when MCP tooling is unavailable (`POST {"action":"greet","params":{"name":"Alice"}}`)
+2. **CLI commands** for local shell workflows (`rarcane greet --name Alice`)
+3. **REST `/v1/rarcane`** when MCP tooling is unavailable (`POST {"action":"greet","params":{"name":"Alice"}}`)
 4. **Plugin skills** as human/agent guidance
 
 The action metadata in `src/actions.rs` keeps these surfaces aligned. Every action that the MCP tool exposes must also be reachable from the CLI (with the exception of MCP-only features like elicitation).
@@ -89,14 +89,14 @@ The action metadata in `src/actions.rs` keeps these surfaces aligned. Every acti
 
 ```
 # Default: summary view (fits on screen)
-$ rustcane things
+$ rarcane things
   ID   NAME               STATE    UPDATED
   42   my-thing           active   2m ago
   43   other-thing        idle     1h ago
 
 # Full detail: --verbose or specific action
-$ rustcane thing 42
-$ rustcane thing 42 --json
+$ rarcane thing 42
+$ rarcane thing 42 --json
 ```
 
 ## Documentation contract

@@ -25,7 +25,7 @@ const CORE_RUST_FORBIDDEN: &[&str] = &[
     "std::process::Command",
     "Command::new",
     "ArcaneClient::new",
-    "crate::rustcane::ArcaneClient",
+    "crate::rarcane::ArcaneClient",
 ];
 
 const WEB_FORBIDDEN: &[&str] = &[
@@ -33,7 +33,7 @@ const WEB_FORBIDDEN: &[&str] = &[
     "node:child_process",
     "fs.",
     "node:fs",
-    "process.env.RUSTCANE_",
+    "process.env.RARCANE_",
     "fetch(\"https://",
     "fetch('https://",
 ];

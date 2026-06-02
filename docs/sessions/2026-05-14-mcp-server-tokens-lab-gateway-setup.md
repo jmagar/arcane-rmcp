@@ -1,18 +1,18 @@
 ---
 date: 2026-05-14 20:13:15 EST
-repo: git@github.com:jmagar/rustcane.git
+repo: git@github.com:jmagar/rarcane.git
 branch: full-review-remediation
 head: 2a4599c
 plan: none
 agent: Claude (claude-sonnet-4-6)
 session id: a5ff4274-c46a-4127-af34-aa6cfff2b3f7
-transcript: /home/jmagar/.claude/projects/-home-jmagar-workspace-rustcane/a5ff4274-c46a-4127-af34-aa6cfff2b3f7.jsonl
-working directory: /home/jmagar/workspace/rustcane
+transcript: /home/jmagar/.claude/projects/-home-jmagar-workspace-rarcane/a5ff4274-c46a-4127-af34-aa6cfff2b3f7.jsonl
+working directory: /home/jmagar/workspace/rarcane
 ---
 
 ## User Request
 
-Test 6 custom MCP servers (unrust, rustscale, rustifi, rustify, apprise-mcp, rustcane) using mcporter with their external URLs, generate secure bearer tokens for all of them, and add them to the lab gateway at lab.tootie.tv with protected paths named after each repo.
+Test 6 custom MCP servers (unrust, rustscale, rustifi, rustify, apprise-mcp, rarcane) using mcporter with their external URLs, generate secure bearer tokens for all of them, and add them to the lab gateway at lab.tootie.tv with protected paths named after each repo.
 
 ## Session Overview
 
@@ -58,7 +58,7 @@ Audited 6 MCP servers running locally in Docker, discovered they had no auth tok
 | `/home/jmagar/workspace/rustifi/.env` | Replaced `UNIFI_MCP_DISABLE_HTTP_AUTH=true` with `UNIFI_MCP_TOKEN=<token>` |
 | `/home/jmagar/workspace/rustscale/.env` | Replaced no-auth flags with `TAILSCALE_MCP_TOKEN=<token>` |
 | `/home/jmagar/workspace/apprise-mcp/.env` | Replaced no-auth flags with `APPRISE_MCP_TOKEN=<token>` |
-| `/home/jmagar/workspace/rustcane/.env` | Replaced no-auth flags with `RUSTCANE_MCP_TOKEN=<token>`; removed duplicate `RUSTCANE_NOAUTH=true` |
+| `/home/jmagar/workspace/rarcane/.env` | Replaced no-auth flags with `RARCANE_MCP_TOKEN=<token>`; removed duplicate `RARCANE_NOAUTH=true` |
 | `/home/jmagar/.mcporter/mcporter.json` | Added all 6 servers with real HTTPS domain URLs and bearer tokens; fixed trailing comma left by earlier edit |
 
 ## Commands Executed
@@ -76,7 +76,7 @@ mcporter list rustify    # → 1 tool: gotify (14 actions)
 mcporter list rustifi    # → 1 tool: unifi (9 actions)
 mcporter list rustscale  # → 1 tool: tailscale (10 actions)
 mcporter list apprise-mcp  # → 1 tool: apprise (4 actions)
-mcporter list rustcane  # → 1 tool: rustcane (5 actions)
+mcporter list rarcane  # → 1 tool: rarcane (5 actions)
 
 # Read SWAG proxy configs on squirts
 ssh squirts "cat /mnt/appdata/swag/nginx/proxy-confs/unraid.subdomain.conf ..."
@@ -112,7 +112,7 @@ ssh squirts "cat /mnt/appdata/swag/nginx/proxy-confs/unraid.subdomain.conf ..."
 | `mcporter list rustifi` | Tool schema for unifi | 1 tool · 33ms | ✅ |
 | `mcporter list rustscale` | Tool schema for tailscale | 1 tool · 48ms | ✅ |
 | `mcporter list apprise-mcp` | Tool schema for apprise | 1 tool · 33ms | ✅ |
-| `mcporter list rustcane` | Tool schema for rustcane | 1 tool · 41ms | ✅ |
+| `mcporter list rarcane` | Tool schema for rarcane | 1 tool · 41ms | ✅ |
 | Lab gateway configured count | 18 (12 + 6) | 18 | ✅ |
 
 ## Risks and Rollback
@@ -133,7 +133,7 @@ ssh squirts "cat /mnt/appdata/swag/nginx/proxy-confs/unraid.subdomain.conf ..."
 - Verify the 6 new servers come online in the lab gateway (currently all show Disconnected)
 
 **Follow-on tasks:**
-- Configure Authelia access rules for `https://mcp.tootie.tv/unrust`, `/rustify`, `/rustifi`, `/rustscale`, `/apprise-mcp`, `/rustcane` if required for gateway probing
+- Configure Authelia access rules for `https://mcp.tootie.tv/unrust`, `/rustify`, `/rustifi`, `/rustscale`, `/apprise-mcp`, `/rarcane` if required for gateway probing
 - Run `mcporter list` using the protected path URLs (via `https://mcp.tootie.tv/`) to confirm OAuth flow works end-to-end
 - Commit the `.env` changes for each of the 6 repos (they are gitignored, so document token storage separately if needed)
 - Consider storing tokens in a secret manager rather than plaintext `.env` files

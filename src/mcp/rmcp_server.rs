@@ -3,7 +3,7 @@
 //! This is the adapter between the rmcp crate and your application. It:
 //!   - Advertises tools, resources, and prompts to MCP clients
 //!   - Enforces auth scopes on every call
-//!   - Delegates business logic to `tools.rs` → `app.rs` → `rustcane.rs`
+//!   - Delegates business logic to `tools.rs` → `app.rs` → `rarcane.rs`
 //!
 //! **Template**: rename `ArcaneRmcpServer`. Update action metadata in
 //! `src/actions.rs` to keep schemas, scope rules, and dispatch in sync.
@@ -209,14 +209,14 @@ impl ServerHandler for ArcaneRmcpServer {
 
 // ── resource definitions ──────────────────────────────────────────────────────
 
-/// URI for the schema resource. **Template**: change `rustcane` to your service name.
-const SCHEMA_RESOURCE_URI: &str = "rustcane://schema/mcp-tool";
+/// URI for the schema resource. **Template**: change `rarcane` to your service name.
+const SCHEMA_RESOURCE_URI: &str = "rarcane://schema/mcp-tool";
 
 fn schema_resource() -> Resource {
     Resource::new(
-        RawResource::new(SCHEMA_RESOURCE_URI, "rustcane tool schema")
+        RawResource::new(SCHEMA_RESOURCE_URI, "rarcane tool schema")
             .with_description(
-                "JSON schema for the rustcane MCP tool and its action-based parameters",
+                "JSON schema for the rarcane MCP tool and its action-based parameters",
             )
             .with_mime_type("application/json"),
         None,

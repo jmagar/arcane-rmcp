@@ -100,10 +100,10 @@ just check-env
 Arcane output:
 
 ```
-[OK]      RUSTCANE_MCP_TOKEN   — Static bearer token for MCP auth
-[MISSING] RUSTCANE_API_KEY     — Upstream service API key (required)
+[OK]      RARCANE_MCP_TOKEN   — Static bearer token for MCP auth
+[MISSING] RARCANE_API_KEY     — Upstream service API key (required)
 
-Error: 1 required variable(s) missing. Copy .env.rustcane to .env and fill in the values.
+Error: 1 required variable(s) missing. Copy .env.rarcane to .env and fill in the values.
 ```
 
 **TEMPLATE**: Update `REQUIRED_VARS` and `OPTIONAL_VARS` in `xtask/src/main.rs` for your service. The template ships with no required variables (the stub works without credentials).

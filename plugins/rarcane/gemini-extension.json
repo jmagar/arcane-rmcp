@@ -1,13 +1,13 @@
 {
-  "name": "rustcane-mcp",
+  "name": "rarcane-mcp",
   "description": "Rust MCP server for Arcane Docker management — manage containers, images, networks, volumes, and compose projects.",
   "author": "Jacob Magar",
-  "repository": "https://github.com/jmagar/rustcane",
+  "repository": "https://github.com/jmagar/rarcane",
   "license": "MIT",
-  "keywords": ["rustcane", "arcane", "docker", "containers", "homelab", "mcp"],
+  "keywords": ["rarcane", "arcane", "docker", "containers", "homelab", "mcp"],
   "contextFileName": "GEMINI.md",
   "mcpServers": {
-    "rustcane": {
+    "rarcane": {
       "type": "http",
       "url": "${settings.server_url}/mcp",
       "headers": {
@@ -20,7 +20,7 @@
   "settings": [
     {
       "name": "server_url",
-      "description": "Base URL of the MCP HTTP server. Keep http://localhost:40060 for local use; set to https://rustcane.yourdomain.com for a remote server. Do NOT include a trailing /mcp.",
+      "description": "Base URL of the MCP HTTP server. Keep http://localhost:40060 for local use; set to https://rarcane.yourdomain.com for a remote server. Do NOT include a trailing /mcp.",
       "required": true,
       "default": "http://localhost:40060"
     },
@@ -31,13 +31,13 @@
       "sensitive": true
     },
     {
-      "name": "rustcane_api_url",
-      "description": "Base URL of the upstream Arcane API this server manages Docker through, e.g. https://arcane.example.com. Maps to the RUSTCANE_API_URL env var.",
+      "name": "rarcane_api_url",
+      "description": "Base URL of the upstream Arcane API this server manages Docker through, e.g. https://arcane.example.com. Maps to the RARCANE_API_URL env var.",
       "required": false
     },
     {
-      "name": "rustcane_api_key",
-      "description": "API key or bearer token for authenticating to the upstream Arcane API. Maps to the RUSTCANE_API_KEY env var.",
+      "name": "rarcane_api_key",
+      "description": "API key or bearer token for authenticating to the upstream Arcane API. Maps to the RARCANE_API_KEY env var.",
       "required": false,
       "sensitive": true
     }

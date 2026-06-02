@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # =============================================================================
-# test-mcp.sh — Integration smoke-test for the rustcane (Arcane) MCP server
+# test-mcp.sh — Integration smoke-test for the rarcane (Arcane) MCP server
 #
-# rustcane wraps the Arcane Docker-management API and exposes ONE MCP tool named
+# rarcane wraps the Arcane Docker-management API and exposes ONE MCP tool named
 # `arcane`, dispatched by `action` (+ optional `subaction`/`envId`/`id`/`params`).
 #
 # PHILOSOPHY — what makes a good integration test:
@@ -16,7 +16,7 @@
 #   `destructive` in src/actions.rs and require params.confirm=true.
 #
 #   The checks exercised here run without a live Arcane backend:
-#     status()         → response MUST have status="ok", server="rustcane",
+#     status()         → response MUST have status="ok", server="rarcane",
 #                        upstream="arcane" (handled locally before any HTTP call)
 #     help()           → response MUST have tool="arcane" and list known actions
 #                        (e.g. "container") in its action summary
@@ -28,10 +28,10 @@
 #   tolerant/skipped cases when a live backend is available.
 #
 # Server is assumed to be running as HTTP on localhost:40060 (the `just dev` port).
-# Credentials are sourced from ~/.rustcane/.env OR environment variables:
-#   RUSTCANE_MCP_HOST  (default: localhost)
-#   RUSTCANE_MCP_PORT  (default: 40060)
-#   RUSTCANE_MCP_TOKEN (optional; omit for no-auth dev mode)
+# Credentials are sourced from ~/.rarcane/.env OR environment variables:
+#   RARCANE_MCP_HOST  (default: localhost)
+#   RARCANE_MCP_PORT  (default: 40060)
+#   RARCANE_MCP_TOKEN (optional; omit for no-auth dev mode)
 #
 # Usage:
 #   ./tests/mcporter/test-mcp.sh [--timeout-ms N] [--parallel] [--verbose]
@@ -60,8 +60,8 @@ readonly SCRIPT_NAME="$(basename -- "${BASH_SOURCE[0]}")"
 readonly TS_START="$(date +%s%N)"
 readonly LOG_FILE="${TMPDIR:-/tmp}/${SCRIPT_NAME%.sh}.$(date +%Y%m%d-%H%M%S).log"
 
-# rustcane credentials live in ~/.rustcane/.env (SERVICE_HOME_DIRNAME=.rustcane).
-readonly ENV_FILE="${HOME}/.rustcane/.env"
+# rarcane credentials live in ~/.rarcane/.env (SERVICE_HOME_DIRNAME=.rarcane).
+readonly ENV_FILE="${HOME}/.rarcane/.env"
 
 # ── Colour support ────────────────────────────────────────────────────────────
 if [[ -t 1 ]]; then
@@ -123,13 +123,13 @@ load_env() {
     log_warn "${ENV_FILE} not found — using environment variables"
   fi
 
-  local host="${RUSTCANE_MCP_HOST:-localhost}"
+  local host="${RARCANE_MCP_HOST:-localhost}"
   # Remap bind address 0.0.0.0 → localhost for outbound connections
   [[ "${host}" == "0.0.0.0" ]] && host="localhost"
-  local port="${RUSTCANE_MCP_PORT:-40060}"
+  local port="${RARCANE_MCP_PORT:-40060}"
   MCP_URL="http://${host}:${port}/mcp"
 
-  local token="${RUSTCANE_MCP_TOKEN:-}"
+  local token="${RARCANE_MCP_TOKEN:-}"
   MCPORTER_HEADER_ARGS=()
   if [[ -n "${token}" ]]; then
     MCPORTER_HEADER_ARGS+=(--header "Authorization: Bearer ${token}")
@@ -139,7 +139,7 @@ load_env() {
   if [[ ${#MCPORTER_HEADER_ARGS[@]} -gt 0 ]]; then
     log_info "Auth: Bearer token configured"
   else
-    log_info "Auth: none (RUSTCANE_MCP_TOKEN unset — server must be in no-auth mode)"
+    log_info "Auth: none (RARCANE_MCP_TOKEN unset — server must be in no-auth mode)"
   fi
 }
 
@@ -168,7 +168,7 @@ smoke_test_server() {
 
   if [[ "${health_status}" != "ok" ]]; then
     log_error "Health endpoint at ${base_url}/health did not return status=ok"
-    log_error "Is the rustcane-mcp server running?  just dev   or   just docker-up"
+    log_error "Is the rarcane-mcp server running?  just dev   or   just docker-up"
     log_error "Then retry:  ./tests/mcporter/test-mcp.sh"
     return 2
   fi
@@ -476,9 +476,9 @@ _fail() {
 suite_auth() {
   printf '\n%b== auth enforcement ==%b\n' "${C_BOLD}" "${C_RESET}" | tee -a "${LOG_FILE}"
 
-  if [[ -z "${RUSTCANE_MCP_TOKEN:-}" ]]; then
-    skip_test "auth: unauthenticated /mcp returns 401" "RUSTCANE_MCP_TOKEN unset"
-    skip_test "auth: bad token returns 401"             "RUSTCANE_MCP_TOKEN unset"
+  if [[ -z "${RARCANE_MCP_TOKEN:-}" ]]; then
+    skip_test "auth: unauthenticated /mcp returns 401" "RARCANE_MCP_TOKEN unset"
+    skip_test "auth: bad token returns 401"             "RARCANE_MCP_TOKEN unset"
     return
   fi
 
@@ -508,7 +508,7 @@ suite_auth() {
 # the response contains the RIGHT data, not just that it is JSON.
 #
 # SAFETY: only READ-ONLY, environment-independent actions are exercised here.
-#   `status` and `help` are handled locally by rustcane (src/app.rs dispatch)
+#   `status` and `help` are handled locally by rarcane (src/app.rs dispatch)
 #   before any HTTP call to Arcane, so they need no live backend and touch no
 #   Docker state. Destructive actions (container.stop, image.prune, system.prune,
 #   project.down, …) are NEVER called.
@@ -527,10 +527,10 @@ suite_core() {
     "arcane" '{"action":"status"}' \
     "status" "ok" "exact"
 
-  # status names this server "rustcane" and its upstream "arcane".
-  run_test_semantic "arcane status: server is rustcane" \
+  # status names this server "rarcane" and its upstream "arcane".
+  run_test_semantic "arcane status: server is rarcane" \
     "arcane" '{"action":"status"}' \
-    "server" "rustcane" "exact"
+    "server" "rarcane" "exact"
 
   run_test_semantic "arcane status: upstream is arcane" \
     "arcane" '{"action":"status"}' \
@@ -555,14 +555,14 @@ suite_core() {
 }
 
 # ── suite_schema_resource ──────────────────────────────────────────────────────
-# The schema resource is exposed by the rustcane server at the (server-scoped)
-# URI rustcane://schema/mcp-tool. The tool it describes is named `arcane`.
+# The schema resource is exposed by the rarcane server at the (server-scoped)
+# URI rarcane://schema/mcp-tool. The tool it describes is named `arcane`.
 suite_schema_resource() {
   printf '\n%b== schema resource ==%b\n' "${C_BOLD}" "${C_RESET}" | tee -a "${LOG_FILE}"
 
   # Fetch the schema resource via mcporter when supported. The wrapper falls
   # back to raw JSON-RPC for older mcporter versions.
-  local resource_uri="rustcane://schema/mcp-tool"
+  local resource_uri="rarcane://schema/mcp-tool"
   local output t0 elapsed_ms
 
   t0="$(date +%s%N)"
@@ -707,7 +707,7 @@ main() {
   load_env
 
   printf '%b%s%b\n' "${C_BOLD}" "$(printf '=%.0s' {1..65})" "${C_RESET}"
-  printf '%b  rustcane-mcp integration smoke-test%b\n' "${C_BOLD}" "${C_RESET}"
+  printf '%b  rarcane-mcp integration smoke-test%b\n' "${C_BOLD}" "${C_RESET}"
   printf '%b  Project:  %s%b\n' "${C_BOLD}" "${PROJECT_DIR}" "${C_RESET}"
   printf '%b  MCP URL:  %s%b\n' "${C_BOLD}" "${MCP_URL}" "${C_RESET}"
   printf '%b  Timeout:  %dms/call | Parallel: %s%b\n' \
@@ -724,7 +724,7 @@ main() {
     log_error "To diagnose:"
     log_error "  just dev                            # start in no-auth dev mode"
     log_error "  curl http://localhost:40060/health   # check health endpoint"
-    log_error "  docker ps | grep rustcane-mcp        # check Docker container"
+    log_error "  docker ps | grep rarcane-mcp        # check Docker container"
     exit 2
   }
 

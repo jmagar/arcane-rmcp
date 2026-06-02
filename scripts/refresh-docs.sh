@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# refresh-docs.sh — Refresh reference docs for rustcane
+# refresh-docs.sh — Refresh reference docs for rarcane
 #
 # TEMPLATE: This script fetches the MCP protocol docs and Rust SDK so every
 # server built from this template has up-to-date reference material for the
@@ -92,7 +92,7 @@ require_cmd() {
   command -v "$1" >/dev/null 2>&1 || { echo "ERROR: required command not found: $1" >&2; exit 1; }
 }
 
-make_tmpdir() { mktemp -d "${TMPDIR:-/tmp}/rustcane-refresh-docs.XXXXXX"; }
+make_tmpdir() { mktemp -d "${TMPDIR:-/tmp}/rarcane-refresh-docs.XXXXXX"; }
 
 atomic_replace_dir() {
   local src="$1" dst="$2" parent backup
@@ -169,7 +169,7 @@ write_index() {
   [[ -d "$REF_DIR/mcporter/docs" ]] && mcporter_docs="$(find "$REF_DIR/mcporter/docs" -type f | wc -l | tr -d ' ')"
 
   cat > "$REF_DIR/INDEX.md" <<EOF
-# Reference Index — rustcane
+# Reference Index — rarcane
 
 TEMPLATE: When you adapt this template, update this index to reflect your service's
 reference material.
@@ -241,7 +241,7 @@ ensure_changes_file() {
   [[ -f "$CHANGES_FILE" ]] && return 0
   cat > "$CHANGES_FILE" <<EOF
 ---
-title: Reference Refresh Change Log — rustcane
+title: Reference Refresh Change Log — rarcane
 generated_by: scripts/refresh-docs.sh
 created_at: $(date -u +%Y-%m-%dT%H:%M:%SZ)
 ---

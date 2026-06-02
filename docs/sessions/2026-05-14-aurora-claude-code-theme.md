@@ -1,14 +1,14 @@
 ---
 date: 2026-05-14 03:45:56 EST
-repo: git@github.com:jmagar/rustcane.git
+repo: git@github.com:jmagar/rarcane.git
 branch: refactor/server-api-module-split
 head: 13601af
 plan: none
 agent: Claude (claude-sonnet-4-6)
 session id: 8ee9e706-62e9-4afc-b325-4fabf0f29ad4
-transcript: /home/jmagar/.claude/projects/-home-jmagar-workspace-rustcane/8ee9e706-62e9-4afc-b325-4fabf0f29ad4.jsonl
-working directory: /home/jmagar/workspace/rustcane
-pr: "#1 — feat: watch command, monitors, Gemini extension, scripts, and tooling (0.2.0 → 0.3.0) — https://github.com/jmagar/rustcane/pull/1"
+transcript: /home/jmagar/.claude/projects/-home-jmagar-workspace-rarcane/8ee9e706-62e9-4afc-b325-4fabf0f29ad4.jsonl
+working directory: /home/jmagar/workspace/rarcane
+pr: "#1 — feat: watch command, monitors, Gemini extension, scripts, and tooling (0.2.0 → 0.3.0) — https://github.com/jmagar/rarcane/pull/1"
 ---
 
 ## User Request
@@ -84,7 +84,7 @@ cargo check  # → Finished dev (no errors)
 git add . && git commit -m "feat: watch command, monitors, ..."
 git push -u origin refactor/server-api-module-split
 gh pr create --title "feat: ..." --body "..."
-# → https://github.com/jmagar/rustcane/pull/1
+# → https://github.com/jmagar/rarcane/pull/1
 ```
 
 ## Errors Encountered
@@ -108,7 +108,7 @@ gh pr create --title "feat: ..." --body "..."
 |---------|----------|--------|--------|
 | `cargo check` | `Finished dev` | `Finished dev` | ✅ |
 | `git push` | branch pushed | `ok refactor/server-api-module-split` | ✅ |
-| `gh pr create` | PR URL returned | `https://github.com/jmagar/rustcane/pull/1` | ✅ |
+| `gh pr create` | PR URL returned | `https://github.com/jmagar/rarcane/pull/1` | ✅ |
 
 ## Risks and Rollback
 
@@ -120,11 +120,11 @@ gh pr create --title "feat: ..." --body "..."
 - [Claude Code custom theme docs](https://code.claude.com/docs/en/terminal-config#create-a-custom-theme)
 - [wmedia.es theme tutorial](https://wmedia.es/en/tips/claude-code-custom-themes)
 - Aurora design system color source: `aurora-design-system/registry/aurora/styles/aurora.css`
-- [PR #1](https://github.com/jmagar/rustcane/pull/1)
+- [PR #1](https://github.com/jmagar/rarcane/pull/1)
 
 ## Next Steps
 
 **Follow-on tasks:**
-- Ship themes inside the plugin (`plugins/rustcane/.claude-plugin/themes/aurora.json`) so they distribute with `plugin install`.
+- Ship themes inside the plugin (`plugins/rarcane/.claude-plugin/themes/aurora.json`) so they distribute with `plugin install`.
 - Consider adding `aurora-daltonized` variant based on Aurora's accessibility-adjusted palette.
 - Index the official Claude Code theme token docs into Axon so future `axon ask` queries return results directly.

@@ -72,9 +72,9 @@ fn justfile_exposes_ported_automation_recipes() {
 #[test]
 fn plugin_manifests_do_not_have_version_fields() {
     for path in [
-        "plugins/rustcane/.claude-plugin/plugin.json",
-        "plugins/rustcane/.codex-plugin/plugin.json",
-        "plugins/rustcane/gemini-extension.json",
+        "plugins/rarcane/.claude-plugin/plugin.json",
+        "plugins/rarcane/.codex-plugin/plugin.json",
+        "plugins/rarcane/gemini-extension.json",
     ] {
         let manifest = json(path);
         assert!(

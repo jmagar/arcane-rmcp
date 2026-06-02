@@ -2,16 +2,16 @@
 
 This template ships one service plugin package with three host-specific entrypoints:
 
-- Claude Code: `plugins/rustcane/.claude-plugin/plugin.json`
-- Codex: `plugins/rustcane/.codex-plugin/plugin.json`
-- Gemini: `plugins/rustcane/gemini-extension.json`
+- Claude Code: `plugins/rarcane/.claude-plugin/plugin.json`
+- Codex: `plugins/rarcane/.codex-plugin/plugin.json`
+- Gemini: `plugins/rarcane/gemini-extension.json`
 
 All three surfaces should describe the same MCP server, expose the same skills, and connect to the same HTTP MCP endpoint. The host manifests differ, but the service behavior should not.
 
 ## Layout
 
 ```text
-plugins/rustcane/
+plugins/rarcane/
   .claude-plugin/
     plugin.json          # Claude Code manifest
   .codex-plugin/
@@ -23,15 +23,15 @@ plugins/rustcane/
     hooks.json           # Claude lifecycle hook declarations
     plugin-setup.sh      # Thin adapter to the binary setup command
   bin/
-    rustcane             # Optional Git LFS-tracked plugin binary artifact
+    rarcane             # Optional Git LFS-tracked plugin binary artifact
   skills/
-    rustcane/
+    rarcane/
       SKILL.md           # Shared action documentation
     scaffold-project/
       SKILL.md           # Approval-first template adaptation handoff skill
 ```
 
-When adapting the template, rename `rustcane`, `Arcane`, and `EXAMPLE` consistently across the package, then update host-specific display text and credentials.
+When adapting the template, rename `rarcane`, `Arcane`, and `EXAMPLE` consistently across the package, then update host-specific display text and credentials.
 
 ## Shared Contract
 
@@ -49,7 +49,7 @@ Keep the plugin manifests thin. Runtime setup belongs in the service binary, not
 
 ## Claude Code
 
-Claude Code uses `plugins/rustcane/.claude-plugin/plugin.json`.
+Claude Code uses `plugins/rarcane/.claude-plugin/plugin.json`.
 
 Responsibilities:
 
@@ -58,7 +58,7 @@ Responsibilities:
 - defines `userConfig` settings exposed in Claude Code
 - marks sensitive values with `sensitive: true`
 
-Claude-specific lifecycle hooks live in `plugins/rustcane/hooks/hooks.json`. The default hooks are:
+Claude-specific lifecycle hooks live in `plugins/rarcane/hooks/hooks.json`. The default hooks are:
 
 | Hook | Trigger | Command |
 | --- | --- | --- |
@@ -81,7 +81,7 @@ The hook script may map `CLAUDE_PLUGIN_OPTION_*` values into runtime env vars, c
 
 ## Codex
 
-Codex uses `plugins/rustcane/.codex-plugin/plugin.json`.
+Codex uses `plugins/rarcane/.codex-plugin/plugin.json`.
 
 Responsibilities:
 
@@ -89,7 +89,7 @@ Responsibilities:
 - points at shared `skills` and `.mcp.json`
 - describes the interface shown in Codex UI
 - declares read/write capabilities
-- provides rustcane prompts
+- provides rarcane prompts
 - provides branding fields such as `brandColor`, `composerIcon`, and `logo`
 
 Codex does not use Claude lifecycle hooks. Its manifest should still point to the same MCP server and shared skills so behavior stays aligned with Claude Code.
@@ -105,11 +105,11 @@ Codex-specific fields to adapt:
 | `interface.defaultPrompt` | three realistic prompts |
 | `interface.brandColor` | service-appropriate hex color |
 
-See `plugins/rustcane/.codex-plugin/README.md` for the full manifest field reference.
+See `plugins/rarcane/.codex-plugin/README.md` for the full manifest field reference.
 
 ## Gemini
 
-Gemini uses `plugins/rustcane/gemini-extension.json`.
+Gemini uses `plugins/rarcane/gemini-extension.json`.
 
 Responsibilities:
 
@@ -131,7 +131,7 @@ Sensitive Gemini settings use:
 "secret": true
 ```
 
-Keep Gemini setting names aligned with Claude/Codex where possible. For rustcane, prefer `server_url`, `api_token`, `<service>_api_url`, and `<service>_api_key` across all three surfaces.
+Keep Gemini setting names aligned with Claude/Codex where possible. For rarcane, prefer `server_url`, `api_token`, `<service>_api_url`, and `<service>_api_key` across all three surfaces.
 
 ## Plugin Validation
 
@@ -149,8 +149,8 @@ The validator checks:
 - Claude, Codex, and Gemini manifests are valid JSON
 - plugin manifests do not contain a `version` field
 - manifests point to the shared `.mcp.json`, hooks, and skills paths
-- shared MCP config exposes the `rustcane` HTTP server at `${user_config.server_url}/mcp`
-- Gemini config exposes the same `rustcane` HTTP server at `${settings.server_url}/mcp`
+- shared MCP config exposes the `rarcane` HTTP server at `${user_config.server_url}/mcp`
+- Gemini config exposes the same `rarcane` HTTP server at `${settings.server_url}/mcp`
 - hook config runs `${CLAUDE_PLUGIN_ROOT}/hooks/plugin-setup.sh`
 - every skill has `name:` and `description:` frontmatter
 
@@ -161,12 +161,12 @@ template gates.
 
 ## Shared MCP Config
 
-Claude Code and Codex share `plugins/rustcane/.mcp.json`:
+Claude Code and Codex share `plugins/rarcane/.mcp.json`:
 
 ```json
 {
   "mcpServers": {
-    "rustcane": {
+    "rarcane": {
       "type": "http",
       "url": "${user_config.server_url}/mcp",
       "headers": {
@@ -181,34 +181,34 @@ Gemini carries equivalent MCP config directly in `gemini-extension.json` because
 
 ## Skills
 
-`plugins/rustcane/skills/rustcane/SKILL.md` is shared across Claude, Codex, and Gemini. Every skill follows the three-tier fallback pattern — agents try each tier in order and stop when one works:
+`plugins/rarcane/skills/rarcane/SKILL.md` is shared across Claude, Codex, and Gemini. Every skill follows the three-tier fallback pattern — agents try each tier in order and stop when one works:
 
 ```markdown
-# rustcane — Claude Code Skill
+# rarcane — Claude Code Skill
 
 Use this skill whenever you need to query or manage the Arcane service.
 
 ## Tier 1: MCP tool (preferred)
-Use when the rustcane MCP server is configured in your agent.
+Use when the rarcane MCP server is configured in your agent.
 
-rustcane(action="things")
-rustcane(action="thing", id="abc123")
-rustcane(action="help")          # always available, no auth required
+rarcane(action="things")
+rarcane(action="thing", id="abc123")
+rarcane(action="help")          # always available, no auth required
 
 ## Tier 2: CLI binary
 Use when MCP is unavailable but the binary is installed in $PATH.
 
-rustcane things [--json]
-rustcane thing <id> [--json]
-rustcane status
+rarcane things [--json]
+rarcane thing <id> [--json]
+rarcane status
 
-Env required: RUSTCANE_API_URL, RUSTCANE_API_KEY
+Env required: RARCANE_API_URL, RARCANE_API_KEY
 
 ## Tier 3: Direct API (last resort)
 Use when neither MCP nor CLI is available.
 
-curl -H "Authorization: Bearer $RUSTCANE_API_KEY" \
-     "$RUSTCANE_API_URL/things"
+curl -H "Authorization: Bearer $RARCANE_API_KEY" \
+     "$RARCANE_API_URL/things"
 
 ## Gotchas
 - [service-specific pitfalls go here]
@@ -265,9 +265,9 @@ Keep version and metadata synchronized across:
 | File | Fields |
 | --- | --- |
 | `Cargo.toml` | package `version`, homepage/repository when present |
-| `plugins/rustcane/.claude-plugin/plugin.json` | identity, repository, user config; no `version` field |
-| `plugins/rustcane/.codex-plugin/plugin.json` | identity, repository, interface metadata; no `version` field |
-| `plugins/rustcane/gemini-extension.json` | identity, repository, settings |
+| `plugins/rarcane/.claude-plugin/plugin.json` | identity, repository, user config; no `version` field |
+| `plugins/rarcane/.codex-plugin/plugin.json` | identity, repository, interface metadata; no `version` field |
+| `plugins/rarcane/gemini-extension.json` | identity, repository, settings |
 | `server.json` | package version and registry metadata, when present |
 
 `Cargo.toml` is the canonical version source for this template. Use
@@ -281,11 +281,11 @@ The template should not claim write capability unless the MCP server has real wr
 
 When creating a real server from the template:
 
-1. Rename `rustcane`, `Arcane`, and `EXAMPLE` across plugin files.
+1. Rename `rarcane`, `Arcane`, and `EXAMPLE` across plugin files.
 2. Update all three manifests with the real repository, description, author, keywords, and capability claims.
 3. Keep credential names aligned across Claude `userConfig`, Codex shared `.mcp.json`, and Gemini `settings`.
-4. Replace upstream credential fields such as `example_api_url` and `example_api_key`.
-5. Update `plugins/rustcane/hooks/plugin-setup.sh` to map service-specific plugin options into env vars.
+4. Replace upstream credential fields such as `rarcane_api_url` and `rarcane_api_key`.
+5. Update `plugins/rarcane/hooks/plugin-setup.sh` to map service-specific plugin options into env vars.
 6. Implement `<binary> setup plugin-hook`, `--no-repair`, `check`, and `repair`.
 7. Update shared skill docs for the actual action surface.
 8. Replace Codex `defaultPrompt` entries with realistic prompts.

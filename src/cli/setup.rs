@@ -27,40 +27,40 @@ pub enum SetupCommand {
 }
 
 /// Translate Claude Code plugin options (`CLAUDE_PLUGIN_OPTION_*`) into the
-/// `RUSTCANE_*` process env vars the binary reads, before `Config::load()` runs.
+/// `RARCANE_*` process env vars the binary reads, before `Config::load()` runs.
 ///
 /// This replaces the former `plugin-setup.sh` wrapper: the binary now owns the
-/// env-var mapping itself, so the plugin hook calls the binary directly. rustcane
+/// env-var mapping itself, so the plugin hook calls the binary directly. rarcane
 /// is template-style — `Config::load()` runs before the setup command dispatches
 /// and `setup_check()` validates the pre-loaded `&Config` — so this MUST be
 /// called before `Config::load()` (hoisted in `run_cli`, gated to the plugin-hook
 /// path). Values containing newlines/CR are skipped, mirroring the script's
 /// `reject_unsafe_value` guard.
 ///
-/// No `CLAUDE_PLUGIN_DATA` → `RUSTCANE_HOME` mapping is needed: `setup_data_dir()`
-/// already reads `CLAUDE_PLUGIN_DATA` natively (the script's `RUSTCANE_HOME`
+/// No `CLAUDE_PLUGIN_DATA` → `RARCANE_HOME` mapping is needed: `setup_data_dir()`
+/// already reads `CLAUDE_PLUGIN_DATA` natively (the script's `RARCANE_HOME`
 /// re-export was redundant).
 pub fn apply_plugin_options() {
-    // CLAUDE_PLUGIN_OPTION_<OPT> -> <RUSTCANE_ENVVAR>
+    // CLAUDE_PLUGIN_OPTION_<OPT> -> <RARCANE_ENVVAR>
     let map = [
-        ("CLAUDE_PLUGIN_OPTION_API_TOKEN", "RUSTCANE_MCP_TOKEN"),
-        ("CLAUDE_PLUGIN_OPTION_SERVER_URL", "RUSTCANE_SERVER_URL"),
-        ("CLAUDE_PLUGIN_OPTION_RUSTCANE_API_URL", "RUSTCANE_API_URL"),
-        ("CLAUDE_PLUGIN_OPTION_RUSTCANE_API_KEY", "RUSTCANE_API_KEY"),
-        ("CLAUDE_PLUGIN_OPTION_AUTH_MODE", "RUSTCANE_MCP_AUTH_MODE"),
-        ("CLAUDE_PLUGIN_OPTION_NO_AUTH", "RUSTCANE_MCP_NO_AUTH"),
-        ("CLAUDE_PLUGIN_OPTION_PUBLIC_URL", "RUSTCANE_MCP_PUBLIC_URL"),
+        ("CLAUDE_PLUGIN_OPTION_API_TOKEN", "RARCANE_MCP_TOKEN"),
+        ("CLAUDE_PLUGIN_OPTION_SERVER_URL", "RARCANE_SERVER_URL"),
+        ("CLAUDE_PLUGIN_OPTION_RARCANE_API_URL", "RARCANE_API_URL"),
+        ("CLAUDE_PLUGIN_OPTION_RARCANE_API_KEY", "RARCANE_API_KEY"),
+        ("CLAUDE_PLUGIN_OPTION_AUTH_MODE", "RARCANE_MCP_AUTH_MODE"),
+        ("CLAUDE_PLUGIN_OPTION_NO_AUTH", "RARCANE_MCP_NO_AUTH"),
+        ("CLAUDE_PLUGIN_OPTION_PUBLIC_URL", "RARCANE_MCP_PUBLIC_URL"),
         (
             "CLAUDE_PLUGIN_OPTION_GOOGLE_CLIENT_ID",
-            "RUSTCANE_MCP_GOOGLE_CLIENT_ID",
+            "RARCANE_MCP_GOOGLE_CLIENT_ID",
         ),
         (
             "CLAUDE_PLUGIN_OPTION_GOOGLE_CLIENT_SECRET",
-            "RUSTCANE_MCP_GOOGLE_CLIENT_SECRET",
+            "RARCANE_MCP_GOOGLE_CLIENT_SECRET",
         ),
         (
             "CLAUDE_PLUGIN_OPTION_AUTH_ADMIN_EMAIL",
-            "RUSTCANE_MCP_AUTH_ADMIN_EMAIL",
+            "RARCANE_MCP_AUTH_ADMIN_EMAIL",
         ),
     ];
     for (opt, dest) in map {
@@ -228,16 +228,16 @@ fn setup_check(config: &Config, no_repair: bool) -> SetupReport {
             ),
         });
     }
-    if config.rustcane.api_url.is_empty() {
+    if config.rarcane.api_url.is_empty() {
         report.blocking_failures.push(SetupFailure {
-            code: "missing_example_api_url",
-            message: "RUSTCANE_API_URL is required".into(),
+            code: "missing_rarcane_api_url",
+            message: "RARCANE_API_URL is required".into(),
         });
     }
-    if config.rustcane.api_key.is_empty() {
+    if config.rarcane.api_key.is_empty() {
         report.blocking_failures.push(SetupFailure {
-            code: "missing_example_api_key",
-            message: "RUSTCANE_API_KEY is required".into(),
+            code: "missing_rarcane_api_key",
+            message: "RARCANE_API_KEY is required".into(),
         });
     }
 
@@ -295,30 +295,30 @@ fn check_auth(config: &Config, report: &mut SetupReport) {
             report,
             &config.mcp.auth.public_url,
             "missing_oauth_public_url",
-            "RUSTCANE_MCP_PUBLIC_URL is required for OAuth mode",
+            "RARCANE_MCP_PUBLIC_URL is required for OAuth mode",
         );
         require_oauth_field(
             report,
             &config.mcp.auth.google_client_id,
             "missing_oauth_client_id",
-            "RUSTCANE_MCP_GOOGLE_CLIENT_ID is required for OAuth mode",
+            "RARCANE_MCP_GOOGLE_CLIENT_ID is required for OAuth mode",
         );
         require_oauth_field(
             report,
             &config.mcp.auth.google_client_secret,
             "missing_oauth_client_secret",
-            "RUSTCANE_MCP_GOOGLE_CLIENT_SECRET is required for OAuth mode",
+            "RARCANE_MCP_GOOGLE_CLIENT_SECRET is required for OAuth mode",
         );
         require_oauth_field(
             report,
             &Some(config.mcp.auth.admin_email.clone()),
             "missing_oauth_admin_email",
-            "RUSTCANE_MCP_AUTH_ADMIN_EMAIL is required for OAuth mode",
+            "RARCANE_MCP_AUTH_ADMIN_EMAIL is required for OAuth mode",
         );
     } else if config.mcp.api_token.as_deref().unwrap_or("").is_empty() {
         report.blocking_failures.push(SetupFailure {
             code: "missing_mcp_token",
-            message: "RUSTCANE_MCP_TOKEN is required unless no_auth or OAuth mode is enabled"
+            message: "RARCANE_MCP_TOKEN is required unless no_auth or OAuth mode is enabled"
                 .into(),
         });
     }
@@ -334,12 +334,12 @@ fn check_port(host: &str, port: u16, report: &mut SetupReport) {
 }
 
 fn setup_data_dir() -> anyhow::Result<PathBuf> {
-    // L11: setup_data_dir uses CLAUDE_PLUGIN_DATA/RUSTCANE_HOME while Config::load
-    // searches ~/.rustcane/config.toml first. In the plugin context CLAUDE_PLUGIN_DATA
+    // L11: setup_data_dir uses CLAUDE_PLUGIN_DATA/RARCANE_HOME while Config::load
+    // searches ~/.rarcane/config.toml first. In the plugin context CLAUDE_PLUGIN_DATA
     // and the config search path should coincide, but they can diverge in non-standard
     // deployments. TEMPLATE: align these when adapting the template.
     if let Some(val) =
-        std::env::var_os("CLAUDE_PLUGIN_DATA").or_else(|| std::env::var_os("RUSTCANE_HOME"))
+        std::env::var_os("CLAUDE_PLUGIN_DATA").or_else(|| std::env::var_os("RARCANE_HOME"))
     {
         return Ok(PathBuf::from(val));
     }
@@ -348,30 +348,30 @@ fn setup_data_dir() -> anyhow::Result<PathBuf> {
 
 fn write_env(data_dir: &Path, config: &Config) -> Result<()> {
     let mut lines = vec![
-        dotenv_assignment("RUSTCANE_API_URL", &config.rustcane.api_url)?,
-        dotenv_assignment("RUSTCANE_API_KEY", &config.rustcane.api_key)?,
-        dotenv_assignment("RUSTCANE_MCP_HOST", &config.mcp.host)?,
-        dotenv_assignment("RUSTCANE_MCP_PORT", &config.mcp.port.to_string())?,
-        dotenv_assignment("RUSTCANE_MCP_NO_AUTH", &config.mcp.no_auth.to_string())?,
+        dotenv_assignment("RARCANE_API_URL", &config.rarcane.api_url)?,
+        dotenv_assignment("RARCANE_API_KEY", &config.rarcane.api_key)?,
+        dotenv_assignment("RARCANE_MCP_HOST", &config.mcp.host)?,
+        dotenv_assignment("RARCANE_MCP_PORT", &config.mcp.port.to_string())?,
+        dotenv_assignment("RARCANE_MCP_NO_AUTH", &config.mcp.no_auth.to_string())?,
     ];
 
     if let Some(token) = config.mcp.api_token.as_deref().filter(|v| !v.is_empty()) {
-        lines.push(dotenv_assignment("RUSTCANE_MCP_TOKEN", token)?);
+        lines.push(dotenv_assignment("RARCANE_MCP_TOKEN", token)?);
     }
     if config.mcp.auth.mode == AuthMode::OAuth {
-        lines.push("RUSTCANE_MCP_AUTH_MODE=oauth".into());
+        lines.push("RARCANE_MCP_AUTH_MODE=oauth".into());
         if let Some(v) = &config.mcp.auth.public_url {
-            lines.push(dotenv_assignment("RUSTCANE_MCP_PUBLIC_URL", v)?);
+            lines.push(dotenv_assignment("RARCANE_MCP_PUBLIC_URL", v)?);
         }
         if let Some(v) = &config.mcp.auth.google_client_id {
-            lines.push(dotenv_assignment("RUSTCANE_MCP_GOOGLE_CLIENT_ID", v)?);
+            lines.push(dotenv_assignment("RARCANE_MCP_GOOGLE_CLIENT_ID", v)?);
         }
         if let Some(v) = &config.mcp.auth.google_client_secret {
-            lines.push(dotenv_assignment("RUSTCANE_MCP_GOOGLE_CLIENT_SECRET", v)?);
+            lines.push(dotenv_assignment("RARCANE_MCP_GOOGLE_CLIENT_SECRET", v)?);
         }
         if !config.mcp.auth.admin_email.is_empty() {
             lines.push(dotenv_assignment(
-                "RUSTCANE_MCP_AUTH_ADMIN_EMAIL",
+                "RARCANE_MCP_AUTH_ADMIN_EMAIL",
                 &config.mcp.auth.admin_email,
             )?);
         }

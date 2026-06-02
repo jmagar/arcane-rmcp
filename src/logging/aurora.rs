@@ -16,7 +16,7 @@
 //! The values below match `lab/crates/lab/src/output/theme.rs` exactly.
 //! When adapting this template for your service, copy this file unchanged.
 //! The aurora palette is shared across the entire rmcp server family:
-//! unrust, rustify, rustifi, rustscale, apprise-mcp, and rustcane.
+//! unrust, rustify, rustifi, rustscale, apprise-mcp, and rarcane.
 //!
 //! # ANSI 256 vs TrueColor
 //!
@@ -36,7 +36,7 @@
 /// - The first word of every log message (the "action verb")
 /// - The `service` structured field value
 ///
-/// # Visual rustcane (approximate)
+/// # Visual rarcane (approximate)
 /// ```text
 /// HH:MM:SS  INFO  starting  bind=0.0.0.0:3000  auth=bearer
 ///           ────  ────────
@@ -51,7 +51,7 @@ pub const SERVICE_NAME: u8 = 211;
 /// Used for structured field values where the value identifies the
 /// primary action being taken:
 /// - `action=greet` → "greet" in blue
-/// - `tool=rustcane` → "rustcane" in blue
+/// - `tool=rarcane` → "rarcane" in blue
 /// - `route=/health` → "/health" in blue
 /// - `addr=0.0.0.0:3000` → "0.0.0.0:3000" in blue
 pub const ACCENT_PRIMARY: u8 = 39;

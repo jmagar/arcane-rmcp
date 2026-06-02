@@ -1,4 +1,4 @@
-//! `rustcane` library crate.
+//! `rarcane` library crate.
 //!
 //! Exposes the service layer, config, and transport client so that integration
 //! tests can import them without duplicating state construction.
@@ -72,7 +72,7 @@ pub mod testing {
         AppState {
             config: McpConfig {
                 auth: crate::config::AuthConfig {
-                    public_url: Some("https://rustcane.rustcane.com".to_string()),
+                    public_url: Some("https://rarcane.rarcane.com".to_string()),
                     ..Default::default()
                 },
                 ..McpConfig::default()
@@ -86,41 +86,41 @@ pub mod testing {
 
     pub async fn build_auth_state(data_dir: &std::path::Path) -> lab_auth::state::AuthState {
         let vars: Vec<(String, String)> = vec![
-            ("RUSTCANE_MCP_AUTH_MODE".into(), "oauth".into()),
+            ("RARCANE_MCP_AUTH_MODE".into(), "oauth".into()),
             (
-                "RUSTCANE_MCP_PUBLIC_URL".into(),
-                "https://rustcane.rustcane.com".into(),
+                "RARCANE_MCP_PUBLIC_URL".into(),
+                "https://rarcane.rarcane.com".into(),
             ),
             (
-                "RUSTCANE_MCP_GOOGLE_CLIENT_ID".into(),
+                "RARCANE_MCP_GOOGLE_CLIENT_ID".into(),
                 "test-client-id".into(),
             ),
             (
-                "RUSTCANE_MCP_GOOGLE_CLIENT_SECRET".into(),
+                "RARCANE_MCP_GOOGLE_CLIENT_SECRET".into(),
                 "test-client-secret".into(),
             ),
             (
-                "RUSTCANE_MCP_AUTH_ADMIN_EMAIL".into(),
-                "admin@rustcane.com".into(),
+                "RARCANE_MCP_AUTH_ADMIN_EMAIL".into(),
+                "admin@rarcane.com".into(),
             ),
             (
-                "RUSTCANE_MCP_AUTH_SQLITE_PATH".into(),
+                "RARCANE_MCP_AUTH_SQLITE_PATH".into(),
                 data_dir.join("auth.db").display().to_string(),
             ),
             (
-                "RUSTCANE_MCP_AUTH_KEY_PATH".into(),
+                "RARCANE_MCP_AUTH_KEY_PATH".into(),
                 data_dir.join("auth-jwt.pem").display().to_string(),
             ),
         ];
 
         let auth_config = lab_auth::config::AuthConfigBuilder::new()
-            .env_prefix("RUSTCANE_MCP")
+            .env_prefix("RARCANE_MCP")
             .session_cookie_name("example_mcp_session")
             .scopes_supported(vec![
                 crate::actions::READ_SCOPE.into(),
                 crate::actions::WRITE_SCOPE.into(),
             ])
-            .default_scope("rustcane:read")
+            .default_scope("rarcane:read")
             .resource_path("/mcp")
             .build_from_sources(vars)
             .expect("test auth config should build");

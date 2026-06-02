@@ -73,7 +73,7 @@ fn unknown_action_gets_deny_scope() {
 fn unknown_action_is_rejected_as_validation_before_scope() {
     let error = reject_unknown_action_before_scope("nonexistent_action")
         .expect_err("unknown action should be invalid params");
-    assert!(error.message.contains("unknown rustcane action"));
+    assert!(error.message.contains("unknown rarcane action"));
 }
 
 #[test]

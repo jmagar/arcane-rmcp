@@ -2,7 +2,7 @@
 title: "Testing"
 doc_type: "guide"
 status: "active"
-owner: "rustcane"
+owner: "rarcane"
 audience:
   - "contributors"
   - "agents"
@@ -113,7 +113,7 @@ use example_mcp::testing::loopback_state;
 #[tokio::test]
 async fn help_returns_help_key() {
     let state = loopback_state();
-    let result = execute_tool(&state, "rustcane", json!({"action": "help"})).await.unwrap();
+    let result = execute_tool(&state, "rarcane", json!({"action": "help"})).await.unwrap();
     assert!(result.get("help").is_some());
     assert!(!result["help"].as_str().unwrap().is_empty());
 }
@@ -130,18 +130,18 @@ just test-mcporter
 The mcporter harness validates tools and resources against a running server. It logs calls to `/tmp/test-mcp.<timestamp>.log`.
 
 The test script validates:
-- auth rejection when `RUSTCANE_MCP_TOKEN` is set
+- auth rejection when `RARCANE_MCP_TOKEN` is set
 - tool semantic behavior for `greet`, `echo`, `status`, and `help`
-- MCP resource behavior for `rustcane://schema/mcp-tool`
+- MCP resource behavior for `rarcane://schema/mcp-tool`
 
 Use semantic assertions, not liveness-only checks:
 
 ```bash
 # Bad test — only proves MCP responded
-run_test "server info" "rustcane" '{"action":"status"}'
+run_test "server info" "rarcane" '{"action":"status"}'
 
 # Good test — proves the service actually returned real data
-run_test "status has version" "rustcane" '{"action":"status"}' "version"
+run_test "status has version" "rarcane" '{"action":"status"}' "version"
 ```
 
 ## Template checks

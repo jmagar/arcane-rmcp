@@ -28,7 +28,7 @@
 //! BEFORE constructing the `CallToolResult`. Arcane:
 //!
 //! ```rust,ignore
-//! use rustcane::token_limit;
+//! use rarcane::token_limit;
 //!
 //! let result = state.service.list_things(limit, offset).await?;
 //! let text = serde_json::to_string_pretty(&result)?;

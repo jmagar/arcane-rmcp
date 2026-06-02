@@ -96,5 +96,5 @@ fn doctor_and_setup_still_parse() {
 
 #[test]
 fn usage_mentions_call() {
-    assert!(usage().contains("rustcane call --action"));
+    assert!(usage().contains("rarcane call --action"));
 }
