@@ -93,8 +93,10 @@ SERVERS = [
     Server(
         "rustcane",
         ROOT,
-        "rustcane",
-        "plugins/rustcane/hooks/plugin-setup.sh",
+        "rarcane",
+        # Hook calls the binary directly now (no plugin-setup.sh wrapper); the
+        # env-var mapping lives in apply_plugin_options() in src/cli/setup.rs.
+        None,
         env=(
             ("RUSTCANE_API_URL", "https://api.rustcane.test"),
             ("RUSTCANE_API_KEY", "test-key"),

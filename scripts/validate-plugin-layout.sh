@@ -80,8 +80,8 @@ check "MCP Authorization header uses api_token" "jq -er '.mcpServers.rustcane.he
 
 check "hooks config exists" "test -f '${HOOKS_JSON}'"
 check "hooks config is valid JSON" "jq empty '${HOOKS_JSON}'"
-check "SessionStart runs plugin setup" "jq -er '.hooks.SessionStart[]?.hooks[]?.command == \"\${CLAUDE_PLUGIN_ROOT}/hooks/plugin-setup.sh\"' '${HOOKS_JSON}'"
-check "ConfigChange runs plugin setup" "jq -er '.hooks.ConfigChange[]? | select(.matcher == \"user_settings\") | .hooks[]?.command == \"\${CLAUDE_PLUGIN_ROOT}/hooks/plugin-setup.sh\"' '${HOOKS_JSON}'"
+check "SessionStart runs plugin setup" "jq -er '.hooks.SessionStart[]?.hooks[]?.command == \"\${CLAUDE_PLUGIN_ROOT}/bin/rarcane setup plugin-hook\"' '${HOOKS_JSON}'"
+check "ConfigChange runs plugin setup" "jq -er '.hooks.ConfigChange[]? | select(.matcher == \"user_settings\") | .hooks[]?.command == \"\${CLAUDE_PLUGIN_ROOT}/bin/rarcane setup plugin-hook\"' '${HOOKS_JSON}'"
 
 check "skills directory exists" "test -d '${SKILLS_DIR}'"
 

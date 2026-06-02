@@ -26,6 +26,55 @@ pub enum SetupCommand {
     PluginHook { no_repair: bool },
 }
 
+/// Translate Claude Code plugin options (`CLAUDE_PLUGIN_OPTION_*`) into the
+/// `RUSTCANE_*` process env vars the binary reads, before `Config::load()` runs.
+///
+/// This replaces the former `plugin-setup.sh` wrapper: the binary now owns the
+/// env-var mapping itself, so the plugin hook calls the binary directly. rustcane
+/// is template-style — `Config::load()` runs before the setup command dispatches
+/// and `setup_check()` validates the pre-loaded `&Config` — so this MUST be
+/// called before `Config::load()` (hoisted in `run_cli`, gated to the plugin-hook
+/// path). Values containing newlines/CR are skipped, mirroring the script's
+/// `reject_unsafe_value` guard.
+///
+/// No `CLAUDE_PLUGIN_DATA` → `RUSTCANE_HOME` mapping is needed: `setup_data_dir()`
+/// already reads `CLAUDE_PLUGIN_DATA` natively (the script's `RUSTCANE_HOME`
+/// re-export was redundant).
+pub fn apply_plugin_options() {
+    // CLAUDE_PLUGIN_OPTION_<OPT> -> <RUSTCANE_ENVVAR>
+    let map = [
+        ("CLAUDE_PLUGIN_OPTION_API_TOKEN", "RUSTCANE_MCP_TOKEN"),
+        ("CLAUDE_PLUGIN_OPTION_SERVER_URL", "RUSTCANE_SERVER_URL"),
+        ("CLAUDE_PLUGIN_OPTION_RUSTCANE_API_URL", "RUSTCANE_API_URL"),
+        ("CLAUDE_PLUGIN_OPTION_RUSTCANE_API_KEY", "RUSTCANE_API_KEY"),
+        ("CLAUDE_PLUGIN_OPTION_AUTH_MODE", "RUSTCANE_MCP_AUTH_MODE"),
+        ("CLAUDE_PLUGIN_OPTION_NO_AUTH", "RUSTCANE_MCP_NO_AUTH"),
+        ("CLAUDE_PLUGIN_OPTION_PUBLIC_URL", "RUSTCANE_MCP_PUBLIC_URL"),
+        (
+            "CLAUDE_PLUGIN_OPTION_GOOGLE_CLIENT_ID",
+            "RUSTCANE_MCP_GOOGLE_CLIENT_ID",
+        ),
+        (
+            "CLAUDE_PLUGIN_OPTION_GOOGLE_CLIENT_SECRET",
+            "RUSTCANE_MCP_GOOGLE_CLIENT_SECRET",
+        ),
+        (
+            "CLAUDE_PLUGIN_OPTION_AUTH_ADMIN_EMAIL",
+            "RUSTCANE_MCP_AUTH_ADMIN_EMAIL",
+        ),
+    ];
+    for (opt, dest) in map {
+        if let Some(v) = std::env::var_os(opt) {
+            let s = v.to_string_lossy();
+            if s.is_empty() || s.contains('\n') || s.contains('\r') {
+                continue;
+            }
+            // edition 2021: set_var is safe (no unsafe block required).
+            std::env::set_var(dest, v);
+        }
+    }
+}
+
 pub async fn run_setup(config: &Config, command: SetupCommand) -> Result<()> {
     let report = match command {
         SetupCommand::Check => setup_check(config, true),

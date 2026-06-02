@@ -118,8 +118,18 @@ async fn serve_stdio_mcp() -> Result<()> {
 
 /// Dispatch CLI subcommands.
 async fn run_cli() -> Result<()> {
+    let parsed = cli::parse_args()?;
+    // Translate CLAUDE_PLUGIN_OPTION_* into RUSTCANE_* env vars BEFORE Config::load()
+    // so the plugin hook can call the binary directly (no plugin-setup.sh wrapper).
+    // rustcane is template-style: setup_check validates the pre-loaded &Config.
+    if matches!(
+        parsed,
+        Some(cli::Command::Setup(cli::SetupCommand::PluginHook { .. }))
+    ) {
+        cli::apply_plugin_options();
+    }
     let config = Config::load()?;
-    match cli::parse_args()? {
+    match parsed {
         Some(cli::Command::Doctor { json }) => {
             // Doctor needs the full Config (not just ArcaneConfig) to check
             // MCP port, auth mode, etc. — intercept here before service construction.

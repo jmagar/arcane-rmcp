@@ -23,7 +23,6 @@ fn plugin_manifests_exist_for_all_supported_hosts() {
         "plugins/rustcane/gemini-extension.json",
         "plugins/rustcane/.mcp.json",
         "plugins/rustcane/hooks/hooks.json",
-        "plugins/rustcane/hooks/plugin-setup.sh",
         "plugins/rustcane/skills/rustcane/SKILL.md",
     ] {
         assert!(std::path::Path::new(path).exists(), "{path} should exist");
@@ -104,31 +103,14 @@ fn plugin_manifests_share_identity_and_connection_settings() {
 }
 
 #[test]
-fn claude_hooks_delegate_to_plugin_setup_script() {
+fn claude_hooks_call_binary_setup_plugin_hook_directly() {
     let hooks = json("plugins/rustcane/hooks/hooks.json");
     for hook_name in ["SessionStart", "ConfigChange"] {
         let command = hooks["hooks"][hook_name][0]["hooks"][0]["command"]
             .as_str()
             .unwrap();
-        assert_eq!(command, "${CLAUDE_PLUGIN_ROOT}/hooks/plugin-setup.sh");
+        assert_eq!(command, "${CLAUDE_PLUGIN_ROOT}/bin/rarcane setup plugin-hook");
     }
-}
-
-#[test]
-fn plugin_setup_delegates_to_binary_owned_hook_command() {
-    let setup = read("plugins/rustcane/hooks/plugin-setup.sh");
-    assert!(
-        setup.contains("rustcane setup plugin-hook"),
-        "plugin setup should delegate to the binary-owned hook command"
-    );
-    assert!(
-        !setup.contains("systemctl --user"),
-        "plugin setup should not own systemd orchestration"
-    );
-    assert!(
-        !setup.contains("docker compose"),
-        "plugin setup should not own Docker orchestration"
-    );
 }
 
 #[test]
@@ -146,7 +128,7 @@ fn plugin_hook_standard_is_documented() {
 }
 
 fn example_bin() -> &'static str {
-    env!("CARGO_BIN_EXE_rustcane")
+    env!("CARGO_BIN_EXE_rarcane")
 }
 
 fn setup_command(data_dir: &std::path::Path) -> Command {
@@ -160,6 +142,49 @@ fn setup_command(data_dir: &std::path::Path) -> Command {
         .env("RUSTCANE_MCP_PORT", "0")
         .env("RUSTCANE_MCP_TOKEN", "mcp-secret");
     cmd
+}
+
+/// The hook calls the binary directly now, so `apply_plugin_options()` (run
+/// before `Config::load()`) must map `CLAUDE_PLUGIN_OPTION_*` into the binary's
+/// `RUSTCANE_*` env vars. Supplying the credentials only via plugin options
+/// makes the `missing_example_api_url` / `missing_example_api_key` blocking
+/// failures disappear — proving the mapping reaches the loaded config.
+#[test]
+fn plugin_hook_maps_plugin_options_into_env() {
+    let dir = tempdir().unwrap();
+    let mut cmd = Command::new(example_bin());
+    cmd.env_clear()
+        .env("HOME", dir.path())
+        .env("PATH", std::env::var("PATH").unwrap_or_default())
+        .env("CLAUDE_PLUGIN_DATA", dir.path())
+        .env("RUSTCANE_MCP_PORT", "0")
+        // Supply credentials only via plugin options, not RUSTCANE_* directly.
+        .env(
+            "CLAUDE_PLUGIN_OPTION_RUSTCANE_API_URL",
+            "https://api.rustcane.test",
+        )
+        .env("CLAUDE_PLUGIN_OPTION_RUSTCANE_API_KEY", "rustcane-secret")
+        .env("CLAUDE_PLUGIN_OPTION_API_TOKEN", "mcp-secret");
+    let output = cmd
+        .args(["setup", "plugin-hook", "--no-repair"])
+        .output()
+        .unwrap();
+
+    let json: Value = serde_json::from_slice(&output.stdout).unwrap();
+    let blocking: Vec<String> = json["blocking_failures"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|f| f["code"].as_str().unwrap_or_default().to_string())
+        .collect();
+    assert!(
+        !blocking.contains(&"missing_example_api_url".to_string()),
+        "API URL option should map into RUSTCANE_API_URL; blocking: {blocking:?}"
+    );
+    assert!(
+        !blocking.contains(&"missing_example_api_key".to_string()),
+        "API key option should map into RUSTCANE_API_KEY; blocking: {blocking:?}"
+    );
 }
 
 #[test]

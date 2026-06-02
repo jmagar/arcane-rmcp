@@ -240,31 +240,24 @@ pub(super) fn plugins(reporter: &mut PatternReporter) {
         reporter.fail("plugins", failures.join("; "));
     }
 
-    let hook_path = Path::new("plugins/rustcane/hooks/plugin-setup.sh");
+    let hook_path = Path::new("plugins/rustcane/hooks/hooks.json");
     if hook_path.exists() {
-        let hook = read_file("plugins/rustcane/hooks/plugin-setup.sh");
-        let forbidden = ["docker compose", "systemctl"]
-            .iter()
-            .copied()
-            .filter(|token| hook.contains(token))
-            .collect::<Vec<_>>();
-        if !hook.contains("rustcane setup plugin-hook \"$@\"") {
+        let hook = read_file("plugins/rustcane/hooks/hooks.json");
+        // The hook must call the binary directly (no plugin-setup.sh wrapper).
+        if hook.contains("plugin-setup.sh") {
             reporter.fail(
                 "plugins",
-                "rustcane hook must delegate to `rustcane setup plugin-hook \"$@\"`",
+                "hooks.json must not reference the removed plugin-setup.sh wrapper",
             );
-        } else if !forbidden.is_empty() {
+        } else if !hook.contains("/bin/rarcane setup plugin-hook") {
             reporter.fail(
                 "plugins",
-                format!(
-                    "rustcane hook contains forbidden bootstrap token(s): {}",
-                    forbidden.join(", ")
-                ),
+                "hooks.json must call `${CLAUDE_PLUGIN_ROOT}/bin/rarcane setup plugin-hook` directly",
             );
         } else {
             reporter.ok(
                 "plugins",
-                "plugin setup hook is a thin binary-owned adapter",
+                "plugin hooks call the binary's setup plugin-hook directly",
             );
         }
     }
