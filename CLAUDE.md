@@ -4,6 +4,15 @@
 
 A reusable Rust template for building MCP servers with the rmcp crate. The binary is named `rarcane`. All stub identifiers (`Arcane*`, `RARCANE_*`) are renamed when the template is used for a real service.
 
+## Long-Lived Branches
+
+- `marketplace-no-mcp` is an intentional long-lived marketplace variant branch,
+  not stale cleanup. It keeps the rarcane plugin/skill surface available while
+  removing bundled MCP server registration for environments where the MCP server
+  is already connected through the Labby gateway.
+- Do not merge `marketplace-no-mcp` into `main` by default, and do not delete it
+  as stale unless Jacob explicitly retires the no-MCP marketplace variant.
+
 ## Module map
 
 | File | Role |
