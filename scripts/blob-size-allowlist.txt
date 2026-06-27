@@ -4,6 +4,3 @@
 # Examples:
 # bin/rarcane
 # docs/references/**/*.md
-
-# Plugin build embeds a platform binary for plugin distribution.
-plugins/rarcane/bin/*

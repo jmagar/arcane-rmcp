@@ -30,15 +30,15 @@ When changing user-configurable settings, update all three manifests: `userConfi
 
 ## Monitors (Claude Code v2.1.105+)
 
-`monitors/monitors.json` runs `rarcane watch` from `${CLAUDE_PLUGIN_ROOT}/bin/rarcane`. The binary must exist at that path before the plugin is installed. Populate it with:
-
-```bash
-just install   # cargo build --release, then copies to plugins/rarcane/bin/rarcane
-```
+`monitors/monitors.json` runs `scripts/watch.sh`, which delegates to an installed
+`rarcane` on PATH. Plugin monitors must not assume a bundled binary in the
+plugin directory.
 
 The monitor command uses `${user_config.server_url}` substitution — this is resolved at runtime from the user's plugin settings. Do not hardcode URLs in `monitors.json`.
 
-When adding a new monitor: add an entry to `monitors.json` and reference only `${CLAUDE_PLUGIN_ROOT}/bin/rarcane` or scripts under `${CLAUDE_PLUGIN_ROOT}/scripts/`. Do not reference bare binary names that depend on PATH — the monitor may start before `plugin-setup.sh` has run.
+When adding a new monitor: add an entry to `monitors.json` and reference only
+scripts under `${CLAUDE_PLUGIN_ROOT}/scripts/`; those scripts should resolve the
+runtime binary from PATH and exit non-blocking when it is unavailable.
 
 ## Updating the skill
 
