@@ -4,6 +4,7 @@ set -euo pipefail
 REPO="${ARCANE_RMCP_REPO:-jmagar/arcane-rmcp}"
 INSTALL_DIR="${INSTALL_DIR:-${HOME}/.local/bin}"
 VERSION="${ARCANE_RMCP_VERSION:-latest}"
+RELEASE_BASE_URL="${ARCANE_RMCP_RELEASE_BASE_URL:-}"
 BINARY_NAME="rarcane"
 
 usage() {
@@ -59,7 +60,9 @@ asset="$(target_asset)"
 tmpdir="$(mktemp -d)"
 trap 'rm -rf "${tmpdir}"' EXIT
 
-if [[ "${VERSION}" == "latest" ]]; then
+if [[ -n "${RELEASE_BASE_URL}" ]]; then
+  url="${RELEASE_BASE_URL%/}/${VERSION}/${asset}"
+elif [[ "${VERSION}" == "latest" ]]; then
   url="https://github.com/${REPO}/releases/latest/download/${asset}"
 else
   url="https://github.com/${REPO}/releases/download/${VERSION}/${asset}"
