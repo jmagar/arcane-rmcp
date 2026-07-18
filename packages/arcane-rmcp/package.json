@@ -57,5 +57,8 @@
   "author": {
     "name": "dinglebear.ai",
     "url": "https://dinglebear.ai"
+  },
+  "devDependencies": {
+    "jsonpath-plus": "^10.3.0"
   }
 }

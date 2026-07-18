@@ -36,12 +36,16 @@ jobs:
       - id: meta
         name: Resolve draft release
         shell: bash
+        env:
+          TAG_NAME: ${{ inputs.tag_name }}
+          SOURCE_REF: ${{ inputs.source_ref }}
         run: |
           set -euo pipefail
-          tag="${{ inputs.tag_name }}"
-          source_ref="${{ inputs.source_ref }}"
+          tag="$TAG_NAME"
+          source_ref="$SOURCE_REF"
           test -n "$tag" || { echo "::error::tag_name is required"; exit 1; }
           test -n "$source_ref" || { echo "::error::source_ref is required"; exit 1; }
+          [[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([+-][0-9A-Za-z.-]+)?$ ]] || { echo "::error::tag_name must be a semantic version tag"; exit 1; }
           [[ "$source_ref" =~ ^[0-9a-f]{40}$ ]] || { echo "::error::source_ref must be a full commit SHA"; exit 1; }
           {
             echo "tag_name=${tag}"
@@ -154,6 +158,9 @@ jobs:
         with:
           path: dist/release-assets
           merge-multiple: true
+      - name: Install npm test dependencies
+        if: ${{ hashFiles('packages/arcane-rmcp/package-lock.json') != '' }}
+        run: npm ci --ignore-scripts --prefix packages/arcane-rmcp
       - name: Verify npm package version matches release tag
         id: npm-version
         shell: bash

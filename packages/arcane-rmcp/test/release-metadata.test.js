@@ -4,6 +4,7 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
+const { JSONPath } = require("jsonpath-plus");
 
 const repoRoot = path.resolve(__dirname, "..", "..", "..");
 
@@ -14,21 +15,22 @@ test("release-please paths cover and transform every published version", () => {
     .filter((entry) => entry && entry.type === "json" && entry.path === "server.json")
     .map((entry) => entry.jsonpath);
   const next = "9.9.9";
+  const versionPattern = /\d+\.\d+\.\d+(?:-[\w.]+)?(?:\+[-\w.]+)?/;
 
   for (const jsonpath of paths) {
-    if (jsonpath === "$.version") {
-      server.version = next;
-    } else if (jsonpath === "$.packages[?(@.identifier == 'arcane-rmcp')].version") {
-      const target = server.packages.find((entry) => entry.identifier === "arcane-rmcp");
-      assert.ok(target, "semantic package selector must resolve a live target");
-      target.version = next;
-    } else if (jsonpath.endsWith(".distribution.npm")) {
-      server._meta["io.modelcontextprotocol.registry/publisher-provided"].distribution.npm = `arcane-rmcp@${next}`;
-    } else if (jsonpath.endsWith(".buildInfo.version")) {
-      server._meta["io.modelcontextprotocol.registry/publisher-provided"].buildInfo.version = next;
-    } else {
-      assert.fail(`unrecognized release metadata path: ${jsonpath}`);
-    }
+    let matches = 0;
+    JSONPath({
+      resultType: "all",
+      path: jsonpath,
+      json: server,
+      callback(payload) {
+        matches += 1;
+        assert.equal(typeof payload.value, "string", `${jsonpath} must select a string`);
+        assert.match(payload.value, versionPattern, `${jsonpath} must select a versioned value`);
+        payload.parent[payload.parentProperty] = payload.value.replace(versionPattern, next);
+      },
+    });
+    assert.equal(matches, 1, `${jsonpath} must resolve exactly one live target`);
   }
 
   const publisher = server._meta["io.modelcontextprotocol.registry/publisher-provided"];
