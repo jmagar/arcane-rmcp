@@ -151,6 +151,7 @@ template-features:
 template-check:
     just patterns-check
     just validate-plugin
+    just test-marketplace-no-mcp
     just schema-docs-check
     just scaffold-contract-check
     just template-features
@@ -344,6 +345,16 @@ install-local: build-release
 # Validate all plugin manifests, MCP config, hooks, and skills
 validate-plugin:
     bash scripts/validate-plugin-layout.sh
+
+# Build the plugin/skill-only marketplace artifact for gateway-managed MCP environments
+marketplace-no-mcp:
+    python3 scripts/build-no-mcp-marketplace.py
+    bash scripts/validate-no-mcp-marketplace.sh
+
+# Verify no-MCP artifact generation, validation, determinism, and overwrite safety
+test-marketplace-no-mcp:
+    bash scripts/validate-plugin-layout.sh
+    bash scripts/test-no-mcp-marketplace.sh
 
 # Validate all plugin skills have required SKILL.md fields
 validate-skills: validate-plugin

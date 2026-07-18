@@ -32,6 +32,27 @@ plugins/rarcane/
 
 When adapting the template, rename `rarcane`, `Arcane`, and `EXAMPLE` consistently across the package, then update host-specific display text and credentials.
 
+## Gateway-managed marketplace artifact
+
+Some marketplaces need the plugin, skills, hooks, and settings without registering
+another MCP server because the server is already connected through a shared gateway.
+Generate that variant from the canonical plugin tree instead of maintaining a copied
+tree:
+
+```bash
+just marketplace-no-mcp
+```
+
+The generated directory is `dist/marketplace-no-mcp/rarcane`. It omits both the
+current `.mcp.json` registration and the legacy `mcp.json` path, and removes the
+inline `mcpServers` object from the Gemini manifest. The generator preserves the
+remaining manifests, settings, hooks, skills, and instruction symlinks.
+
+Run `just test-marketplace-no-mcp` to validate the normal plugin, build the variant
+twice, verify identical output, and confirm the source plugin is unchanged. Generated
+directories contain a marker file and may be replaced by later runs; the generator
+refuses to replace an unmarked directory.
+
 ## Shared Contract
 
 Each plugin surface should agree on:

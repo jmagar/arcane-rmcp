@@ -18,6 +18,7 @@
 !crates/lab/src/dispatch/logs/*.rs
 /config.runtime.json
 /artifacts/
+/dist/
 backups/
 *.log
 *.pid
