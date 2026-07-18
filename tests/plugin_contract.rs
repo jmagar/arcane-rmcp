@@ -134,6 +134,7 @@ fn example_bin() -> &'static str {
 fn setup_command(data_dir: &std::path::Path) -> Command {
     let mut cmd = Command::new(example_bin());
     cmd.env_clear()
+        .current_dir(isolated_command_cwd(data_dir))
         .env("HOME", data_dir)
         .env("PATH", std::env::var("PATH").unwrap_or_default())
         .env("RARCANE_HOME", data_dir)
@@ -142,6 +143,20 @@ fn setup_command(data_dir: &std::path::Path) -> Command {
         .env("RARCANE_MCP_PORT", "0")
         .env("RARCANE_MCP_TOKEN", "mcp-secret");
     cmd
+}
+
+/// Run subprocess checks outside the repository so an ignored developer
+/// `config.toml` cannot leak into tests through Config's local-dev fallback.
+/// For repair tests the data directory may not exist yet, so use its existing
+/// temporary parent without creating the directory under test.
+fn isolated_command_cwd(data_dir: &std::path::Path) -> &std::path::Path {
+    if data_dir.is_dir() {
+        data_dir
+    } else {
+        data_dir
+            .parent()
+            .expect("test data directory should have a parent")
+    }
 }
 
 /// The hook calls the binary directly now, so `apply_plugin_options()` (run
@@ -154,6 +169,7 @@ fn plugin_hook_maps_plugin_options_into_env() {
     let dir = tempdir().unwrap();
     let mut cmd = Command::new(example_bin());
     cmd.env_clear()
+        .current_dir(isolated_command_cwd(dir.path()))
         .env("HOME", dir.path())
         .env("PATH", std::env::var("PATH").unwrap_or_default())
         .env("RARCANE_HOME", dir.path())
@@ -286,6 +302,7 @@ fn assert_env_file_mode(path: &std::path::Path) {
 fn oauth_setup_command(data_dir: &std::path::Path) -> Command {
     let mut cmd = Command::new(example_bin());
     cmd.env_clear()
+        .current_dir(isolated_command_cwd(data_dir))
         .env("HOME", data_dir)
         .env("PATH", std::env::var("PATH").unwrap_or_default())
         .env("RARCANE_HOME", data_dir)
