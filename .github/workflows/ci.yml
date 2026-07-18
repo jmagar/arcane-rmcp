@@ -142,6 +142,9 @@ jobs:
       - name: Validate plugin layout
         run: bash scripts/validate-plugin-layout.sh
 
+      - name: Validate no-MCP marketplace artifact
+        run: bash scripts/test-no-mcp-marketplace.sh
+
       - name: Check schema docs
         run: python3 scripts/check-schema-docs.py --check
 

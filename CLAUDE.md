@@ -12,6 +12,10 @@ A reusable Rust template for building MCP servers with the rmcp crate. The binar
   is already connected through the Labby gateway.
 - Do not merge `marketplace-no-mcp` into `main` by default, and do not delete it
   as stale unless Jacob explicitly retires the no-MCP marketplace variant.
+- `scripts/build-no-mcp-marketplace.py` is the reproducible source for new no-MCP
+  artifacts from `main`; validate its output with
+  `scripts/test-no-mcp-marketplace.sh`. Keep the branch until its marketplace
+  consumer has moved to generated artifacts.
 
 ## Module map
 
