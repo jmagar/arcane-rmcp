@@ -26,6 +26,11 @@ FROM rust:1.97-slim-bookworm@sha256:99e09cb2284e2ddbb73a995deee3e91783fd04d17760
 
 WORKDIR /app
 
+# Keep BuildKit caches architecture-specific. Multi-platform builds execute
+# these stages concurrently; shared locked cache IDs serialize the builds and
+# sharing target artifacts across architectures can corrupt the cache.
+ARG TARGETARCH
+
 # Install build dependencies.
 # pkg-config and libssl-dev are needed for openssl-sys (used by reqwest/lab-auth).
 # TEMPLATE: Add other system deps your crates need (e.g. libpq-dev for postgres).
@@ -45,9 +50,9 @@ RUN sed -i 's/, \"xtask\"//g; s/\"xtask\", //g; s/\"xtask\"//g' Cargo.toml
 
 # TEMPLATE: Replace "rarcane" cache IDs with your service name to avoid
 #           sharing cache with other projects on the same build host.
-RUN --mount=type=cache,id=rarcane-cargo-registry,target=/usr/local/cargo/registry,sharing=locked \
-    --mount=type=cache,id=rarcane-cargo-git,target=/usr/local/cargo/git,sharing=locked \
-    --mount=type=cache,id=rarcane-cargo-target,target=/app/target,sharing=locked \
+RUN --mount=type=cache,id=rarcane-cargo-registry-${TARGETARCH},target=/usr/local/cargo/registry,sharing=locked \
+    --mount=type=cache,id=rarcane-cargo-git-${TARGETARCH},target=/usr/local/cargo/git,sharing=locked \
+    --mount=type=cache,id=rarcane-cargo-target-${TARGETARCH},target=/app/target,sharing=locked \
     mkdir src && echo "fn main() {}" > src/main.rs && cargo build --release --locked -p rarcane && rm -rf src
 
 # ── Application build ─────────────────────────────────────────────────────────
@@ -55,9 +60,9 @@ RUN --mount=type=cache,id=rarcane-cargo-registry,target=/usr/local/cargo/registr
 # The `touch src/main.rs` forces Cargo to re-link even when timestamps haven't
 # changed (Docker layer caching can confuse Cargo's incremental build detection).
 COPY src/ src/
-RUN --mount=type=cache,id=rarcane-cargo-registry,target=/usr/local/cargo/registry,sharing=locked \
-    --mount=type=cache,id=rarcane-cargo-git,target=/usr/local/cargo/git,sharing=locked \
-    --mount=type=cache,id=rarcane-cargo-target,target=/app/target,sharing=locked \
+RUN --mount=type=cache,id=rarcane-cargo-registry-${TARGETARCH},target=/usr/local/cargo/registry,sharing=locked \
+    --mount=type=cache,id=rarcane-cargo-git-${TARGETARCH},target=/usr/local/cargo/git,sharing=locked \
+    --mount=type=cache,id=rarcane-cargo-target-${TARGETARCH},target=/app/target,sharing=locked \
     touch src/main.rs && cargo build --release --locked -p rarcane && \
     cp target/release/rarcane /usr/local/bin/rarcane
 
