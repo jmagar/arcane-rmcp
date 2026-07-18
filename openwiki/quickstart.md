@@ -15,28 +15,21 @@ This repository tracks source-of-truth documentation with OpenWiki. The canonica
 Use this page as the start point whenever you need to understand:
 
 - how OpenWiki runs automatically in CI, which is documented in [OpenWiki update workflow](./operations/openwiki-update-workflow.md),
-- contributor expectations for generated docs in `AGENTS.md` and `CLAUDE.md`, and
 - where to look after documentation-sensitive source changes.
 
 ## Core navigation
 
 - [Operations: OpenWiki update workflow](./operations/openwiki-update-workflow.md)
-- `AGENTS.md`
-- `CLAUDE.md`
 
 ## What changed recently
 
-The latest source change in this maintenance cycle is focused on OpenWiki automation:
-
-- `.github/workflows/openwiki-update.yml` now runs `openwiki code --update --print` with `OPENWIKI_PROVIDER=openrouter`, `OPENROUTER_API_KEY`, and `OPENWIKI_MODEL_ID=z-ai/glm-5.2`, and drops the prior preflight API/Tailscale network assumptions.
-- The same workflow now asks the update PR to include `openwiki`, `AGENTS.md`, `CLAUDE.md`, and `.github/workflows/openwiki-update.yml` in generated updates.
-- `AGENTS.md` and `CLAUDE.md` were updated to route maintainers toward [`openwiki/quickstart.md`](./quickstart.md) as the recurring doc entrypoint.
+The current workflow connects to the private OpenAI-compatible API over Tailscale, verifies its `/models` endpoint, and runs `openwiki --update --print` with the `gpt-5.3-codex-spark` model. Generated pull requests include only the `openwiki` directory.
 
 ## Practical workflow for maintainers
 
 When these source files change, keep edits scoped to the docs pages they affect: update the **OpenWiki operation playbook** rather than broad files.
 
-For any future edit to a file that changes OpenWiki behavior (for example `.github/workflows/openwiki-update.yml`, `AGENTS.md`, or `CLAUDE.md`), review [the related operation doc](./operations/openwiki-update-workflow.md) and only refresh the directly affected sections.
+For any future edit to `.github/workflows/openwiki-update.yml`, review [the related operation doc](./operations/openwiki-update-workflow.md) and refresh the directly affected sections.
 
 ## Backlog
 
