@@ -9,6 +9,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
                Format: ## [X.Y.Z] — YYYY-MM-DD
                Use Added / Changed / Deprecated / Removed / Fixed / Security headers. -->
 
+## [0.5.0](https://github.com/jmagar/arcane-rmcp/compare/v0.4.4...v0.5.0) (2026-07-18)
+
+
+### Added
+
+* align arcane npm launcher naming ([3f44bec](https://github.com/jmagar/arcane-rmcp/commit/3f44becf93eaa8ebb8b7892225e5172ecc58acf2))
+
+
+### Fixed
+
+* address lavra review findings ([56d53d8](https://github.com/jmagar/arcane-rmcp/commit/56d53d84156839c15659d985209785c4c54dbac7))
+* **ci:** allow cold multi-arch image builds ([061b30b](https://github.com/jmagar/arcane-rmcp/commit/061b30bc10f6d1176672333830f450f2e721775e))
+* **ci:** repair invalid action pins ([5115543](https://github.com/jmagar/arcane-rmcp/commit/511554333f5b40f81e5937e192c2eb60f689d993))
+* **ci:** switch OpenWiki to local openai-compatible proxy ([6f557a3](https://github.com/jmagar/arcane-rmcp/commit/6f557a3dcf460cda5d12b21390f8963aa225baea))
+* **ci:** upgrade Trivy scanner action ([eddf4ca](https://github.com/jmagar/arcane-rmcp/commit/eddf4ca44fc72e73e57f6bfa43a5a092c1908294))
+* **docker:** isolate multi-arch cargo caches ([38e281a](https://github.com/jmagar/arcane-rmcp/commit/38e281a26476bf55a6f4b7b629a57a3cd2630784))
+* migrate MCP models to rmcp 2.2 ([a65ed85](https://github.com/jmagar/arcane-rmcp/commit/a65ed8532baf070f77180c6b9f4416fd2bf72a2d))
+* **release:** install Windows archive tool ([16d5873](https://github.com/jmagar/arcane-rmcp/commit/16d58738cc2db3137de2303bfbdebe6f85fc6e6d))
+* **release:** install Windows archive tool ([5e969ef](https://github.com/jmagar/arcane-rmcp/commit/5e969ef6fc87123e5d87006844f12824485ff4e4))
+* **release:** install Windows assembler ([361f045](https://github.com/jmagar/arcane-rmcp/commit/361f0458ca438df50606af92f451d1ee446028ee))
+* **release:** make draft publishing source-safe ([edc7380](https://github.com/jmagar/arcane-rmcp/commit/edc7380dd567de9c0ad6dbc392d560d62096c72f))
+* **release:** synchronize npm lock metadata ([ccaec69](https://github.com/jmagar/arcane-rmcp/commit/ccaec69112093da8166bf8a39f6384ad60911e63))
+* **release:** synchronize server registry metadata ([fdbe902](https://github.com/jmagar/arcane-rmcp/commit/fdbe90219a227e38392f140e88ff3756c711d4f9))
+* **release:** use draft owner token ([e07a3a2](https://github.com/jmagar/arcane-rmcp/commit/e07a3a2d54e001ee7470cdef5ffb3e399d63ba64))
+* **release:** use draft owner token ([0809d14](https://github.com/jmagar/arcane-rmcp/commit/0809d142ddbb8c3ad6bcf1c971f69c7659a48892))
+* remediate comprehensive repository review ([de496d1](https://github.com/jmagar/arcane-rmcp/commit/de496d104a632feedcec0818256ac9fa698f94a3))
+* remediate comprehensive review findings ([5e6398d](https://github.com/jmagar/arcane-rmcp/commit/5e6398d96560c8f498e42059cc937447d32aef92))
+* route rust builds through sccache wrapper ([e9ceeb1](https://github.com/jmagar/arcane-rmcp/commit/e9ceeb17e59d45a512ae66c7d930a63d86cacc14))
+* update vulnerable cmov dependency ([b6bda37](https://github.com/jmagar/arcane-rmcp/commit/b6bda37a9457ee34c6e2b579902189214fa4a7a0))
+* validate staged npm release assets ([1c5a787](https://github.com/jmagar/arcane-rmcp/commit/1c5a7877f26278b404168520ae00d662de698e2b))
+
 ## [0.4.4](https://github.com/jmagar/arcane-rmcp/compare/v0.4.3...v0.4.4) (2026-07-18)
 
 
