@@ -84,7 +84,10 @@ jobs:
           targets: ${{ matrix.target }}
       - name: Install pinned cross toolchain
         if: matrix.target == 'x86_64-pc-windows-msvc'
-        run: cargo install cargo-xwin --version 0.23.0 --locked
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends --yes llvm
+          cargo install cargo-xwin --version 0.23.0 --locked
       - uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2.8.2
         with:
           key: ${{ matrix.target }}
