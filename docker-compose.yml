@@ -10,11 +10,11 @@
 #   docker compose down            # stop and remove containers
 # =============================================================================
 
-name: arcane-rmcp
+name: rarcane
 
 services:
   # TEMPLATE: Replace "arcane-rmcp" with your service name throughout this file.
-  arcane-rmcp:
+  rarcane:
     extends:
       file: docker-compose.prod.yml
       service: arcane-rmcp

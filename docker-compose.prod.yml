@@ -12,7 +12,7 @@
 #   RARCANE_*              -> your env var prefix
 # =============================================================================
 
-name: arcane-rmcp
+name: rarcane
 
 x-common-service: &common-service
   networks:
@@ -32,11 +32,11 @@ x-common-service: &common-service
       compress: "true"
 
 services:
-  arcane-rmcp:
+  rarcane:
     <<: *common-service
     # TEMPLATE: Replace with your image path.
-    image: ghcr.io/jmagar/arcane-rmcp:${RARCANE_MCP_VERSION:-latest}
-    container_name: arcane-rmcp
+    image: ghcr.io/jmagar/arcane-rmcp:latest
+    container_name: rarcane
     env_file:
       - path: .env
         required: false
@@ -67,7 +67,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 256M
+          memory: 2G
           cpus: '0.5'
 
 volumes:
