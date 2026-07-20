@@ -33,7 +33,7 @@ concurrency:
 
 jobs:
   release-meta:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, unraid]
     timeout-minutes: 5
     outputs:
       tag_name: ${{ steps.meta.outputs.tag_name }}
@@ -62,7 +62,7 @@ jobs:
 
   build:
     needs: release-meta
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, unraid]
     timeout-minutes: 60
     permissions:
       contents: read
@@ -132,7 +132,7 @@ jobs:
 
   stage-release-assets:
     needs: [release-meta, build]
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, unraid]
     timeout-minutes: 15
     permissions:
       contents: write
@@ -152,7 +152,7 @@ jobs:
 
   npm:
     needs: [release-meta, stage-release-assets]
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, unraid]
     timeout-minutes: 20
     permissions:
       contents: read
@@ -203,7 +203,7 @@ jobs:
 
   finalize-release:
     needs: [release-meta, npm]
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, unraid]
     timeout-minutes: 5
     permissions:
       contents: write

@@ -9,13 +9,13 @@ on:
     tags: ["v*"]
 
 env:
-  IMAGE_NAME: ghcr.io/jmagar/arcane-rmcp
+  IMAGE_NAME: ghcr.io/jmagar/rarcane
 
 jobs:
   ci-gate:
     name: Require successful CI
     if: ${{ github.event_name == 'push' || github.event.workflow_run.conclusion == 'success' }}
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, unraid]
     timeout-minutes: 20
     permissions:
       contents: read
@@ -30,7 +30,7 @@ jobs:
   scan:
     name: Build and scan image
     needs: ci-gate
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, unraid]
     timeout-minutes: 60
     permissions:
       contents: read
@@ -69,7 +69,7 @@ jobs:
   publish:
     name: Publish verified image
     needs: scan
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, unraid]
     # The ARM64 Rust release build runs under QEMU on GitHub's amd64 runner and
     # can exceed an hour from a cold cache. Keep a bounded but realistic limit.
     timeout-minutes: 90
