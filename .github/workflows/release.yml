@@ -31,6 +31,12 @@ concurrency:
   group: release-${{ inputs.tag_name }}
   cancel-in-progress: false
 
+env:
+  # REQUIRED under a compile wrapper (soldr/zccache).
+  CARGO_INCREMENTAL: "0"
+  # Persistent per-runner zccache compile store (replaces the old sccache dir).
+  SOLDR_CACHE_DIR: ${{ github.workspace }}/../.soldr-cache
+
 jobs:
   release-meta:
     runs-on: [self-hosted, unraid]
@@ -84,8 +90,8 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6.0.0
         with:
           ref: ${{ needs.release-meta.outputs.source_ref }}
-      - name: Install pinned Rust toolchain
-        uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4
+      - name: Install pinned Rust toolchain + soldr
+        uses: ./.github/actions/setup-rust-soldr
         with:
           toolchain: 1.96.0
           targets: ${{ matrix.target }}
@@ -95,9 +101,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install --no-install-recommends --yes llvm nasm
           cargo install cargo-xwin --version 0.23.0 --locked
-      - uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2.8.2
-        with:
-          key: ${{ matrix.target }}
       - name: Build Linux binary
         if: matrix.target == 'x86_64-unknown-linux-gnu'
         run: cargo build --release --locked --target ${{ matrix.target }} --bin rarcane

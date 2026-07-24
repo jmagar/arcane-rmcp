@@ -30,6 +30,10 @@ concurrency:
 env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
+  # REQUIRED under a compile wrapper (soldr/zccache).
+  CARGO_INCREMENTAL: "0"
+  # Persistent per-runner zccache compile store (replaces the old sccache dir).
+  SOLDR_CACHE_DIR: ${{ github.workspace }}/../.soldr-cache
 
 jobs:
   # ── fmt: cargo fmt --check ──────────────────────────────────────────────────
@@ -40,8 +44,8 @@ jobs:
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
-      - name: Install Rust (stable with rustfmt)
-        uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
+      - name: Install Rust + soldr
+        uses: ./.github/actions/setup-rust-soldr
         with:
           components: rustfmt
 
@@ -56,22 +60,10 @@ jobs:
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
-      - name: Install Rust (stable with clippy)
-        uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
+      - name: Install Rust + soldr
+        uses: ./.github/actions/setup-rust-soldr
         with:
           components: clippy
-
-      # Cache Cargo registry and build artifacts between runs.
-      # TEMPLATE: Change the cache key prefix from "rmcp-template" to your repo name.
-      - name: Cache Cargo
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ github.repository }}-clippy-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ github.repository }}-clippy-
 
       - name: cargo clippy -- -D warnings
         run: cargo clippy --all-targets -- -D warnings
@@ -84,19 +76,8 @@ jobs:
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
-      - name: Install Rust (stable)
-        uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
-
-      # TEMPLATE: Change cache key prefix from "rmcp-template" to your repo name.
-      - name: Cache Cargo
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ github.repository }}-test-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ github.repository }}-test-
+      - name: Install Rust + soldr
+        uses: ./.github/actions/setup-rust-soldr
 
       - name: Install cargo-nextest
         uses: taiki-e/install-action@95cc2373c3f00275e315c306e56fef1c7a8854c0 # cargo-nextest
@@ -130,8 +111,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install Rust (stable)
-        uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
+      - name: Install Rust + soldr
+        uses: ./.github/actions/setup-rust-soldr
 
       - name: Check PATTERNS.md contracts
         run: cargo xtask patterns
