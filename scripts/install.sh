@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO="${ARCANE_RMCP_REPO:-jmagar/arcane-rmcp}"
+REPO="${ARCANE_RMCP_REPO:-jmagar/rarcane}"
 INSTALL_DIR="${INSTALL_DIR:-${HOME}/.local/bin}"
 VERSION="${ARCANE_RMCP_VERSION:-latest}"
 RELEASE_BASE_URL="${ARCANE_RMCP_RELEASE_BASE_URL:-}"

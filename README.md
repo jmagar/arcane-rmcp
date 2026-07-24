@@ -84,7 +84,7 @@ registered as `rarcane`, but the tool clients call is `arcane`.
 | Path | Command | Best for | Notes |
 |---|---|---|---|
 | npm / npx | `npx -y arcane-rmcp --help` | Local MCP clients and quick trials. | Downloads the matching `rarcane` binary from GitHub Releases. |
-| Release installer | `curl -fsSL https://raw.githubusercontent.com/jmagar/arcane-rmcp/main/scripts/install.sh \| bash` | Host installs without Node. | Installs `rarcane` for the current Linux host. |
+| Release installer | `curl -fsSL https://raw.githubusercontent.com/jmagar/rarcane/main/scripts/install.sh \| bash` | Host installs without Node. | Installs `rarcane` for the current Linux host. |
 | Docker / Compose | `docker compose up -d` | Shared HTTP MCP deployments. | Reads `.env` and exposes container port `40110`. |
 | Build from source | `cargo build --release` | Development and audits. | Produces `target/release/rarcane`. |
 | Plugin | `claude plugin install plugins/rarcane` | Claude Code local plugin setup from this checkout. | Uses the packaged setup hook, skill, and monitor metadata. |
@@ -112,7 +112,7 @@ behavior only when testing packaging:
 ### Build From Source
 
 ```bash
-git clone https://github.com/jmagar/arcane-rmcp
+git clone https://github.com/jmagar/rarcane
 cd arcane-rmcp
 cargo build --release
 ./target/release/rarcane --help
@@ -377,7 +377,7 @@ CLI shim      (src/cli.rs)         argv -> service -> stdout
 - GitHub Releases publish the `rarcane` binary consumed by the npm launcher.
 - The npm package name is `arcane-rmcp`; the installed binary alias is
   `rarcane`.
-- Docker/OCI metadata uses `ghcr.io/jmagar/arcane-rmcp:<version>`.
+- Docker/OCI metadata uses `ghcr.io/jmagar/rarcane:<version>`.
 - `plugins/rarcane/.mcp.json` must launch `npx -y arcane-rmcp mcp` so stdio
   clients start the MCP transport rather than the HTTP server.
 - The root README is curated. Generated or source-of-truth details live in
@@ -451,14 +451,14 @@ gateway.
 ## Related Servers
 
 - [soma](https://github.com/jmagar/soma) - RMCP runtime for provider-backed MCP servers.
-- [unifi-rmcp](https://github.com/jmagar/unifi-rmcp) - UniFi controller REST API bridge.
-- [tailscale-rmcp](https://github.com/jmagar/tailscale-rmcp) - Tailscale API bridge for devices, users, and tailnet operations.
-- [unraid-rmcp](https://github.com/jmagar/unraid-rmcp) - Unraid GraphQL bridge for NAS and server management.
-- [apprise-rmcp](https://github.com/jmagar/apprise-rmcp) - Apprise notification fan-out bridge for many delivery backends.
-- [gotify-rmcp](https://github.com/jmagar/gotify-rmcp) - Gotify push notification bridge for sends, messages, apps, and clients.
+- [unifi-rmcp](https://github.com/jmagar/runifi) - UniFi controller REST API bridge.
+- [tailscale-rmcp](https://github.com/jmagar/rtailscale) - Tailscale API bridge for devices, users, and tailnet operations.
+- [unraid-rmcp](https://github.com/jmagar/runraid) - Unraid GraphQL bridge for NAS and server management.
+- [apprise-rmcp](https://github.com/jmagar/rapprise) - Apprise notification fan-out bridge for many delivery backends.
+- [gotify-rmcp](https://github.com/jmagar/rgotify) - Gotify push notification bridge for sends, messages, apps, and clients.
 - [yarr](https://github.com/jmagar/yarr) - Media-stack bridge for Sonarr, Radarr, Prowlarr, Plex, and related services.
-- [ytdl-rmcp](https://github.com/jmagar/ytdl-rmcp) - Media download and metadata workflow server.
-- [synapse-rmcp](https://github.com/jmagar/synapse-rmcp) - Local Synapse workflow server for scout and flux actions.
+- [ytdl-rmcp](https://github.com/jmagar/rytdl) - Media download and metadata workflow server.
+- [synapse-rmcp](https://github.com/jmagar/synapse) - Local Synapse workflow server for scout and flux actions.
 - [cortex](https://github.com/jmagar/cortex) - Syslog and homelab log aggregation MCP server.
 - [axon](https://github.com/jmagar/axon) - RAG, crawl, scrape, extract, and semantic search project.
 - [labby](https://github.com/jmagar/labby) - Homelab control plane and MCP gateway project.

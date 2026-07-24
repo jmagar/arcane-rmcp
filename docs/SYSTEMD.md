@@ -25,7 +25,7 @@ install -m 755 target/release/rarcane ~/.local/bin/rarcane
 Or use the install script:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/jmagar/arcane-rmcp/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/jmagar/rarcane/main/scripts/install.sh | bash
 ```
 
 The binary installs to `~/.local/bin/`. Verify it's in `$PATH`:

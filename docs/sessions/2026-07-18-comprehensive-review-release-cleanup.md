@@ -1,6 +1,6 @@
 ---
 date: 2026-07-18 20:17:48 EST
-repo: git@github.com:jmagar/arcane-rmcp.git
+repo: git@github.com:jmagar/rarcane.git
 branch: main
 head: a9ad118ae41098258737f843a9ab10d0415071f6
 working directory: /home/jmagar/workspace/arcane-rmcp
@@ -295,16 +295,16 @@ The obsolete PR #32 was closed rather than merged after its commits were compare
 
 ## References
 
-- [PR #24 — comprehensive review remediation](https://github.com/jmagar/arcane-rmcp/pull/24)
-- [PR #26 — npm package hardening](https://github.com/jmagar/arcane-rmcp/pull/26)
-- [PR #27 — no-MCP marketplace artifact](https://github.com/jmagar/arcane-rmcp/pull/27)
-- [PR #28 — v0.4.3 release correction](https://github.com/jmagar/arcane-rmcp/pull/28)
-- [PR #29 — v0.4.4 release](https://github.com/jmagar/arcane-rmcp/pull/29)
-- [PR #30 — Windows release tools](https://github.com/jmagar/arcane-rmcp/pull/30)
-- [PR #31 — draft owner token](https://github.com/jmagar/arcane-rmcp/pull/31)
-- [Release v0.4.2](https://github.com/jmagar/arcane-rmcp/releases/tag/v0.4.2)
-- [Release v0.4.3](https://github.com/jmagar/arcane-rmcp/releases/tag/v0.4.3)
-- [Release v0.4.4](https://github.com/jmagar/arcane-rmcp/releases/tag/v0.4.4)
+- [PR #24 — comprehensive review remediation](https://github.com/jmagar/rarcane/pull/24)
+- [PR #26 — npm package hardening](https://github.com/jmagar/rarcane/pull/26)
+- [PR #27 — no-MCP marketplace artifact](https://github.com/jmagar/rarcane/pull/27)
+- [PR #28 — v0.4.3 release correction](https://github.com/jmagar/rarcane/pull/28)
+- [PR #29 — v0.4.4 release](https://github.com/jmagar/rarcane/pull/29)
+- [PR #30 — Windows release tools](https://github.com/jmagar/rarcane/pull/30)
+- [PR #31 — draft owner token](https://github.com/jmagar/rarcane/pull/31)
+- [Release v0.4.2](https://github.com/jmagar/rarcane/releases/tag/v0.4.2)
+- [Release v0.4.3](https://github.com/jmagar/rarcane/releases/tag/v0.4.3)
+- [Release v0.4.4](https://github.com/jmagar/rarcane/releases/tag/v0.4.4)
 - Final repo-status evidence: `/tmp/arcane-rmcp-repo-status-final.json`
 
 ## Next Steps

@@ -9,37 +9,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
                Format: ## [X.Y.Z] — YYYY-MM-DD
                Use Added / Changed / Deprecated / Removed / Fixed / Security headers. -->
 
-## [0.4.4](https://github.com/jmagar/arcane-rmcp/compare/v0.4.3...v0.4.4) (2026-07-18)
+## [0.4.4](https://github.com/jmagar/rarcane/compare/v0.4.3...v0.4.4) (2026-07-18)
 
 
 ### Fixed
 
-* **release:** install LLVM archive tooling and NASM for Windows artifacts ([16d5873](https://github.com/jmagar/arcane-rmcp/commit/16d58738cc2db3137de2303bfbdebe6f85fc6e6d))
-* **release:** use the draft-owner token for asset staging and finalization ([e07a3a2](https://github.com/jmagar/arcane-rmcp/commit/e07a3a2d54e001ee7470cdef5ffb3e399d63ba64))
+* **release:** install LLVM archive tooling and NASM for Windows artifacts ([16d5873](https://github.com/jmagar/rarcane/commit/16d58738cc2db3137de2303bfbdebe6f85fc6e6d))
+* **release:** use the draft-owner token for asset staging and finalization ([e07a3a2](https://github.com/jmagar/rarcane/commit/e07a3a2d54e001ee7470cdef5ffb3e399d63ba64))
 
-## [0.4.3](https://github.com/jmagar/arcane-rmcp/compare/v0.4.2...v0.4.3) (2026-07-18)
+## [0.4.3](https://github.com/jmagar/rarcane/compare/v0.4.2...v0.4.3) (2026-07-18)
 
 ### Fixed
 
 * Build draft releases from an explicit source commit instead of a tag that does not exist yet.
 * Keep npm, Cargo, and MCP registry versions synchronized and fail closed on drift.
-* **ci:** allow cold multi-arch image builds ([061b30b](https://github.com/jmagar/arcane-rmcp/commit/061b30bc10f6d1176672333830f450f2e721775e))
-* **ci:** repair invalid action pins ([5115543](https://github.com/jmagar/arcane-rmcp/commit/511554333f5b40f81e5937e192c2eb60f689d993))
-* **ci:** upgrade Trivy scanner action ([eddf4ca](https://github.com/jmagar/arcane-rmcp/commit/eddf4ca44fc72e73e57f6bfa43a5a092c1908294))
-* **docker:** isolate multi-arch cargo caches ([38e281a](https://github.com/jmagar/arcane-rmcp/commit/38e281a26476bf55a6f4b7b629a57a3cd2630784))
+* **ci:** allow cold multi-arch image builds ([061b30b](https://github.com/jmagar/rarcane/commit/061b30bc10f6d1176672333830f450f2e721775e))
+* **ci:** repair invalid action pins ([5115543](https://github.com/jmagar/rarcane/commit/511554333f5b40f81e5937e192c2eb60f689d993))
+* **ci:** upgrade Trivy scanner action ([eddf4ca](https://github.com/jmagar/rarcane/commit/eddf4ca44fc72e73e57f6bfa43a5a092c1908294))
+* **docker:** isolate multi-arch cargo caches ([38e281a](https://github.com/jmagar/rarcane/commit/38e281a26476bf55a6f4b7b629a57a3cd2630784))
 
-## [0.4.2](https://github.com/jmagar/arcane-rmcp/compare/v0.4.1...v0.4.2) (2026-07-18)
+## [0.4.2](https://github.com/jmagar/rarcane/compare/v0.4.1...v0.4.2) (2026-07-18)
 
 
 ### Fixed
 
-* address lavra review findings ([56d53d8](https://github.com/jmagar/arcane-rmcp/commit/56d53d84156839c15659d985209785c4c54dbac7))
-* migrate MCP models to rmcp 2.2 ([a65ed85](https://github.com/jmagar/arcane-rmcp/commit/a65ed8532baf070f77180c6b9f4416fd2bf72a2d))
-* remediate comprehensive repository review ([de496d1](https://github.com/jmagar/arcane-rmcp/commit/de496d104a632feedcec0818256ac9fa698f94a3))
-* remediate comprehensive review findings ([5e6398d](https://github.com/jmagar/arcane-rmcp/commit/5e6398d96560c8f498e42059cc937447d32aef92))
-* route rust builds through sccache wrapper ([e9ceeb1](https://github.com/jmagar/arcane-rmcp/commit/e9ceeb17e59d45a512ae66c7d930a63d86cacc14))
-* update vulnerable cmov dependency ([b6bda37](https://github.com/jmagar/arcane-rmcp/commit/b6bda37a9457ee34c6e2b579902189214fa4a7a0))
-* validate staged npm release assets ([1c5a787](https://github.com/jmagar/arcane-rmcp/commit/1c5a7877f26278b404168520ae00d662de698e2b))
+* address lavra review findings ([56d53d8](https://github.com/jmagar/rarcane/commit/56d53d84156839c15659d985209785c4c54dbac7))
+* migrate MCP models to rmcp 2.2 ([a65ed85](https://github.com/jmagar/rarcane/commit/a65ed8532baf070f77180c6b9f4416fd2bf72a2d))
+* remediate comprehensive repository review ([de496d1](https://github.com/jmagar/rarcane/commit/de496d104a632feedcec0818256ac9fa698f94a3))
+* remediate comprehensive review findings ([5e6398d](https://github.com/jmagar/rarcane/commit/5e6398d96560c8f498e42059cc937447d32aef92))
+* route rust builds through sccache wrapper ([e9ceeb1](https://github.com/jmagar/rarcane/commit/e9ceeb17e59d45a512ae66c7d930a63d86cacc14))
+* update vulnerable cmov dependency ([b6bda37](https://github.com/jmagar/rarcane/commit/b6bda37a9457ee34c6e2b579902189214fa4a7a0))
+* validate staged npm release assets ([1c5a787](https://github.com/jmagar/rarcane/commit/1c5a7877f26278b404168520ae00d662de698e2b))
 
 ### Changed
 

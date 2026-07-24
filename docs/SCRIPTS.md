@@ -94,7 +94,7 @@ preflight() {
 
 One-line install:
 ```bash
-curl -fsSL https://raw.githubusercontent.com/jmagar/arcane-rmcp/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/jmagar/rarcane/main/scripts/install.sh | bash
 ```
 
 After install: `rarcane doctor` to validate the environment.

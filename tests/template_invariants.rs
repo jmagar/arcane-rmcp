@@ -86,11 +86,11 @@ fn production_deployment_is_authenticated_and_uses_the_published_image() {
     let env_example = read(".env.example");
 
     assert!(
-        compose.contains("ghcr.io/jmagar/arcane-rmcp:${RARCANE_MCP_VERSION:-latest}"),
+        compose.contains("ghcr.io/jmagar/rarcane:${RARCANE_MCP_VERSION:-latest}"),
         "production compose must consume the image published by CI"
     );
     assert!(
-        docker_workflow.contains("IMAGE_NAME: ghcr.io/jmagar/arcane-rmcp"),
+        docker_workflow.contains("IMAGE_NAME: ghcr.io/jmagar/rarcane"),
         "Docker workflow and production compose image names must match"
     );
     assert!(

@@ -4,9 +4,9 @@
   "title": "Arcane RMCP",
   "description": "Rust MCP server and CLI for Arcane Docker and container management.",
   "version": "0.4.4",
-  "websiteUrl": "https://github.com/jmagar/arcane-rmcp",
+  "websiteUrl": "https://github.com/jmagar/rarcane",
   "repository": {
-    "url": "https://github.com/jmagar/arcane-rmcp",
+    "url": "https://github.com/jmagar/rarcane",
     "source": "github",
     "id": "1247261735"
   },
@@ -68,8 +68,8 @@
           "format": "string",
           "isRequired": false,
           "isSecret": false,
-          "default": "jmagar/arcane-rmcp",
-          "placeholder": "jmagar/arcane-rmcp"
+          "default": "jmagar/rarcane",
+          "placeholder": "jmagar/rarcane"
         },
         {
           "name": "ARCANE_RMCP_RELEASE_BASE_URL",
@@ -103,7 +103,7 @@
       },
       "buildInfo": {
         "version": "0.4.4",
-        "repository": "https://github.com/jmagar/arcane-rmcp"
+        "repository": "https://github.com/jmagar/rarcane"
       }
     }
   }
